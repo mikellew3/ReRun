@@ -292,7 +292,7 @@ Users read public data and their own rows. Only jobs, with the service role key,
 
 ## 13. Front end (`web/`)
 
-Design: **GMDHC design system** — IBM Plex Sans + IBM Plex Mono, copper amber `#b45309`, dark terminal aesthetic, no gradients, no emoji. Mobile-first.
+Design: light background, plain system sans-serif font everywhere (no monospace or "terminal" fonts; use tabular numbers for aligned figures), copper amber `#b45309` accent, no gradients, no emoji. Mobile-first. (Mike's preference, replacing the original dark IBM Plex terminal look.)
 
 Pages:
 1. **Slate** — every game this week with market lines, weather, injury and role-change flags, and the house build's numbers; tap a game to open the Sim Lab

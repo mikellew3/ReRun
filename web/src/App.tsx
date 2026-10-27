@@ -239,7 +239,7 @@ export function App() {
     <div className="page">
       <header>
         <div className="brand">
-          RE<span>RUN</span>
+          Re<span>Run</span>
         </div>
         <div className="tagline">Every game, 10,000 times. Your way.</div>
       </header>
@@ -279,7 +279,7 @@ export function App() {
               </button>
             </div>
             {game && (
-              <div className="meta mono">
+              <div className="meta num">
                 {game.stadium.name} · {game.stadium.roof} · slate {snapshot.id} · engine{' '}
                 {ENGINE_VERSION}
               </div>
@@ -296,24 +296,24 @@ export function App() {
                 <div className="progress">
                   <div style={{ width: pct(agg.done / agg.total) }} />
                 </div>
-                <div className="meta mono">
+                <div className="meta num">
                   {agg.done.toLocaleString()} / {agg.total.toLocaleString()} sims ·{' '}
                   {(agg.elapsedMs / 1000).toFixed(1)}s · seed {seed}
                 </div>
                 <div className="score">
                   <div>
                     <div className="team">{game.away}</div>
-                    <div className="pts mono">{summary.away.toFixed(1)}</div>
-                    <div className="muted mono">win {pct(1 - summary.homeWin - summary.tie)}</div>
+                    <div className="pts num">{summary.away.toFixed(1)}</div>
+                    <div className="muted num">win {pct(1 - summary.homeWin - summary.tie)}</div>
                   </div>
                   <div className="at">@</div>
                   <div>
                     <div className="team">{game.home}</div>
-                    <div className="pts mono">{summary.home.toFixed(1)}</div>
-                    <div className="muted mono">win {pct(summary.homeWin)}</div>
+                    <div className="pts num">{summary.home.toFixed(1)}</div>
+                    <div className="muted num">win {pct(summary.homeWin)}</div>
                   </div>
                 </div>
-                <div className="stats mono">
+                <div className="stats num">
                   <span>
                     Home margin {(summary.home - summary.away).toFixed(1)} (median {summary.median})
                   </span>
@@ -344,7 +344,7 @@ export function App() {
 
               <section className="panel">
                 <h2>Player projections</h2>
-                <table className="mono">
+                <table className="num">
                   <thead>
                     <tr>
                       <th>Player</th>
@@ -358,7 +358,7 @@ export function App() {
                   <tbody>
                     {summary.players.map((p) => (
                       <tr key={p.id}>
-                        <td className="sans">
+                        <td>
                           {p.name} <span className="muted">{`${p.team} ${p.position}`}</span>
                         </td>
                         <td>{p.passYds ? (p.passYds / summary.n).toFixed(0) : '–'}</td>
@@ -377,8 +377,8 @@ export function App() {
 
           <section className="panel note small">
             Early preview with default model settings. Injuries, weather, altitude and rest are in
-            the model. Market lines, live forecasts, edges and the full Sim Lab controls are coming.
-            Injury reports update when teams publish them.
+            the model. Live weather forecasts are in. Market lines, edges and the full Sim Lab
+            controls are coming. Injury reports update when teams publish them.
           </section>
         </>
       )}
