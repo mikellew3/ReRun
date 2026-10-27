@@ -26,8 +26,8 @@ export const MODEL_CONFIG = {
     historyWindows: ['season', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8'],
     /** Season window: weight of a game halves every N games back. start */
     recencyHalfLifeGames: 8,
-    /** Ridge penalty for opponent adjustment. start */
-    ridgeLambda: 30,
+    /** Ridge penalty for opponent adjustment, in plays (one game is roughly 30-35 plays per unit). start */
+    ridgeLambdaPlays: 200,
     /** Fewer games than this in a window -> params for that window are omitted. */
     minTeamGamesPerWindow: 2,
     minPlayerGamesPerWindow: 2,
@@ -38,6 +38,30 @@ export const MODEL_CONFIG = {
     explosiveRunYds: 10,
     /** Expected pass-rate grid distance buckets (upper bounds, yards). Last bucket = longer. */
     passRateDistanceBuckets: [2, 4, 7, 10, 15],
+    /** Field zones, in yards from the opponent's goal line. */
+    redZoneYardline: 20,
+    goalLineYardline: 5,
+    /** "Neutral" game state for pace, PROE and the pass-rate grid. */
+    neutral: { wpMin: 0.2, wpMax: 0.8, maxQuarter: 3 },
+    /** Gaps between snaps longer than this (seconds) are not pace (injuries, reviews). */
+    paceMaxGapSec: 60,
+    /** Integer-yard histogram ranges [min, max]; values outside go to the end bins. */
+    histograms: {
+      completionYds: [-10, 99],
+      runYds: [-10, 99],
+      scrambleYds: [-5, 99],
+      sackYds: [-25, 0],
+      puntNetYds: [-10, 80],
+      kickoffStartYardline: [1, 99],
+    },
+    /** Punts used for the net-yards histogram: snapped at least this far from the opponent goal. */
+    puntHistogramMinYardline: 60,
+    /** Kicks shorter than this are treated as onside or squib attempts and left out. */
+    kickoffMinDistance: 40,
+    /** A player whose playProb is below this counts as "out" for starter-injury counts. */
+    starterOutPlayProb: 0.5,
+    /** Decimal places for floats written to the snapshot (size). */
+    snapshotDecimals: 4,
   },
 
   /** Shrinkage toward league average: adjusted = (n*observed + k*league) / (n + k). */

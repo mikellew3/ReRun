@@ -1,6 +1,6 @@
 # Phase 1, steps 1–3 — proposal for review
 
-Status: **approved by Mike, 2026-10-27.** Step 1 implemented.
+Status: **approved by Mike, 2026-10-27.** Steps 1 and 2 implemented.
 
 ### Changes made while implementing step 1
 
@@ -9,6 +9,17 @@ Status: **approved by Mike, 2026-10-27.** Step 1 implemented.
 - **`side` added to `MarketLine` and `CustomLine`** for team totals (which team's total).
 - **`ENGINE_VERSION` is a hand-bumped version** in `engine/src/version.ts`. A golden-output test (step 3) will fail if sim output changes without a bump.
 - **Python config loader and its test moved into step 1** (`pipeline/common/config.py`, `pipeline/tests/test_model_config.py`) so the Python CI job has something to run.
+
+### Changes made while implementing step 2
+
+- **`LeagueParams.kickReturnYds` renamed `kickoffStartYardline`** (where the receiving team starts after a returned kickoff, which is what the engine needs), and a **`specialTeams` block** added (kickoff/punt touchback and return-TD rates, FG block rate).
+- **Fitting constants added to `model.config.ts`** (`fitting.*`: red-zone and goal-line lines, neutral game state, pace gap cap, histogram ranges, punt/kickoff filters, rounding). `ridgeLambda` became `ridgeLambdaPlays: 200`, with its unit stated.
+- **Opponent adjustment method:** one ridge regression per rate over the season window gives each team's offense and defense effect; each game is then adjusted by the opponent's effect and averaged over the chosen history window. This lets every window (season, L3–L8) reuse one fit.
+- **`L3`–`L8` windows cross into the prior season** when a team or player has fewer games this season, so they always have data.
+- **`routeShare` is snap share** for now: free nflverse data has no route counts.
+- **`replacementDelta` is filled for QBs only** in step 2. Skill-position replacement comes with injuries in step 5.
+- **Depth charts:** ESPN-format charts (2025+) are used directly. Older seasons fall back to ordering by snap share, which the 2022–2024 backtest will rely on.
+- **Injury status is never carried over from last week.** Until the current week's report exists, players are `active`.
 
 Contents:
 1. Decisions that need a yes/no

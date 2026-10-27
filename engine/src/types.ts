@@ -241,13 +241,26 @@ export interface LeagueParams {
   scrambleYds: YardHistogram;
   sackYds: YardHistogram;
   puntNetYds: YardHistogram;
-  kickReturnYds: YardHistogram;
+  /** Receiving team's starting yardline after a returned kickoff (no touchback). */
+  kickoffStartYardline: YardHistogram;
   /** League average, same fields as a team unit. */
   rates: UnitParams;
   /** Expected pass rate grid [down - 1][distance bucket]; buckets defined in config. */
   passRateByDownDist: number[][];
   /** League average; the shrinkage target. */
   dvp: DefVsPos;
+  specialTeams: LeagueSpecialTeams;
+}
+
+export interface LeagueSpecialTeams {
+  /** Per kickoff (excluding onside/squib). */
+  kickoffTouchbackRate: number;
+  kickoffReturnTdRate: number;
+  /** Per punt. */
+  puntReturnTdRate: number;
+  puntTouchbackRate: number;
+  /** Per field-goal attempt. */
+  fgBlockRate: number;
 }
 
 export interface TeamForm {

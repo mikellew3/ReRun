@@ -1,6 +1,6 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "3c010050c557afb2",
+  "configHash": "3c33cfc911c03012",
   "engineVersion": "0.1.0",
   "model": {
     "configVersion": 1,
@@ -15,7 +15,7 @@
         "L8"
       ],
       "recencyHalfLifeGames": 8,
-      "ridgeLambda": 30,
+      "ridgeLambdaPlays": 200,
       "minTeamGamesPerWindow": 2,
       "minPlayerGamesPerWindow": 2,
       "priorSeasonCarryoverGames": 4,
@@ -27,7 +27,45 @@
         7,
         10,
         15
-      ]
+      ],
+      "redZoneYardline": 20,
+      "goalLineYardline": 5,
+      "neutral": {
+        "wpMin": 0.2,
+        "wpMax": 0.8,
+        "maxQuarter": 3
+      },
+      "paceMaxGapSec": 60,
+      "histograms": {
+        "completionYds": [
+          -10,
+          99
+        ],
+        "runYds": [
+          -10,
+          99
+        ],
+        "scrambleYds": [
+          -5,
+          99
+        ],
+        "sackYds": [
+          -25,
+          0
+        ],
+        "puntNetYds": [
+          -10,
+          80
+        ],
+        "kickoffStartYardline": [
+          1,
+          99
+        ]
+      },
+      "puntHistogramMinYardline": 60,
+      "kickoffMinDistance": 40,
+      "starterOutPlayProb": 0.5,
+      "snapshotDecimals": 4
     },
     "shrinkage": {
       "dvpTargetsK": 60,

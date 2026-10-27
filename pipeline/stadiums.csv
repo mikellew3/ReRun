@@ -1,0 +1,44 @@
+stadium_id,name,aliases,teams,lat,lon,roof,surface,altitude_ft,tz
+ATL97,Mercedes-Benz Stadium,,ATL,33.7554,-84.4008,retractable,turf,1050,America/New_York
+BAL00,M&T Bank Stadium,,BAL,39.2780,-76.6227,outdoors,grass,30,America/New_York
+BOS00,Gillette Stadium,,NE,42.0909,-71.2643,outdoors,turf,290,America/New_York
+BUF00,Highmark Stadium,New Era Field,BUF,42.7738,-78.7870,outdoors,grass,600,America/New_York
+CAR00,Bank of America Stadium,,CAR,35.2258,-80.8528,outdoors,grass,750,America/New_York
+CHI98,Soldier Field,,CHI,41.8623,-87.6167,outdoors,grass,600,America/Chicago
+CIN00,Paycor Stadium,,CIN,39.0955,-84.5161,outdoors,turf,490,America/New_York
+CLE00,Huntington Bank Field,FirstEnergy Stadium,CLE,41.5061,-81.6995,outdoors,grass,580,America/New_York
+DAL00,AT&T Stadium,,DAL,32.7473,-97.0945,retractable,turf,600,America/Chicago
+DEN00,Empower Field at Mile High,,DEN,39.7439,-105.0201,outdoors,grass,5280,America/Denver
+DET00,Ford Field,,DET,42.3400,-83.0456,dome,turf,600,America/Detroit
+GNB00,Lambeau Field,,GB,44.5013,-88.0622,outdoors,grass,640,America/Chicago
+HOU00,NRG Stadium,Reliant Stadium,HOU,29.6847,-95.4107,retractable,turf,50,America/Chicago
+IND00,Lucas Oil Stadium,,IND,39.7601,-86.1639,retractable,turf,715,America/Indiana/Indianapolis
+JAX00,EverBank Stadium,TIAA Bank Stadium,JAX,30.3239,-81.6373,outdoors,grass,20,America/New_York
+KAN00,GEHA Field at Arrowhead Stadium,Arrowhead Stadium,KC,39.0489,-94.4839,outdoors,grass,860,America/Chicago
+LAX01,SoFi Stadium,,LA|LAC,33.9535,-118.3392,dome,turf,100,America/Los_Angeles
+MIA00,Hard Rock Stadium,,MIA,25.9580,-80.2389,outdoors,grass,10,America/New_York
+MIN01,U.S. Bank Stadium,,MIN,44.9737,-93.2577,dome,turf,830,America/Chicago
+NAS00,Nissan Stadium,,TEN,36.1665,-86.7713,outdoors,grass,400,America/Chicago
+NOR00,Caesars Superdome,Mercedes-Benz Superdome,NO,29.9511,-90.0812,dome,turf,10,America/Chicago
+NYC01,MetLife Stadium,,NYG|NYJ,40.8135,-74.0745,outdoors,turf,10,America/New_York
+PHI00,Lincoln Financial Field,,PHI,39.9008,-75.1675,outdoors,grass,30,America/New_York
+PHO00,State Farm Stadium,,ARI,33.5276,-112.2626,retractable,grass,1070,America/Phoenix
+PIT00,Acrisure Stadium,,PIT,40.4468,-80.0158,outdoors,grass,730,America/New_York
+SEA00,Lumen Field,,SEA,47.5952,-122.3316,outdoors,turf,20,America/Los_Angeles
+SFO01,Levi's Stadium,,SF,37.4030,-121.9700,outdoors,grass,10,America/Los_Angeles
+TAM00,Raymond James Stadium,,TB,27.9759,-82.5033,outdoors,grass,30,America/New_York
+VEG00,Allegiant Stadium,,LV,36.0909,-115.1833,dome,grass,2030,America/Los_Angeles
+WAS00,Northwest Stadium,FedExField,WAS,38.9078,-76.8645,outdoors,grass,200,America/New_York
+LON00,Wembley Stadium,,,51.5560,-0.2796,outdoors,grass,150,Europe/London
+LON02,Tottenham Hotspur Stadium,Tottenham Stadium,,51.6043,-0.0665,outdoors,grass,100,Europe/London
+FRA00,Deutsche Bank Park,,,50.0686,8.6455,outdoors,grass,360,Europe/Berlin
+MUN01,Allianz Arena,FC Bayern Munich Stadium,,48.2188,11.6247,outdoors,grass,1700,Europe/Berlin
+GER00,Allianz Arena,,,48.2188,11.6247,outdoors,grass,1700,Europe/Berlin
+BER00,Olympiastadion Berlin,Olympiastadion,,52.5147,13.2395,outdoors,grass,160,Europe/Berlin
+DUB00,Croke Park,,,53.3607,-6.2511,outdoors,grass,30,Europe/Dublin
+PAR00,Stade de France,,,48.9245,2.3602,outdoors,grass,150,Europe/Paris
+MAD01,Santiago Bernabeu,Bernabeu,,40.4531,-3.6883,retractable,turf,2150,Europe/Madrid
+MEX00,Estadio Banorte,Estadio Azteca,,19.3029,-99.1505,outdoors,grass,7200,America/Mexico_City
+SAO00,Arena Corinthians,Neo Quimica Arena,,-23.5453,-46.4742,outdoors,grass,2500,America/Sao_Paulo
+RIO00,Maracana Stadium,Maracana,,-22.9122,-43.2302,outdoors,grass,30,America/Sao_Paulo
+MEL00,Melbourne Cricket Ground,MCG,,-37.8200,144.9834,outdoors,grass,100,Australia/Melbourne
