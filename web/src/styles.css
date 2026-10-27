@@ -193,13 +193,60 @@ button:disabled {
   fill: var(--accent);
 }
 
-.axis {
-  display: flex;
-  justify-content: space-between;
+.marker {
+  stroke: var(--text);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.ticks {
+  position: relative;
+  height: 20px;
   font-variant-numeric: tabular-nums;
   font-size: 13px;
   color: var(--muted);
   margin-top: 4px;
+}
+
+.ticks span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.sides {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.buckets {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 4px;
+}
+
+.buckets div {
+  flex: 1 1 0;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.buckets strong {
+  font-size: 17px;
+}
+
+.buckets span {
+  font-size: 13px;
+  color: var(--muted);
 }
 
 table {

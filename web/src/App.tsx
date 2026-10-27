@@ -110,6 +110,26 @@ function GameFactors({ snapshot, game }: { snapshot: SlateSnapshot; game: Snapsh
   );
 }
 
+/** Share of sims where the value satisfies `test`. */
+function shareWhere(counts: Record<number, number>, n: number, test: (x: number) => boolean) {
+  let k = 0;
+  for (const [x, c] of Object.entries(counts)) if (test(Number(x))) k += c;
+  return k / Math.max(1, n);
+}
+
+/** Value at quantile q of a count table. */
+function quantile(counts: Record<number, number>, n: number, q: number): number {
+  const xs = Object.keys(counts)
+    .map(Number)
+    .sort((a, b) => a - b);
+  let seen = 0;
+  for (const x of xs) {
+    seen += counts[x]!;
+    if (seen >= q * n) return x;
+  }
+  return xs[xs.length - 1] ?? 0;
+}
+
 function Histogram(props: {
   counts: Record<number, number>;
   from: number;
@@ -117,11 +137,15 @@ function Histogram(props: {
   n: number;
   highlight?: (x: number) => boolean;
   label: (x: number) => string;
+  ticks: number[];
+  /** Vertical reference lines (e.g. 0 margin, median total). */
+  markers?: number[];
 }) {
-  const { counts, from, to, n, highlight, label } = props;
+  const { counts, from, to, n, highlight, label, ticks, markers = [] } = props;
   const xs = Array.from({ length: to - from + 1 }, (_, i) => from + i);
   const max = Math.max(1, ...xs.map((x) => counts[x] ?? 0));
   const w = 100 / xs.length;
+  const center = (x: number) => (x - from + 0.5) * w;
   return (
     <div className="hist">
       <svg viewBox="0 0 100 40" preserveAspectRatio="none" role="img">
@@ -140,13 +164,106 @@ function Histogram(props: {
             </rect>
           );
         })}
+        {markers.map((m) => (
+          <line
+            key={m}
+            x1={center(m)}
+            x2={center(m)}
+            y1={0}
+            y2={40}
+            className="marker"
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
       </svg>
-      <div className="axis">
-        <span>{label(from)}</span>
-        <span>{label(Math.round((from + to) / 2))}</span>
-        <span>{label(to)}</span>
+      <div className="ticks">
+        {ticks.map((t) => (
+          <span key={t} style={{ left: `${center(t)}%` }}>
+            {label(t)}
+          </span>
+        ))}
       </div>
     </div>
+  );
+}
+
+function MarginChart(props: {
+  counts: Record<number, number>;
+  n: number;
+  home: string;
+  away: string;
+}) {
+  const { counts, n, home, away } = props;
+  const buckets = [
+    { label: `${away} by 8+`, p: shareWhere(counts, n, (m) => m <= -8) },
+    { label: `${away} by 1–7`, p: shareWhere(counts, n, (m) => m < 0 && m > -8) },
+    { label: 'Tie', p: shareWhere(counts, n, (m) => m === 0) },
+    { label: `${home} by 1–7`, p: shareWhere(counts, n, (m) => m > 0 && m < 8) },
+    { label: `${home} by 8+`, p: shareWhere(counts, n, (m) => m >= 8) },
+  ].filter((b) => b.label !== 'Tie' || b.p >= 0.005);
+  return (
+    <>
+      <div className="sides">
+        <span>← {away} wins</span>
+        <span>{home} wins →</span>
+      </div>
+      <Histogram
+        counts={counts}
+        from={-35}
+        to={35}
+        n={n}
+        highlight={(x) => KEY_NUMBERS.has(Math.abs(x))}
+        label={(x) => (x === 0 ? 'Even' : String(Math.abs(x)))}
+        ticks={[-28, -21, -14, -7, 0, 7, 14, 21, 28]}
+        markers={[0]}
+      />
+      <div className="buckets num">
+        {buckets.map((b) => (
+          <div key={b.label}>
+            <strong>{pct(b.p)}</strong>
+            <span>{b.label}</span>
+          </div>
+        ))}
+      </div>
+      <p className="muted small">
+        Each bar is one final margin; taller means more likely. Orange bars are 3, 6, 7, 10 and 14
+        points, the margins football games end on most often.
+      </p>
+    </>
+  );
+}
+
+function TotalChart(props: { counts: Record<number, number>; n: number }) {
+  const { counts, n } = props;
+  const median = quantile(counts, n, 0.5);
+  const low = quantile(counts, n, 0.25);
+  const high = quantile(counts, n, 0.75);
+  const mid = Math.floor(median) + 0.5;
+  const lines = [mid - 7, mid, mid + 7];
+  return (
+    <>
+      <Histogram
+        counts={counts}
+        from={10}
+        to={80}
+        n={n}
+        label={String}
+        ticks={[20, 30, 40, 50, 60, 70]}
+        markers={[median]}
+      />
+      <div className="buckets num">
+        {lines.map((l) => (
+          <div key={l}>
+            <strong>{pct(shareWhere(counts, n, (t) => t > l))}</strong>
+            <span>Over {l}</span>
+          </div>
+        ))}
+      </div>
+      <p className="muted small">
+        Combined points for both teams. The line marks the middle game ({median} points); half of
+        games land between {low} and {high}.
+      </p>
+    </>
   );
 }
 
@@ -315,31 +432,22 @@ export function App() {
                 </div>
                 <div className="stats num">
                   <span>
-                    Home margin {(summary.home - summary.away).toFixed(1)} (median {summary.median})
+                    {summary.home >= summary.away ? game.home : game.away} by{' '}
+                    {Math.abs(summary.home - summary.away).toFixed(1)} on average
                   </span>
-                  <span>Total {(summary.home + summary.away).toFixed(1)}</span>
+                  <span>{(summary.home + summary.away).toFixed(1)} total points</span>
                   <span>Tie {pct(summary.tie)}</span>
                 </div>
               </section>
 
               <section className="panel">
-                <h2>
-                  Margin ({game.home} − {game.away})
-                </h2>
-                <Histogram
-                  counts={agg.margins}
-                  from={-35}
-                  to={35}
-                  n={summary.n}
-                  highlight={(x) => KEY_NUMBERS.has(Math.abs(x))}
-                  label={(x) => (x > 0 ? `+${x}` : `${x}`)}
-                />
-                <p className="muted small">Highlighted: key numbers 3, 6, 7, 10, 14.</p>
+                <h2>Who wins, and by how much</h2>
+                <MarginChart counts={agg.margins} n={summary.n} home={game.home} away={game.away} />
               </section>
 
               <section className="panel">
                 <h2>Total points</h2>
-                <Histogram counts={agg.totals} from={10} to={80} n={summary.n} label={String} />
+                <TotalChart counts={agg.totals} n={summary.n} />
               </section>
 
               <section className="panel">
