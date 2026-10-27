@@ -4,3 +4,4 @@ pipeline/
 CLAUDE.md
 docs/
 engine/test/fixtures/
+web/public/snapshots/
