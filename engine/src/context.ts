@@ -6,7 +6,7 @@
 import type { GameInputs, OffenseUnit } from './applySettings';
 import { MODEL_CONFIG } from './config/model.config';
 import type { Rng } from './rng';
-import type { GameState, PlayOutcome, PlayRecord, Side } from './types';
+import type { GameState, PlayOutcome, PlayerId, PlayRecord, Side } from './types';
 
 export const other = (side: Side): Side => (side === 'home' ? 'away' : 'home');
 
@@ -60,6 +60,8 @@ export interface GameCtx {
   /** Set when the next kickoff is a free kick after a safety. */
   safetyKick: boolean;
   firstHalf: Record<Side, number> | null;
+  /** Questionable/doubtful players this sim drew as not playing. */
+  sittingOut: PlayerId[];
   /** Filled only when replaying one game. */
   record: PlayRecord[] | null;
 }

@@ -181,26 +181,66 @@ def calibration_games(sched: pd.DataFrame, weeks: list[int]) -> list[dict]:
     ]
 
 
-def player_games(pbp: pd.DataFrame, game_ids: set[str]) -> dict:
-    """Actual per-player lines in the calibration games, for player-level checks of the engine
-    (jobs/checkAdjustments.ts): targets, catches, receiving yards, designed carries, rushing
-    yards on them."""
-    p = pbp[pbp["game_id"].isin(game_ids)]
-    att = p[p["is_attempt"] & p["receiver_player_id"].notna()]
-    rec = att.groupby(["game_id", "receiver_player_id"]).agg(
-        targets=("is_attempt", "size"),
-        rec=("is_complete", "sum"),
-        recYds=("yards_gained", lambda y: float(y[att.loc[y.index, "is_complete"]].sum())),
+SKILL = ["QB", "RB", "FB", "WR", "TE"]
+BOX_FIELDS = [
+    "passAtt", "passCmp", "passYds", "passTd", "passInt",
+    "carries", "rushYds", "rushTd", "targets", "rec", "recYds", "recTd",
+]  # fmt: skip
+
+
+def player_games(pbp: pd.DataFrame, sched: pd.DataFrame, seasons: list[int]) -> dict:
+    """Box scores for the calibration games, for player-level and prop checks
+    (jobs/checkAdjustments.ts, jobs/checkProps.ts). Counted the way official box scores (and
+    prop markets) count them, which is also how the engine counts them: rushing includes
+    scrambles and kneels; passing yards exclude sacks. Every active skill player (weekly
+    roster status ACT) is listed, with zeros if he recorded nothing, so "played but did
+    nothing" is not confused with "did not play"."""
+    games = sched.set_index("game_id")
+    p = pbp[pbp["game_id"].isin(games.index) & ~pbp["two_point_attempt"]]
+    att = p[p["is_attempt"]]
+    runs = p[p["play_type"].isin(["run", "qb_kneel"]) & p["rusher_player_id"].notna()]
+    comp = att[att["is_complete"]]
+    parts = {
+        "passAtt": att.groupby(["game_id", "passer_id"]).size(),
+        "passCmp": comp.groupby(["game_id", "passer_id"]).size(),
+        "passYds": comp.groupby(["game_id", "passer_id"])["yards_gained"].sum(),
+        "passTd": comp[comp["offense_td"]].groupby(["game_id", "passer_id"]).size(),
+        "passInt": att[att["is_int"]].groupby(["game_id", "passer_id"]).size(),
+        "carries": runs.groupby(["game_id", "rusher_player_id"]).size(),
+        "rushYds": runs.groupby(["game_id", "rusher_player_id"])["yards_gained"].sum(),
+        "rushTd": runs[runs["offense_td"]].groupby(["game_id", "rusher_player_id"]).size(),
+        "targets": att[att["receiver_player_id"].notna()]
+        .groupby(["game_id", "receiver_player_id"])
+        .size(),
+        "rec": comp.groupby(["game_id", "receiver_player_id"]).size(),
+        "recYds": comp.groupby(["game_id", "receiver_player_id"])["yards_gained"].sum(),
+        "recTd": comp[comp["offense_td"]].groupby(["game_id", "receiver_player_id"]).size(),
+    }
+    for v in parts.values():
+        v.index.names = ["game_id", "player_id"]
+    box = pd.DataFrame(parts).fillna(0)
+
+    rost = read_raw(
+        "rosters_weekly",
+        seasons,
+        columns=["season", "week", "team", "gsis_id", "position", "status"],
     )
-    runs = p[p["is_designed_run"] & p["rusher_player_id"].notna()]
-    rush = runs.groupby(["game_id", "rusher_player_id"]).agg(
-        carries=("is_designed_run", "size"), rushYds=("yards_gained", "sum")
-    )
-    rec.index.names = rush.index.names = ["game_id", "player_id"]
-    lines = rec.join(rush, how="outer").fillna(0)
+    rost = rost[(rost["status"] == "ACT") & rost["position"].isin(SKILL) & rost["gsis_id"].notna()]
     out: dict = {}
-    for (gid, pid), r in lines.iterrows():
-        out.setdefault(gid, {})[pid] = {k: round(float(v), 1) for k, v in r.items()}
+    for gid, g in games.iterrows():
+        active = rost[
+            (rost["season"] == g["season"])
+            & (rost["week"] == g["week"])
+            & rost["team"].isin([g["home_team"], g["away_team"]])
+        ]["gsis_id"]
+        ids = set(active) | set(box.loc[gid].index if gid in box.index.get_level_values(0) else [])
+        lines = {}
+        for pid in sorted(ids):
+            row = box.loc[(gid, pid)] if (gid, pid) in box.index else None
+            lines[pid] = {
+                k: (round(float(row[k]), 1) if row is not None else 0.0) for k in BOX_FIELDS
+            }
+        out[gid] = lines
     return out
 
 
@@ -212,10 +252,12 @@ def main() -> None:
 
     sched = read_raw("schedules", args.seasons)
     sched = sched[(sched["game_type"] == "REG") & sched["result"].notna()]
-    extra = ["touchdown", "score_differential", "quarter_seconds_remaining"]
+    extra = ["touchdown", "td_team", "score_differential", "quarter_seconds_remaining"]
     pbp = read_raw("pbp", args.seasons, columns=[*PBP_COLUMNS, *extra])
     pbp = pbp[pbp["season_type"] == "REG"]
     pbp["touchdown"] = pbp["touchdown"].fillna(0).astype(int)
+    # Touchdowns scored by the offense (not fumble/interception returns), for box scores.
+    pbp["offense_td"] = (pbp["touchdown"] == 1) & (pbp["td_team"] == pbp["posteam"])
     pbp = add_flags(pbp)
     events = event_targets(pbp)
     late_drives = late_drive_targets(pbp)
@@ -234,7 +276,8 @@ def main() -> None:
     }
     write_json(OUT, targets)
     games = {g["gameId"] for g in targets["calibrationGames"]}
-    raw = json.dumps(player_games(pbp, games), separators=(",", ":")).encode()
+    in_set = sched[sched["game_id"].isin(games)]
+    raw = json.dumps(player_games(pbp, in_set, args.seasons), separators=(",", ":")).encode()
     OUT.with_name("player_games.json.gz").write_bytes(gzip.compress(raw, 9, mtime=0))
     print(
         f"Wrote {OUT}: {targets['game']['games']} games, "

@@ -508,6 +508,11 @@ export interface SimGameResult {
   team: Record<Side, TeamGameLine>;
   /** Players who recorded anything. */
   players: PlayerGameLine[];
+  /**
+   * Questionable/doubtful players this sim drew as not playing. Prop bets on a player who
+   * doesn't play are void, so prop pricing skips these sims for him.
+   */
+  sittingOut: PlayerId[];
 }
 
 // ---------------------------------------------------------------------------

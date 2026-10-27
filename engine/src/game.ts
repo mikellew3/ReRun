@@ -86,6 +86,7 @@ function buildResult(ctx: GameCtx, simIndex: number): SimGameResult {
     plays: st.plays,
     team: { home: { ...st.team.home }, away: { ...st.team.away } },
     players,
+    sittingOut: ctx.sittingOut,
   };
 }
 
@@ -112,6 +113,11 @@ export function createGameCtx(inputs: GameInputs, simIndex: number, record = fal
     stats: new GameStats(inputs.playerIds.length),
     safetyKick: false,
     firstHalf: null,
+    sittingOut: (['home', 'away'] as const).flatMap((side) =>
+      inputs.teams[side].uncertain
+        .filter((u) => !availability[side].available.has(u.idx))
+        .map((u) => inputs.playerIds[u.idx]!),
+    ),
     record: record ? [] : null,
   };
   return ctx;
