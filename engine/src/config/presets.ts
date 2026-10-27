@@ -33,20 +33,19 @@ export const PRESETS: readonly Preset[] = deepFreeze([
     'The house build. Even blend of model and market, season-long history.',
     {},
   ),
-  preset(
-    'sharp',
-    'Sharp',
-    'Leans on the market, uses season-long history and moderate matchup effects.',
-    { marketBlend: 0.8, historyWindow: 'season', matchupWeight: 0.7 },
-  ),
+  preset('sharp', 'Sharp', 'Leans on the market and season-long history.', {
+    marketBlend: 0.8,
+    historyWindow: 'season',
+  }),
   preset('pure-model', 'Pure Model', 'Ignores market prices entirely. Model numbers only.', {
     marketBlend: 0,
   }),
-  preset('hot-hand', 'Hot Hand', 'Recent form: last 4 games only, streaks on.', {
-    marketBlend: 0.3,
-    historyWindow: 'L4',
-    streaks: true,
-  }),
+  preset(
+    'hot-hand',
+    'Hot Hand',
+    'Recent form: last 4 games only, streaks and defense-vs-position matchups on.',
+    { marketBlend: 0.3, historyWindow: 'L4', streaks: true, matchupWeight: 1 },
+  ),
   preset(
     'weatherman',
     'Weatherman',

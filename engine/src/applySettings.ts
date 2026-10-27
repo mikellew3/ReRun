@@ -12,10 +12,30 @@
  * and doubtful players are drawn per sim with their play probability; the offense built for
  * each in/out combination is cached.
  *
- * Situational adjustments (weather, rest, matchup, injuries' efficiency effects) plug in here
- * in step 5.
+ * Situational adjustments (adjust/): each is a pure function, switchable from SimSettings.
+ * - Points of advantage per team (home field, altitude, rest/travel, streaks) become offense and
+ *   defense efficiency shifts, half each, through config.pointsToEfficiency.
+ * - Weather changes completion odds, yards and FG odds.
+ * - Injuries: backup-QB level for QB swaps, OL/secondary starters out, position-aware
+ *   reallocation of an out player's usage.
+ * - Matchups: defense-vs-position multipliers on receivers' targets and yards.
  */
 
+import {
+  lineInjuryEffects,
+  NO_QB_DELTAS,
+  qbSwapDeltas,
+  redistributeOutShares,
+} from './adjust/injuries';
+import type { LineEffects } from './adjust/injuries';
+import { dvpMultipliers } from './adjust/matchup';
+import type { DvpMultiplier } from './adjust/matchup';
+import { restPts, travelPts } from './adjust/rest';
+import { streakPts } from './adjust/form';
+import { altitudePts, homeFieldPts, ZERO_PTS } from './adjust/venue';
+import type { SidePts } from './adjust/venue';
+import { NO_WEATHER, resolveConditions, weatherEffects } from './adjust/weather';
+import type { ResolvedConditions, WeatherEffects } from './adjust/weather';
 import { MODEL_CONFIG } from './config/model.config';
 import { parseRunRequest } from './config/settings.schema';
 import type { GameOverrides, RunRequest, SimSettings } from './config/settings.schema';
@@ -29,14 +49,16 @@ import {
   combineRates,
   logit,
   standardNormal,
+  tiltForMeanShift,
+  tiltedMean,
 } from './samplers';
 import type {
+  DvpBucket,
   HistoryWindow,
   LeagueParams,
   PlayerEntry,
   PlayerId,
   PlayerParams,
-  Precip,
   Side,
   SlateSnapshot,
   SnapshotGame,
@@ -54,12 +76,25 @@ const RUSHER_POSITIONS = new Set(['RB', 'FB', 'WR', 'TE']);
 // Types
 // ---------------------------------------------------------------------------
 
-export interface ResolvedConditions {
-  /** true for domes and closed roofs: weather has no effect. */
-  indoor: boolean;
-  windMph: number;
-  tempF: number;
-  precip: Precip;
+export type { ResolvedConditions, WeatherEffects };
+
+/** Points of advantage by source, per team, and what was applied to each offense. */
+export interface AdjustmentSummary {
+  pts: Record<
+    Side,
+    {
+      homeField: number;
+      altitude: number;
+      rest: number;
+      travel: number;
+      streaks: number;
+      total: number;
+    }
+  >;
+  weather: WeatherEffects;
+  lines: Record<Side, LineEffects>;
+  /** Per receiver bucket, for each side's offense against the other defense. */
+  matchup: Record<Side, Record<DvpBucket, DvpMultiplier>>;
 }
 
 /** One team's offense against the other team's defense, for one in/out combination. */
@@ -97,6 +132,9 @@ export interface OffenseUnit {
   rzRusherYds: ShiftedSamplers;
   /** -1 = none available. */
   kicker: number;
+  /** Added to the FG make logit: flat, and per yard of kick distance (weather). */
+  fgLogit: number;
+  fgLogitPerYard: number;
   punter: number;
   fgMakeShift: number;
   xpRate: number;
@@ -120,7 +158,8 @@ export interface TeamSetup {
   team: string;
   entry: TeamEntry;
   params: TeamParams;
-  /** Points of advantage given to this team's offense (home field etc.). */
+  /** Points of efficiency shift for this team's offense: half its own advantage (home field,
+   *  rest...) minus half the opponent's. */
   ptsShift: number;
   players: PlayerRef[];
   /** Global player indexes whose availability is drawn per sim, with play probabilities. */
@@ -139,6 +178,8 @@ export interface GameInputs {
   league: LeagueParams;
   teams: Record<Side, TeamSetup>;
   conditions: ResolvedConditions;
+  weather: WeatherEffects;
+  adjustments: AdjustmentSummary;
   sackYds: YardSampler;
   scrambleYds: YardSampler;
   puntNetYds: YardSampler;
@@ -159,26 +200,35 @@ function paramsFor(entry: PlayerEntry, window: HistoryWindow): PlayerParams | un
   return entry.params[window] ?? entry.params.season;
 }
 
-function resolveConditions(game: SnapshotGame, o: GameOverrides): ResolvedConditions {
-  const roof = game.stadium.roof;
-  const roofState = o.conditions.roof ?? game.weather?.roofExpected ?? null;
-  const indoor = roof === 'dome' || (roof === 'retractable' && roofState !== 'open');
-  return {
-    indoor,
-    windMph: o.conditions.windMph ?? game.weather?.windMph ?? 0,
-    tempF: o.conditions.tempF ?? game.weather?.tempF ?? 60,
-    precip: o.conditions.precip ?? game.weather?.precip ?? 'none',
-  };
-}
-
-/** Home-field advantage in points, per side's offense. Split evenly offense/defense. */
-function homeFieldShift(game: SnapshotGame, settings: SimSettings, venue: GameOverrides['venue']) {
-  const hfa = settings.lenses.homeFieldPts;
-  if (venue === 'neutral' || (venue === 'scheduled' && game.neutralSite)) {
-    return { home: 0, away: 0 };
+/** Each team's points of advantage, by source. */
+function advantagePts(
+  game: SnapshotGame,
+  settings: SimSettings,
+  overrides: GameOverrides,
+  teams: Record<Side, TeamEntry>,
+): AdjustmentSummary['pts'] {
+  const venue = overrides.venue;
+  const adj = settings.adjustments;
+  const hfa = homeFieldPts(game, venue, settings.lenses.homeFieldPts);
+  const altitude: SidePts = adj.venue ? altitudePts(game, venue) : ZERO_PTS;
+  const rest: SidePts = adj.rest ? restPts(game) : ZERO_PTS;
+  const travel: SidePts = adj.rest ? travelPts(game, venue) : ZERO_PTS;
+  const out = {} as AdjustmentSummary['pts'];
+  for (const side of ['home', 'away'] as const) {
+    const streaks = settings.lenses.streaks ? streakPts(teams[side].form) : 0;
+    const parts = {
+      homeField: hfa[side],
+      altitude: altitude[side],
+      rest: rest[side],
+      travel: travel[side],
+      streaks,
+    };
+    out[side] = {
+      ...parts,
+      total: parts.homeField + parts.altitude + parts.rest + parts.travel + parts.streaks,
+    };
   }
-  const favored: Side = venue === 'swap' ? 'away' : 'home';
-  return favored === 'home' ? { home: hfa / 2, away: -hfa / 2 } : { home: -hfa / 2, away: hfa / 2 };
+  return out;
 }
 
 function meanOf(dist: { yards: readonly number[]; probs: readonly number[] }): number {
@@ -235,11 +285,9 @@ export function withUsageNoise(unit: OffenseUnit, rng: Rng): OffenseUnit {
 // Offense builder
 // ---------------------------------------------------------------------------
 
-function buildOffense(
-  inputs: Omit<GameInputs, 'offense' | 'drawAvailability'>,
-  side: Side,
-  available: Set<number>,
-): OffenseUnit {
+type BaseInputs = Omit<GameInputs, 'offense' | 'drawAvailability'>;
+
+function buildOffense(inputs: BaseInputs, side: Side, available: Set<number>): OffenseUnit {
   const cfg = MODEL_CONFIG;
   const own = inputs.teams[side];
   const opp = inputs.teams[side === 'home' ? 'away' : 'home'];
@@ -251,6 +299,11 @@ function buildOffense(
   const marketUsage = inputs.game.marketUsage;
   const pts = own.ptsShift;
   const p2e = cfg.pointsToEfficiency;
+  const injuriesOn = settings.adjustments.injuries;
+  const weather = inputs.weather;
+  const lines = inputs.adjustments.lines[side];
+  const dvp = inputs.adjustments.matchup[side];
+  const completionYds = inputs.league.completionYds;
 
   const byId = new Map(own.players.map((p) => [p.entry.playerId, p]));
   const isIn = (p: PlayerRef) => available.has(p.idx);
@@ -266,40 +319,69 @@ function buildOffense(
   const usual = qbs
     .filter((p) => p.params?.qb)
     .sort((a, b) => b.params!.qb!.dropbacks - a.params!.qb!.dropbacks)[0];
-  const sq = starter.params?.qb;
-  const uq = usual?.params?.qb;
-  const qbDelta = (field: 'sackRate' | 'scrambleRate' | 'intRate' | 'completionRate') =>
-    sq && uq && starter !== usual ? logit(sq[field]) - logit(uq[field]) : 0;
-  const qbTiltDelta = sq && uq && starter !== usual ? sq.passYdsTilt - uq.passYdsTilt : 0;
+  const qb =
+    starter === usual
+      ? NO_QB_DELTAS
+      : qbSwapDeltas(starter.params?.qb, usual?.params?.qb, league, completionYds, injuriesOn);
 
-  const sackRate = combineRates(off.sackRate, def.sackRate, league.sackRate, qbDelta('sackRate'));
+  const sackRate = combineRates(
+    off.sackRate,
+    def.sackRate,
+    league.sackRate,
+    qb.sackLogit + lines.sackLogit,
+  );
   const scrambleRate = combineRates(
     off.scrambleRate,
     def.scrambleRate,
     league.scrambleRate,
-    qbDelta('scrambleRate'),
+    qb.scrambleLogit,
   );
-  const intRate = combineRates(off.intRate, def.intRate, league.intRate, qbDelta('intRate'));
+  const intRate = combineRates(off.intRate, def.intRate, league.intRate, qb.intLogit);
   const teamCompletion = combineRates(
     off.completionRate,
     def.completionRate,
     league.completionRate,
-    qbDelta('completionRate') + pts * p2e.completionLogitPerPt,
+    qb.completionLogit +
+      pts * p2e.completionLogitPerPt +
+      weather.completionLogit +
+      lines.completionLogit,
   );
   const fumbleLostRate = combineRates(
     off.fumbleLostRate,
     def.fumbleLostRate,
     league.fumbleLostRate,
   );
-  const passTilt = off.passYdsTilt + def.passYdsTilt + qbTiltDelta + pts * p2e.passYdsTiltPerPt;
-  const runTilt = off.runYdsTilt + def.runYdsTilt + pts * p2e.runYdsTiltPerPt;
+  const passTilt =
+    off.passYdsTilt +
+    def.passYdsTilt +
+    qb.passYdsTilt +
+    pts * p2e.passYdsTiltPerPt +
+    tiltForMeanShift(completionYds, weather.yardsPerCompletion);
+  const runTilt =
+    off.runYdsTilt +
+    def.runYdsTilt +
+    pts * p2e.runYdsTiltPerPt +
+    tiltForMeanShift(inputs.league.runYds, weather.yardsPerCarry + lines.yardsPerCarry);
 
-  // --- Receivers
-  const receivers = own.players.filter((p) => isIn(p) && RECEIVER_POSITIONS.has(p.entry.position));
-  const targetHist = receivers.map(
-    (p) =>
-      (p.params?.targetShare ?? 0) * (p.entry.depth === 1 ? 1 + cfg.usage.starterTargetBonus : 1),
-  );
+  // --- Receivers. Historical shares (with the starter bonus), out players' shares handed on
+  // (injury adjustments), then defense-vs-position multipliers.
+  const keep = cfg.injuries.outShareKeptInPosition;
+  const receiverPool = own.players.filter((p) => RECEIVER_POSITIONS.has(p.entry.position));
+  const receivers = receiverPool.filter(isIn);
+  const targetBase = (p: PlayerRef) =>
+    (p.params?.targetShare ?? 0) * (p.entry.depth === 1 ? 1 + cfg.usage.starterTargetBonus : 1);
+  const targetPooled = injuriesOn
+    ? redistributeOutShares(
+        receiverPool.map((p) => ({
+          position: p.entry.position,
+          share: targetBase(p),
+          available: isIn(p),
+        })),
+        keep.targets,
+      )
+    : receivers.map(targetBase);
+  const dvpOf = (p: PlayerRef) => (p.entry.dvpBucket ? dvp[p.entry.dvpBucket] : undefined);
+  const targetHist = receivers.map((p, i) => targetPooled[i]! * (dvpOf(p)?.targets ?? 1));
   const targetShares = allocateShares(
     receivers.map((p, i) => ({
       hist: targetHist[i]!,
@@ -321,27 +403,43 @@ function buildOffense(
     );
   const completionProb = completionAt(0);
   const rzCompletionProb = completionAt(rz.completionLogitShift);
+  const compMean = tiltedMean(completionYds, 0);
   const recTilts = centeredTilts(
-    inputs.league.completionYds,
+    completionYds,
     passTilt,
-    receivers.map((p) => p.params?.recYdsTilt ?? 0),
+    receivers.map((p) => {
+      const m = dvpOf(p)?.yardsPerTarget ?? 1;
+      const dvpTilt = m === 1 ? 0 : tiltForMeanShift(completionYds, (m - 1) * compMean);
+      return (p.params?.recYdsTilt ?? 0) + dvpTilt;
+    }),
     Float64Array.from(receivers, (_, i) => targetShares[i]! * completionProb[i]!),
   );
-  const receiverYds = new ShiftedSamplers(inputs.league.completionYds, recTilts);
+  const receiverYds = new ShiftedSamplers(completionYds, recTilts);
   const rzReceiverYds = new ShiftedSamplers(
-    inputs.league.completionYds,
+    completionYds,
     recTilts.map((t) => t + rz.passYdsTiltShift),
   );
 
   // --- Rushers (starting QB included through his designed-run share)
-  const rushers = own.players.filter(
-    (p) => isIn(p) && (RUSHER_POSITIONS.has(p.entry.position) || p === starter),
+  const isRusher = (p: PlayerRef) =>
+    isIn(p) && (RUSHER_POSITIONS.has(p.entry.position) || p === starter);
+  const rusherPool = own.players.filter(
+    (p) => RUSHER_POSITIONS.has(p.entry.position) || p.entry.position === 'QB',
   );
-  const carryHist = rushers.map(
-    (p) =>
-      (p.params?.carryShare ?? 0) *
-      (p.entry.position === 'RB' && p.entry.depth === 1 ? 1 + cfg.usage.starterCarryBonus : 1),
-  );
+  const rushers = rusherPool.filter(isRusher);
+  const carryBase = (p: PlayerRef) =>
+    (p.params?.carryShare ?? 0) *
+    (p.entry.position === 'RB' && p.entry.depth === 1 ? 1 + cfg.usage.starterCarryBonus : 1);
+  const carryHist = injuriesOn
+    ? redistributeOutShares(
+        rusherPool.map((p) => ({
+          position: p.entry.position,
+          share: carryBase(p),
+          available: isRusher(p),
+        })),
+        keep.carries,
+      )
+    : rushers.map(carryBase);
   const carryShares = allocateShares(
     rushers.map((p, i) => ({
       hist: carryHist[i]!,
@@ -408,6 +506,8 @@ function buildOffense(
     rusherYds,
     rzRusherYds,
     kicker: kicker ? kicker.idx : -1,
+    fgLogit: weather.fgLogit,
+    fgLogitPerYard: weather.fgLogitPerYard,
     punter: punter ? punter.idx : -1,
     fgMakeShift: kicker?.params?.kicker?.fgMakeOverExpected ?? 0,
     xpRate: kicker?.params?.kicker?.xpRate ?? cfg.kicking.xpMakeRate,
@@ -445,14 +545,20 @@ export function applySettings(rawRequest: RunRequest, snapshot: SlateSnapshot): 
   const window = request.settings.lenses.historyWindow;
   const league = snapshot.league[window];
   const injuriesOn = request.settings.adjustments.injuries;
-  const hfa = homeFieldShift(game, request.settings, request.overrides.venue);
+  const entries = {} as Record<Side, TeamEntry>;
+  for (const side of ['home', 'away'] as const) {
+    const entry = snapshot.teams[game[side]];
+    if (!entry) throw new Error(`Team ${game[side]} is not in snapshot ${snapshot.id}`);
+    entries[side] = entry;
+  }
+  const pts = advantagePts(game, request.settings, request.overrides, entries);
 
   const playerIds: PlayerId[] = [];
   const teams = {} as Record<Side, TeamSetup>;
   for (const side of ['home', 'away'] as const) {
     const abbr = game[side];
-    const entry = snapshot.teams[abbr];
-    if (!entry) throw new Error(`Team ${abbr} is not in snapshot ${snapshot.id}`);
+    const entry = entries[side];
+    const opp = side === 'home' ? 'away' : 'home';
     const roster = Object.values(snapshot.players)
       .filter((p) => p.team === abbr)
       .sort((a, b) => (a.playerId < b.playerId ? -1 : 1));
@@ -461,7 +567,7 @@ export function applySettings(rawRequest: RunRequest, snapshot: SlateSnapshot): 
       team: abbr,
       entry,
       params: entry.params[window],
-      ptsShift: hfa[side],
+      ptsShift: (pts[side].total - pts[opp].total) / 2,
       players: [],
       uncertain: [],
       fixedIn: new Set(),
@@ -478,8 +584,26 @@ export function applySettings(rawRequest: RunRequest, snapshot: SlateSnapshot): 
   }
 
   const passLogitGrid = league.passRateByDownDist.map((row) => row.map((p) => logit(p)));
+  const conditions = resolveConditions(game, request.overrides);
+  const weather = request.settings.adjustments.weather
+    ? weatherEffects(conditions, request.settings.lenses.conditionsWeight)
+    : NO_WEATHER;
+  const lineFx = (side: Side, opp: Side): LineEffects =>
+    injuriesOn
+      ? lineInjuryEffects(entries[side].olInjuryCount, entries[opp].secondaryInjuryCount)
+      : lineInjuryEffects(0, 0);
+  const matchupWeight = request.settings.lenses.matchupWeight;
+  const adjustments: AdjustmentSummary = {
+    pts,
+    weather,
+    lines: { home: lineFx('home', 'away'), away: lineFx('away', 'home') },
+    matchup: {
+      home: dvpMultipliers(entries.away.dvp[window], league.dvp, matchupWeight),
+      away: dvpMultipliers(entries.home.dvp[window], league.dvp, matchupWeight),
+    },
+  };
 
-  const base = {
+  const base: BaseInputs = {
     request,
     game,
     window,
@@ -487,7 +611,9 @@ export function applySettings(rawRequest: RunRequest, snapshot: SlateSnapshot): 
     playerIds,
     league,
     teams,
-    conditions: resolveConditions(game, request.overrides),
+    conditions,
+    weather,
+    adjustments,
     sackYds: new YardSampler(league.sackYds),
     scrambleYds: new YardSampler(league.scrambleYds),
     puntNetYds: new YardSampler(league.puntNetYds),

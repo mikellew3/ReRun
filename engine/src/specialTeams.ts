@@ -163,7 +163,15 @@ export function fieldGoal(ctx: GameCtx, unit: OffenseUnit): PlayOutcome {
   const curve = MODEL_CONFIG.kicking.fgCurve;
   const p = Math.min(
     0.995,
-    Math.max(0.01, sigmoid(curve.intercept + curve.slopePerYard * distance) + unit.fgMakeShift),
+    Math.max(
+      0.01,
+      sigmoid(
+        curve.intercept +
+          curve.slopePerYard * distance +
+          unit.fgLogit +
+          unit.fgLogitPerYard * distance,
+      ) + unit.fgMakeShift,
+    ),
   );
   const blocked = rng.chance(inputs.league.specialTeams.fgBlockRate);
   const made = !blocked && rng.chance(p);

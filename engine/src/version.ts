@@ -6,4 +6,4 @@
  * (engine code, rng, model.config values). A golden-output test (step 3) fails if output
  * changes without a bump.
  */
-export const ENGINE_VERSION = '0.2.0';
+export const ENGINE_VERSION = '0.3.0';

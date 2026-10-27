@@ -1,7 +1,7 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "9e45b30141e3952f",
-  "engineVersion": "0.2.0",
+  "configHash": "52f105dc2256e420",
+  "engineVersion": "0.3.0",
   "model": {
     "configVersion": 1,
     "fitting": {
@@ -350,55 +350,91 @@
         "ir": 0,
         "inactive": 0
       },
-      "qbReplacementEpaPerDropback": -0.15,
+      "qbReplacementEpaPerDropback": -0.13,
+      "backupQb": {
+        "completionLogit": -0.1,
+        "sackLogit": 0.13,
+        "intLogit": 0.25,
+        "scrambleLogit": 0,
+        "yardsPerCompletion": -0.59
+      },
       "olStarterOut": {
-        "sackRateMult": 1.06,
-        "runEpaDelta": -0.01
+        "sackLogit": 0.02,
+        "yardsPerCarry": -0.07
       },
       "secondaryStarterOut": {
-        "passEpaAllowedDelta": 0.015
+        "completionLogit": 0.04
+      },
+      "outShareKeptInPosition": {
+        "targets": {
+          "WR": 0.8,
+          "TE": 0.55,
+          "RB": 0.53
+        },
+        "carries": {
+          "RB": 0.99
+        }
       }
     },
     "weather": {
       "windStartMph": 12,
       "windFullMph": 25,
       "windFull": {
-        "completionRateDelta": -0.05,
-        "passYdsTiltDelta": -0.08,
-        "fgLogitDelta": -0.9
+        "completionLogit": -0.17,
+        "yardsPerCompletion": 0,
+        "fgLogitAtReference": -0.57
       },
       "fgWindReferenceDistance": 45,
       "precip": {
-        "light": {
-          "completionRateDelta": -0.01,
-          "fumbleRateMult": 1.1
+        "none": {
+          "completionLogit": 0,
+          "yardsPerCompletion": 0,
+          "yardsPerCarry": 0
         },
-        "heavy": {
-          "completionRateDelta": -0.03,
-          "fumbleRateMult": 1.25
+        "light_rain": {
+          "completionLogit": -0.08,
+          "yardsPerCompletion": -0.48,
+          "yardsPerCarry": -0.22
+        },
+        "heavy_rain": {
+          "completionLogit": -0.16,
+          "yardsPerCompletion": -0.96,
+          "yardsPerCarry": -0.44
+        },
+        "light_snow": {
+          "completionLogit": -0.08,
+          "yardsPerCompletion": -0.48,
+          "yardsPerCarry": -0.22
+        },
+        "heavy_snow": {
+          "completionLogit": -0.16,
+          "yardsPerCompletion": -0.96,
+          "yardsPerCarry": -0.44
         }
-      },
-      "snowExtra": {
-        "runYdsTiltDelta": -0.03
       },
       "coldThresholdF": 25,
       "cold": {
-        "completionRateDelta": -0.01,
-        "fgLogitDelta": -0.15
+        "completionLogit": 0,
+        "yardsPerCompletion": -0.79,
+        "fgLogit": 0
       }
+    },
+    "matchup": {
+      "minMultiplier": 0.8,
+      "maxMultiplier": 1.25
     },
     "venue": {
       "altitudeThresholdFt": 5000,
-      "altitudeVisitorPenaltyPts": 0.5
+      "altitudeVisitorPenaltyPts": 0.4
     },
     "rest": {
-      "shortWeekMaxDays": 4,
-      "shortWeekPenaltyPts": 0.5,
       "byeMinDays": 13,
-      "byeBonusPts": 0.5,
+      "byeBonusPts": 0.7,
+      "restGapPtsPerDay": 0,
+      "restGapMaxDays": 3,
       "longTravelMiles": 2000,
-      "longTravelPenaltyPts": 0.25,
-      "tzShiftPenaltyPtsPerHour": 0.1
+      "longTravelPenaltyPts": 0,
+      "tzShiftPenaltyPtsPerHour": 0
     },
     "homeField": {
       "minPts": 0,
@@ -407,7 +443,10 @@
       "defaultPts": 1.5
     },
     "streaks": {
-      "houseUsesStreaks": false
+      "houseUsesStreaks": false,
+      "winStreakPtsPerGame": 0.25,
+      "atsStreakPtsPerGame": 0,
+      "maxStreakGames": 4
     },
     "markets": {
       "edgeTiers": [

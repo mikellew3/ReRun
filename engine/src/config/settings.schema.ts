@@ -111,11 +111,11 @@ export const SETTINGS_CONTROLS = {
     kind: 'number',
     group: 'lenses',
     label: 'Matchup weight',
-    help: 'How strongly defense-vs-position adjustments apply. 0 = ignore matchups, 1 = as fitted, 2 = double.',
+    help: "How much to trust defense-vs-position splits (how a defense does against WR1s, TEs, RBs...). 0 = ignore them (default: in 2022-2025 a defense's splits in one half of a season did not carry over to the other half), 1 = use them, 2 = double.",
     min: 0,
     max: 2,
     step: 0.1,
-    default: 1,
+    default: 0,
     unit: '×',
   },
   'lenses.streaks': {

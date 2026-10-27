@@ -343,7 +343,56 @@ def build_players_and_teams(
     return players, teams
 
 
-def build_games(slate: pd.DataFrame, as_of: datetime, stadiums: Stadiums) -> list[dict]:
+def precip_from_text(text: str | None) -> str:
+    """nflverse weather text -> precip kind. Intensity is not recorded, so any rain or snow
+    counts as light (the weather effects were measured the same way)."""
+    t = (text or "").lower()
+    if "snow" in t:
+        return "light_snow"
+    if any(w in t for w in ("rain", "shower", "drizzle")):
+        return "light_rain"
+    return "none"
+
+
+def observed_weather(g: pd.Series, weather_text: str | None) -> dict | None:
+    """Game-time weather from nflverse, for games already played (backtests and calibration).
+    It stands in for the forecast a live snapshot would carry (step 6 fetches forecasts)."""
+    roof = g.get("roof")
+    if pd.isna(roof) or roof == "dome":
+        return None
+    temp, wind = g.get("temp"), g.get("wind")
+    return {
+        "source": "observed",
+        "windMph": float(wind) if pd.notna(wind) else 0.0,
+        "gustMph": None,
+        "tempF": float(temp) if pd.notna(temp) else 60.0,
+        "precip": precip_from_text(weather_text) if roof in ("outdoors", "open") else "none",
+        "roofExpected": roof if roof in ("open", "closed") else None,
+    }
+
+
+def played_weather_text(season: int) -> dict[str, str]:
+    """game_id -> nflverse weather text, for games with play-by-play."""
+    try:
+        pbp = read_raw("pbp", [season], columns=["game_id", "weather"])
+    except FileNotFoundError:
+        return {}
+    first = pbp.dropna(subset=["weather"]).drop_duplicates("game_id")
+    return dict(zip(first["game_id"], first["weather"], strict=True))
+
+
+def build_games(
+    slate: pd.DataFrame,
+    as_of: datetime,
+    stadiums: Stadiums,
+    weather_texts: dict[str, str] | None = None,
+) -> list[dict]:
+    """weather_texts: game_id -> nflverse weather text; read from play-by-play if not given."""
+    texts = (
+        weather_texts
+        if weather_texts is not None
+        else played_weather_text(int(slate["season"].iloc[0]))
+    )
     games = []
     for _, g in slate.sort_values(["gameday", "gametime", "game_id"]).iterrows():
         kickoff = kickoff_utc(g["gameday"], g["gametime"])
@@ -365,7 +414,9 @@ def build_games(slate: pd.DataFrame, as_of: datetime, stadiums: Stadiums) -> lis
                 "status": status,
                 "neutralSite": g["location"] == "Neutral",
                 "stadium": Stadiums.facts(site),
-                "weather": None,
+                "weather": observed_weather(g, texts.get(g["game_id"]))
+                if pd.notna(g["result"])
+                else None,
                 "context": {
                     "restDays": {"home": int(g["home_rest"]), "away": int(g["away_rest"])},
                     "awayTravelMiles": haversine_miles(away_home, site),

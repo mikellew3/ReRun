@@ -303,7 +303,10 @@ export const MODEL_CONFIG = {
     xpMakeRate: 0.96,
   },
 
-  /** Injuries and roster. */
+  /**
+   * Injuries and roster. Measured values come from pipeline/measure_adjustments.py (2022-2025);
+   * see docs/adjustments.md. Applied when adjustments.injuries is on.
+   */
   injuries: {
     /** Probability a player plays, by report status. start */
     playProbByStatus: {
@@ -314,58 +317,138 @@ export const MODEL_CONFIG = {
       ir: 0,
       inactive: 0,
     },
-    /** QB with no usable data of his own: EPA/dropback vs league average. start */
-    qbReplacementEpaPerDropback: -0.15,
-    /** Per offensive-line starter out. start */
-    olStarterOut: { sackRateMult: 1.06, runEpaDelta: -0.01 },
-    /** Per secondary starter out (applied to the defense). start */
-    secondaryStarterOut: { passEpaAllowedDelta: 0.015 },
+    /**
+     * QB with no usable data of his own: EPA/dropback vs league average. Used by the pipeline for
+     * each QB's replacementDelta (shown in the UI). Measured: -0.127.
+     */
+    qbReplacementEpaPerDropback: -0.13,
+    /**
+     * A QB starting in place of the team's usual QB plays like a backup: his own numbers are
+     * shrunk toward league average + these (instead of league average), with the same k as the
+     * pipeline (shrinkage.qbDropbacksK). A QB with no data gets exactly these. Logits vs league;
+     * yards per completion in yards. Measured on 16,926 non-starter dropbacks.
+     */
+    backupQb: {
+      completionLogit: -0.1,
+      sackLogit: 0.13,
+      intLogit: 0.25,
+      scrambleLogit: 0,
+      yardsPerCompletion: -0.59,
+    },
+    /**
+     * Per offensive-line starter out (report status out/doubtful). Measured per starter missing:
+     * sack logit +0.021 (se 0.021), yards per carry -0.074 (se 0.035), completions no effect.
+     */
+    olStarterOut: { sackLogit: 0.02, yardsPerCarry: -0.07 },
+    /**
+     * Per secondary starter out, applied to the passing his defense allows. Measured:
+     * completion logit +0.042 (se 0.013), yards per completion no effect.
+     */
+    secondaryStarterOut: { completionLogit: 0.04 },
+    /**
+     * Where an out player's targets or carries go. This fraction stays with his position group
+     * (WR, TE, RB), split evenly among the available players there (backups take the snaps); the
+     * rest goes to everyone else in proportion to their shares. Proportional reallocation alone
+     * would keep about 0.50 (WR), 0.08 (TE), 0.05 (RB targets) and 0.77 (RB carries).
+     */
+    outShareKeptInPosition: {
+      targets: { WR: 0.8, TE: 0.55, RB: 0.53 },
+      carries: { RB: 0.99 },
+    },
   },
 
-  /** Weather. All effects are multiplied by the user's conditionsWeight lens. */
+  /**
+   * Weather, measured on outdoor plays with each offense's and defense's season averages taken
+   * out (docs/adjustments.md). Effects are kept at the measured value when at least 1.5 standard
+   * errors from zero, else 0; FG wind is kept at its estimate because its direction is physical.
+   * All effects are multiplied by the user's conditionsWeight lens. Domes and closed roofs: none.
+   */
   weather: {
-    /** Wind effects start here and reach full strength here (sustained mph). */
+    /** Wind effects start here and reach full strength here (sustained mph), linearly. */
     windStartMph: 12,
     windFullMph: 25,
-    /** Effects at full wind. start */
-    windFull: { completionRateDelta: -0.05, passYdsTiltDelta: -0.08, fgLogitDelta: -0.9 },
-    /** FG wind effect grows with distance: multiplier = distance / this. */
+    /**
+     * At full wind. Measured: completion logit -0.174 (se 0.083); yards per completion -0.64
+     * (se 0.49, not kept); FG logit -0.57 at 45 yards (se 0.85).
+     */
+    windFull: { completionLogit: -0.17, yardsPerCompletion: 0, fgLogitAtReference: -0.57 },
+    /** FG wind effect scales with distance: effect x distance / this. */
     fgWindReferenceDistance: 45,
+    /**
+     * By precipitation. light_rain is the measured "rain" effect (completion logit -0.081
+     * se 0.039; yards per completion -0.48 se 0.23; yards per carry -0.22 se 0.13). Snow had too
+     * few plays to measure and uses the rain values. Heavy = 2x light: an assumption (play-by-play
+     * does not record intensity). No precipitation effect on fumbles was found (+0.0001/play).
+     */
     precip: {
-      light: { completionRateDelta: -0.01, fumbleRateMult: 1.1 },
-      heavy: { completionRateDelta: -0.03, fumbleRateMult: 1.25 },
+      none: { completionLogit: 0, yardsPerCompletion: 0, yardsPerCarry: 0 },
+      light_rain: { completionLogit: -0.08, yardsPerCompletion: -0.48, yardsPerCarry: -0.22 },
+      heavy_rain: { completionLogit: -0.16, yardsPerCompletion: -0.96, yardsPerCarry: -0.44 },
+      light_snow: { completionLogit: -0.08, yardsPerCompletion: -0.48, yardsPerCarry: -0.22 },
+      heavy_snow: { completionLogit: -0.16, yardsPerCompletion: -0.96, yardsPerCarry: -0.44 },
     },
-    /** Snow adds this on top of the precip effect. start */
-    snowExtra: { runYdsTiltDelta: -0.03 },
+    /** Below this temperature (F). Measured: yards per completion -0.79 (se 0.37); others ~0. */
     coldThresholdF: 25,
-    cold: { completionRateDelta: -0.01, fgLogitDelta: -0.15 },
+    cold: { completionLogit: 0, yardsPerCompletion: -0.79, fgLogit: 0 },
   },
 
-  /** Venue. */
+  /**
+   * Defense vs position (matchupWeight lens, 0 by default). Shrinkage k is
+   * shrinkage.dvpTargetsK. Split-half check, 2022-2025 (measure_adjustments.py): a defense's
+   * positional target-share and yards-per-target pattern in weeks 1-9 has correlation 0.003
+   * and 0.017 with weeks 10-18, i.e. it is noise (the implied k is in the thousands). The lens
+   * exists for users who want it anyway; k = 60 keeps it visible when they turn it up.
+   */
+  matchup: {
+    /** Bounds on the per-bucket multipliers after shrinkage, before the lens. */
+    minMultiplier: 0.8,
+    maxMultiplier: 1.25,
+  },
+
+  /** Venue. Applied when adjustments.venue is on. */
   venue: {
     altitudeThresholdFt: 5000,
-    /** Points equivalent against the visitor. start */
-    altitudeVisitorPenaltyPts: 0.5,
+    /**
+     * Points against the visitor. Closing spreads charge 0.41 (se 0.69); results show 3.1
+     * (se 2.7) over 34 games.
+     */
+    altitudeVisitorPenaltyPts: 0.4,
   },
 
-  /** Rest and travel, in points equivalent. start */
+  /**
+   * Rest and travel, in points. Applied when adjustments.rest is on. Values are what 2022-2025
+   * closing spreads charge with team ratings held fixed (docs/adjustments.md); results agree
+   * within their (large) errors.
+   */
   rest: {
-    /** Rest days at or below this = short week. */
-    shortWeekMaxDays: 4,
-    shortWeekPenaltyPts: 0.5,
-    /** Rest days at or above this = coming off a bye. */
+    /** Rest days at or above this = coming off a bye. Spreads: +0.70 (se 0.29). */
     byeMinDays: 13,
-    byeBonusPts: 0.5,
+    byeBonusPts: 0.7,
+    /** Per day of rest advantage, non-bye games, capped at 3 days. Spreads: +0.01 (se 0.17). */
+    restGapPtsPerDay: 0,
+    restGapMaxDays: 3,
+    /** Away team travelling at least this far. Spreads: -0.61 (se 0.40), i.e. nothing. */
     longTravelMiles: 2000,
-    longTravelPenaltyPts: 0.25,
-    tzShiftPenaltyPtsPerHour: 0.1,
+    longTravelPenaltyPts: 0,
+    /** Per hour of time-zone change for the away team. Spreads: +0.08 (se 0.11). */
+    tzShiftPenaltyPtsPerHour: 0,
   },
 
   /** Home-field lens range (user control, range set here per the brief). */
   homeField: { minPts: 0, maxPts: 4, stepPts: 0.25, defaultPts: 1.5 },
 
-  /** Streaks lens. The house build uses streaks only if the backtest supports it. */
-  streaks: { houseUsesStreaks: false },
+  /**
+   * Streaks lens (off by default). Points per game of a team's current win streak (+) or losing
+   * streak (-), capped. Against closing spreads, win streaks are worth +0.23 (se 0.17) and ATS
+   * streaks -0.20 (se 0.19): neither is reliable, and the market already moves 0.38 per game of
+   * win streak. The house build uses streaks only if the backtest supports it.
+   */
+  streaks: {
+    houseUsesStreaks: false,
+    winStreakPtsPerGame: 0.25,
+    atsStreakPtsPerGame: 0,
+    maxStreakGames: 4,
+  },
 
   /** Pricing, edges and stakes. */
   markets: {

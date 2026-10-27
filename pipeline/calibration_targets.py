@@ -12,10 +12,13 @@ the sim's margins and totals against the market.
 
 Usage:
   python calibration_targets.py --seasons 2023 2024 2025 --weeks 4 8 12 16
-Writes engine/test/fixtures/calibration/targets.json.
+Writes engine/test/fixtures/calibration/targets.json and player_games.json.gz (actual player lines
+in the calibration games).
 """
 
 import argparse
+import gzip
+import json
 
 import numpy as np
 import pandas as pd
@@ -178,6 +181,29 @@ def calibration_games(sched: pd.DataFrame, weeks: list[int]) -> list[dict]:
     ]
 
 
+def player_games(pbp: pd.DataFrame, game_ids: set[str]) -> dict:
+    """Actual per-player lines in the calibration games, for player-level checks of the engine
+    (jobs/checkAdjustments.ts): targets, catches, receiving yards, designed carries, rushing
+    yards on them."""
+    p = pbp[pbp["game_id"].isin(game_ids)]
+    att = p[p["is_attempt"] & p["receiver_player_id"].notna()]
+    rec = att.groupby(["game_id", "receiver_player_id"]).agg(
+        targets=("is_attempt", "size"),
+        rec=("is_complete", "sum"),
+        recYds=("yards_gained", lambda y: float(y[att.loc[y.index, "is_complete"]].sum())),
+    )
+    runs = p[p["is_designed_run"] & p["rusher_player_id"].notna()]
+    rush = runs.groupby(["game_id", "rusher_player_id"]).agg(
+        carries=("is_designed_run", "size"), rushYds=("yards_gained", "sum")
+    )
+    rec.index.names = rush.index.names = ["game_id", "player_id"]
+    lines = rec.join(rush, how="outer").fillna(0)
+    out: dict = {}
+    for (gid, pid), r in lines.iterrows():
+        out.setdefault(gid, {})[pid] = {k: round(float(v), 1) for k, v in r.items()}
+    return out
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build calibration targets.")
     parser.add_argument("--seasons", type=int, nargs="+", required=True)
@@ -207,6 +233,9 @@ def main() -> None:
         "calibrationGames": calibration_games(sched, args.weeks),
     }
     write_json(OUT, targets)
+    games = {g["gameId"] for g in targets["calibrationGames"]}
+    raw = json.dumps(player_games(pbp, games), separators=(",", ":")).encode()
+    OUT.with_name("player_games.json.gz").write_bytes(gzip.compress(raw, 9, mtime=0))
     print(
         f"Wrote {OUT}: {targets['game']['games']} games, "
         f"{len(targets['calibrationGames'])} calibration games"

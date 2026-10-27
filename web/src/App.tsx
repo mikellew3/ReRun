@@ -4,9 +4,17 @@ import {
   DEFAULT_SETTINGS,
   ENGINE_VERSION,
   GAME_CONTROLS,
+  prepareRun,
   randomSeed,
 } from '@rerun/engine';
-import type { RunRequest, SimCount, SlateSnapshot, SnapshotGame } from '@rerun/engine';
+import type {
+  AdjustmentSummary,
+  ResolvedConditions,
+  RunRequest,
+  SimCount,
+  SlateSnapshot,
+  SnapshotGame,
+} from '@rerun/engine';
 import type { Aggregate, WorkerOut } from './sim.worker';
 
 const KEY_NUMBERS = new Set([3, 6, 7, 10, 14]);
@@ -20,6 +28,87 @@ function kickoffLabel(iso: string): string {
 }
 
 const pct = (x: number) => `${(100 * x).toFixed(1)}%`;
+
+function makeRequest(
+  snapshot: SlateSnapshot,
+  game: SnapshotGame,
+  nSims: SimCount,
+  seed: number,
+): RunRequest {
+  return {
+    snapshotId: snapshot.id,
+    gameId: game.gameId,
+    engineVersion: ENGINE_VERSION,
+    settings: DEFAULT_SETTINGS,
+    overrides: DEFAULT_OVERRIDES,
+    nSims,
+    seed,
+  };
+}
+
+const PTS_LABELS: Record<Exclude<keyof AdjustmentSummary['pts']['home'], 'total'>, string> = {
+  homeField: 'home field',
+  altitude: 'altitude',
+  rest: 'rest',
+  travel: 'travel',
+  streaks: 'streaks',
+};
+
+function ptsLine(pts: AdjustmentSummary['pts']['home']): string {
+  const parts = Object.entries(PTS_LABELS)
+    .map(([key, label]) => [pts[key as keyof typeof PTS_LABELS], label] as const)
+    .filter(([v]) => Math.abs(v) >= 0.005)
+    .map(([v, label]) => `${v > 0 ? '+' : ''}${v.toFixed(1)} ${label}`);
+  return parts.length ? parts.join(', ') : 'none';
+}
+
+function conditionsLine(c: ResolvedConditions, hasForecast: boolean): string {
+  if (c.indoor) return 'Indoors: no weather effect';
+  if (!hasForecast) return 'No forecast in this snapshot yet';
+  const precip = c.precip === 'none' ? 'dry' : c.precip.replace('_', ' ');
+  return `${Math.round(c.windMph)} mph wind, ${Math.round(c.tempF)}°F, ${precip}`;
+}
+
+function injuryLine(snapshot: SlateSnapshot, team: string): string {
+  const hurt = Object.values(snapshot.players).filter(
+    (p) => p.team === team && p.status !== 'active',
+  );
+  if (hurt.length === 0) return 'no skill players listed';
+  return hurt
+    .sort((a, b) => a.status.localeCompare(b.status))
+    .map((p) => `${p.name} (${p.position}, ${p.status})`)
+    .join(', ');
+}
+
+function GameFactors({ snapshot, game }: { snapshot: SlateSnapshot; game: SnapshotGame }) {
+  const inputs = useMemo(
+    () => prepareRun(makeRequest(snapshot, game, GAME_CONTROLS.nSims.default, 0), snapshot),
+    [snapshot, game],
+  );
+  const { pts } = inputs.adjustments;
+  return (
+    <section className="panel">
+      <h2>Game factors</h2>
+      <dl className="factors">
+        <dt>{game.away} points</dt>
+        <dd>{ptsLine(pts.away)}</dd>
+        <dt>{game.home} points</dt>
+        <dd>{ptsLine(pts.home)}</dd>
+        <dt>Weather</dt>
+        <dd>{conditionsLine(inputs.conditions, game.weather !== null)}</dd>
+        <dt>{game.away} injuries</dt>
+        <dd>{injuryLine(snapshot, game.away)}</dd>
+        <dt>{game.home} injuries</dt>
+        <dd>{injuryLine(snapshot, game.home)}</dd>
+      </dl>
+      <p className="muted small">
+        Points are each side&apos;s edge from home field, altitude, rest and travel. Injured
+        players&apos; usage goes mostly to teammates at the same position; backup QBs play at backup
+        level.
+      </p>
+    </section>
+  );
+}
 
 function Histogram(props: {
   counts: Record<number, number>;
@@ -95,15 +184,7 @@ export function App() {
     const worker = new Worker(new URL('./sim.worker.ts', import.meta.url), { type: 'module' });
     workerRef.current = worker;
     const s = randomSeed();
-    const request: RunRequest = {
-      snapshotId: snapshot.id,
-      gameId: game.gameId,
-      engineVersion: ENGINE_VERSION,
-      settings: DEFAULT_SETTINGS,
-      overrides: DEFAULT_OVERRIDES,
-      nSims,
-      seed: s,
-    };
+    const request = makeRequest(snapshot, game, nSims, s);
     setSeed(s);
     setAgg(null);
     setRunError(null);
@@ -202,6 +283,8 @@ export function App() {
             )}
           </section>
 
+          {game && <GameFactors snapshot={snapshot} game={game} />}
+
           {runError && <p className="error">{runError}</p>}
 
           {summary && game && agg && (
@@ -290,9 +373,9 @@ export function App() {
           )}
 
           <section className="panel note small">
-            Early preview. Default model settings only. Market lines, weather, rest, travel and
-            matchup adjustments, edges and the full Sim Lab controls are coming. Injury reports
-            update when teams publish them.
+            Early preview with default model settings. Injuries, weather, altitude and rest are in
+            the model. Market lines, live forecasts, edges and the full Sim Lab controls are coming.
+            Injury reports update when teams publish them.
           </section>
         </>
       )}

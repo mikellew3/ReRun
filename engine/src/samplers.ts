@@ -82,6 +82,32 @@ export function tiltedMean(hist: YardHistogram, tilt: number): number {
  * equals the mean at baseTilt. (Centering in tilt space instead would push the team average
  * up, because the mean grows faster than linearly with the tilt.)
  */
+/**
+ * The tilt that moves a histogram's mean by `deltaMean` yards from its mean at `baseTilt`.
+ * Lets config state effects in yards (easy to read and to measure) while the engine works in
+ * tilts. Newton steps on tiltedMean; d(mean)/d(tilt) is the tilted variance.
+ */
+export function tiltForMeanShift(hist: YardHistogram, deltaMean: number, baseTilt = 0): number {
+  if (deltaMean === 0) return 0;
+  const target = tiltedMean(hist, baseTilt) + deltaMean;
+  let t = baseTilt;
+  for (let iter = 0; iter < 8; iter++) {
+    const probs = tiltedProbs(hist, t);
+    let m = 0;
+    let m2 = 0;
+    for (let i = 0; i < probs.length; i++) {
+      const y = hist.min + i;
+      m += probs[i]! * y;
+      m2 += probs[i]! * y * y;
+    }
+    const variance = Math.max(1e-9, m2 - m * m);
+    const step = (target - m) / variance;
+    t += step;
+    if (Math.abs(step) < 1e-9) break;
+  }
+  return t - baseTilt;
+}
+
 export function centeredTilts(
   hist: YardHistogram,
   baseTilt: number,

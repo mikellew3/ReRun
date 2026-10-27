@@ -1,6 +1,6 @@
 # Engine calibration (Phase 1, step 4)
 
-Status: **all 55 checks pass** with default settings (engine `0.2.0`, CI seed 2026). On three other seeds, 54–55 of 55 pass; the only miss was punts, by 0.002.
+Status: **all 55 checks pass** with default settings (engine `0.3.0`, CI seed 2026), and on three other seeds. Engine `0.3.0` adds the step-5 adjustments (injuries, weather, venue, rest), which are on by default; see [adjustments.md](adjustments.md).
 
 The brief (§10.2) asks that, with default settings, the engine reproduce league reality on historical games. This page covers how that's checked, what had to change to get there, and the gaps that remain.
 
@@ -17,31 +17,31 @@ The brief (§10.2) asks that, with default settings, the engine reproduce league
 
 | Group | Check | Sim | Real | Tolerance |
 |---|---|---|---|---|
-| Scores | Total points, mean | 45.5 | 45.1 | ±1.5 |
+| Scores | Total points, mean | 45.0 | 45.1 | ±1.5 |
 | | Total points, sd | 13.4 | 13.6 | ±1.5 |
-| | Home margin vs closing spreads | 1.09 | 1.27 | ±1.0 |
-| | Margin sd | 13.7 | 14.3 | ±1.5 |
-| | Overtime rate | 4.8% | 5.3% | ±2 pts |
+| | Home margin vs closing spreads | 1.07 | 1.27 | ±1.0 |
+| | Margin sd | 13.9 | 14.3 | ±1.5 |
+| | Overtime rate | 4.9% | 5.3% | ±2 pts |
 | Key numbers | Margin of 3 | 12.9% | 14.2% | ±2.5 pts |
-| | Margin of 7 | 8.1% | 8.3% | ±2 pts |
-| | Margin of 6 | 8.0% | 6.6% | ±1.5 pts |
-| | Margin of 10 | 5.0% | 4.2% | ±1.5 pts |
+| | Margin of 7 | 8.4% | 8.3% | ±2 pts |
+| | Margin of 6 | 7.7% | 6.6% | ±1.5 pts |
+| | Margin of 10 | 4.8% | 4.2% | ±1.5 pts |
 | | Margin of 14 | 3.5% | 4.4% | ±1.5 pts |
-| Plays | Plays per game | 126.5 | 124.4 | ±3 |
-| | Yards per play | 5.33 | 5.34 | ±0.15 |
+| Plays | Plays per game | 126.6 | 124.4 | ±3 |
+| | Yards per play | 5.27 | 5.34 | ±0.15 |
 | | Pass attempt share | 55.6% | 55.0% | ±2 pts |
-| | Completion rate | 64.0% | 65.0% | ±1.5 pts |
-| | Turnovers per team-game | 1.21 | 1.17 | ±0.15 |
-| Starters | QB pass yards (mean / sd) | 233 / 67 | 226 / 74 | ±7% / ±15% |
-| | QB pass TDs | 1.47 | 1.43 | ±0.1 |
-| | RB1 carries / rush yards | 14.9 / 65.4 | 15.2 / 65.9 | ±7% |
-| | Top target: targets / rec / yards | 9.8 / 6.2 / 73 | 9.2 / 6.1 / 75 | ±7% |
-| Market | Sim margin vs closing spread: slope | 0.86 | 1.00 | ±0.15 |
-| | Correlation with closing spread | 0.825 | — | ≥ 0.8 |
-| | Sim total minus closing total | +1.4 | 0 | ±1.5 |
-| Events | Touchdowns / FG attempts / punts per game | 5.08 / 3.87 / 8.14 | 5.01 / 4.00 / 7.65 | ±0.3 / ±0.35 / ±0.6 |
-| | FG rate / 4th-down go rate | 85.0% / 19.4% | 85.2% / 20.9% | |
-| | 3rd-down distance | 7.36 | 6.97 | ±0.5 |
+| | Completion rate | 63.7% | 65.0% | ±1.5 pts |
+| | Turnovers per team-game | 1.24 | 1.17 | ±0.15 |
+| Starters | QB pass yards (mean / sd) | 231 / 68 | 226 / 74 | ±7% / ±15% |
+| | QB pass TDs | 1.44 | 1.43 | ±0.1 |
+| | RB1 carries / rush yards | 14.6 / 63.6 | 15.2 / 65.9 | ±7% |
+| | Top target: targets / rec / yards | 9.5 / 6.0 / 70 | 9.2 / 6.1 / 75 | ±7% |
+| Market | Sim margin vs closing spread: slope | 0.91 | 1.00 | ±0.15 |
+| | Correlation with closing spread | 0.841 | — | ≥ 0.8 |
+| | Sim total minus closing total | +0.9 | 0 | ±1.5 |
+| Events | Touchdowns / FG attempts / punts per game | 5.02 / 3.81 / 8.17 | 5.01 / 4.00 / 7.65 | ±0.3 / ±0.35 / ±0.6 |
+| | FG rate / 4th-down go rate | 84.8% / 19.7% | 85.2% / 20.9% | |
+| | 3rd-down distance | 7.40 | 6.97 | ±0.5 |
 | | Penalties per game (off / def) | 6.6 / 4.4 | 6.4 / 4.5 | ±0.5 |
 | Late drives | Points per drive, last 7 min, by score state | see report | | 2.5 standard errors |
 
@@ -68,9 +68,9 @@ Each change is backed by a measurement from 2023–2025 play-by-play, and every 
 ## Known gaps (within tolerance, but systematic)
 
 - **Punts** run about 0.5 per game high. Sim drives are slightly shorter (5.5 vs 5.9 snaps), so there are about 1 more possession per game.
-- **6-point margins** run about 1.4 points high.
-- **Market slope is 0.86.** The sim's margins vary a little less than the closing spreads. Total margin spread is right (13.7 vs 14.3), so the remaining gap is in how far apart the sim rates teams. This should be revisited with the step-8 backtest, which has far more games.
-- **Totals sit 1.4 points above the closing totals** for these games, while matching the real final scores (45.5 vs 45.1). These games simply went over their closing totals on average.
+- **6-point margins** run about 1.1 points high.
+- **Market slope is 0.91** (0.86 before the step-5 adjustments). The sim's margins vary a little less than the closing spreads. Total margin spread is right (13.9 vs 14.3), so the remaining gap is in how far apart the sim rates teams. This should be revisited with the step-8 backtest, which has far more games.
+- **Totals sit 0.9 points above the closing totals** for these games (1.4 before weather), while matching the real final scores (45.0 vs 45.1). These games simply went over their closing totals on average.
 - **3rd-down distance** is 7.4 vs 7.0.
 
 ## Re-running after changes

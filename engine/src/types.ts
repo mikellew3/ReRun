@@ -295,7 +295,8 @@ export interface StadiumFacts {
 }
 
 export interface WeatherForecast {
-  source: 'nws' | 'open-meteo';
+  /** 'observed' = game-time weather from nflverse, for games already played (backtests). */
+  source: 'nws' | 'open-meteo' | 'observed';
   /** Sustained. */
   windMph: number;
   gustMph: number | null;

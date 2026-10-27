@@ -1,0 +1,415 @@
+{
+  "seasons": [
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "weather": {
+    "completionLogit": {
+      "wind_ramp": {
+        "coef": -0.174,
+        "se": 0.0829
+      },
+      "rain": {
+        "coef": -0.0811,
+        "se": 0.039
+      },
+      "snow": {
+        "coef": -0.0989,
+        "se": 0.0999
+      },
+      "cold": {
+        "coef": 0.0095,
+        "se": 0.0636
+      }
+    },
+    "intLogit": {
+      "wind_ramp": {
+        "coef": 0.21,
+        "se": 0.3288
+      },
+      "rain": {
+        "coef": -0.2503,
+        "se": 0.1547
+      },
+      "snow": {
+        "coef": -0.3192,
+        "se": 0.3962
+      },
+      "cold": {
+        "coef": 0.276,
+        "se": 0.2523
+      }
+    },
+    "sackLogit": {
+      "wind_ramp": {
+        "coef": -0.0951,
+        "se": 0.1636
+      },
+      "rain": {
+        "coef": -0.0004,
+        "se": 0.0768
+      },
+      "snow": {
+        "coef": 0.1387,
+        "se": 0.1936
+      },
+      "cold": {
+        "coef": 0.1174,
+        "se": 0.1265
+      }
+    },
+    "yardsPerCompletion": {
+      "wind_ramp": {
+        "coef": -0.6358,
+        "se": 0.487
+      },
+      "rain": {
+        "coef": -0.4768,
+        "se": 0.2301
+      },
+      "snow": {
+        "coef": 0.1431,
+        "se": 0.593
+      },
+      "cold": {
+        "coef": -0.7943,
+        "se": 0.3678
+      }
+    },
+    "yardsPerCarry": {
+      "wind_ramp": {
+        "coef": -0.3668,
+        "se": 0.26
+      },
+      "rain": {
+        "coef": -0.2223,
+        "se": 0.1279
+      },
+      "snow": {
+        "coef": 0.4804,
+        "se": 0.3011
+      },
+      "cold": {
+        "coef": -0.2081,
+        "se": 0.2033
+      }
+    },
+    "fumbleLostPerPlay": {
+      "wind_ramp": {
+        "coef": 0.0009,
+        "se": 0.0024
+      },
+      "rain": {
+        "coef": -0.0001,
+        "se": 0.0011
+      },
+      "snow": {
+        "coef": 0.0022,
+        "se": 0.0028
+      },
+      "cold": {
+        "coef": 0.0009,
+        "se": 0.0018
+      }
+    },
+    "fumbleLostBase": 0.00736,
+    "fgLogit": {
+      "wind_ramp": {
+        "coef": -0.5716,
+        "se": 0.8461
+      },
+      "rain": {
+        "coef": 0.1288,
+        "se": 0.3147
+      },
+      "snow": {
+        "coef": -0.7862,
+        "se": 0.7832
+      },
+      "cold": {
+        "coef": -0.1742,
+        "se": 0.5614
+      }
+    },
+    "completionByWind": {
+      "(-1, 7]": [
+        19546,
+        0.651
+      ],
+      "(7, 11]": [
+        10430,
+        0.649
+      ],
+      "(11, 15]": [
+        5997,
+        0.633
+      ],
+      "(15, 19]": [
+        1740,
+        0.637
+      ],
+      "(19, 24]": [
+        490,
+        0.62
+      ],
+      "(24, 60]": [
+        121,
+        0.579
+      ]
+    },
+    "attempts": 47784
+  },
+  "qb": {
+    "completionLogit": {
+      "backupVsLeague": -0.1003,
+      "backupVsUsual": -0.1265,
+      "league": 0.6483
+    },
+    "intLogit": {
+      "backupVsLeague": 0.2531,
+      "backupVsUsual": 0.3194,
+      "league": 0.0226
+    },
+    "sackLogit": {
+      "backupVsLeague": 0.1335,
+      "backupVsUsual": 0.1689,
+      "league": 0.0657
+    },
+    "scrambleLogit": {
+      "backupVsLeague": 0.0131,
+      "backupVsUsual": 0.0166,
+      "league": 0.0506
+    },
+    "yardsPerCompletion": {
+      "backupVsLeague": -0.5913,
+      "backupVsUsual": -0.7392,
+      "league": 10.9172
+    },
+    "epaPerDropback": {
+      "backupVsLeague": -0.127,
+      "backupVsUsual": -0.1606,
+      "league": 0.0272
+    },
+    "backupDropbacks": 16926,
+    "dropbacks": 80747
+  },
+  "lines": {
+    "olSackLogit": {
+      "perStarter": 0.0209,
+      "se": 0.0207,
+      "games": {
+        "0": 999,
+        "1": 845,
+        "2": 270,
+        "3": 47,
+        "4": 11,
+        "5": 2
+      }
+    },
+    "olYardsPerCarry": {
+      "perStarter": -0.0736,
+      "se": 0.0354,
+      "games": {
+        "0": 999,
+        "1": 845,
+        "2": 270,
+        "3": 47,
+        "4": 11,
+        "5": 2
+      }
+    },
+    "olCompletionLogit": {
+      "perStarter": -0.007,
+      "se": 0.0105,
+      "games": {
+        "0": 999,
+        "1": 845,
+        "2": 270,
+        "3": 47,
+        "4": 11,
+        "5": 2
+      }
+    },
+    "secondaryCompletionLogit": {
+      "perStarter": 0.0415,
+      "se": 0.0127,
+      "games": {
+        "0": 1304,
+        "1": 713,
+        "2": 126,
+        "3": 27,
+        "4": 4
+      }
+    },
+    "secondaryYardsPerCompletion": {
+      "perStarter": 0.0017,
+      "se": 0.0745,
+      "games": {
+        "0": 1304,
+        "1": 713,
+        "2": 126,
+        "3": 27,
+        "4": 4
+      }
+    }
+  },
+  "usage": {
+    "targets": {
+      "RB": {
+        "keptInPosition": 0.532,
+        "proportionalWouldKeep": 0.049,
+        "players": 7
+      },
+      "TE": {
+        "keptInPosition": 0.548,
+        "proportionalWouldKeep": 0.079,
+        "players": 34
+      },
+      "WR": {
+        "keptInPosition": 0.796,
+        "proportionalWouldKeep": 0.495,
+        "players": 132
+      }
+    },
+    "carries": {
+      "RB": {
+        "keptInPosition": 0.99,
+        "proportionalWouldKeep": 0.768,
+        "players": 129
+      }
+    }
+  },
+  "matchup": {
+    "share_ratio": {
+      "slope": 0.003,
+      "corr": 0.003,
+      "firstHalfTargets": 53.9,
+      "impliedK": 18983.0,
+      "pairs": 640
+    },
+    "ypt_ratio": {
+      "slope": 0.017,
+      "corr": 0.017,
+      "firstHalfTargets": 53.9,
+      "impliedK": 3152.0,
+      "pairs": 640
+    }
+  },
+  "schedule": {
+    "games": 1087,
+    "gamesWithFeature": {
+      "home_field": 1064,
+      "rest_gap": 269,
+      "bye": 102,
+      "long_travel": 108,
+      "tz_hours": 617,
+      "altitude": 34,
+      "win_streak": 838,
+      "ats_streak": 838
+    },
+    "closingSpread": {
+      "home_field": {
+        "pts": 1.627,
+        "se": 0.119
+      },
+      "rest_gap": {
+        "pts": 0.013,
+        "se": 0.166
+      },
+      "bye": {
+        "pts": 0.701,
+        "se": 0.291
+      },
+      "long_travel": {
+        "pts": -0.607,
+        "se": 0.401
+      },
+      "tz_hours": {
+        "pts": 0.084,
+        "se": 0.108
+      },
+      "altitude": {
+        "pts": 0.413,
+        "se": 0.693
+      },
+      "win_streak": {
+        "pts": 0.38,
+        "se": 0.044
+      },
+      "ats_streak": {
+        "pts": 0.02,
+        "se": 0.044
+      }
+    },
+    "result": {
+      "home_field": {
+        "pts": 2.715,
+        "se": 0.57
+      },
+      "rest_gap": {
+        "pts": 0.23,
+        "se": 0.761
+      },
+      "bye": {
+        "pts": 1.405,
+        "se": 1.364
+      },
+      "long_travel": {
+        "pts": -2.385,
+        "se": 1.824
+      },
+      "tz_hours": {
+        "pts": -0.32,
+        "se": 0.502
+      },
+      "altitude": {
+        "pts": 3.136,
+        "se": 2.745
+      },
+      "win_streak": {
+        "pts": 0.848,
+        "se": 0.184
+      },
+      "ats_streak": {
+        "pts": -0.72,
+        "se": 0.194
+      }
+    },
+    "resultMinusSpread": {
+      "home_field": {
+        "pts": 1.002,
+        "se": 0.6
+      },
+      "rest_gap": {
+        "pts": 0.322,
+        "se": 0.773
+      },
+      "bye": {
+        "pts": 0.491,
+        "se": 1.405
+      },
+      "long_travel": {
+        "pts": -1.61,
+        "se": 1.848
+      },
+      "tz_hours": {
+        "pts": -0.314,
+        "se": 0.515
+      },
+      "altitude": {
+        "pts": 2.079,
+        "se": 2.501
+      },
+      "win_streak": {
+        "pts": 0.225,
+        "se": 0.171
+      },
+      "ats_streak": {
+        "pts": -0.203,
+        "se": 0.189
+      }
+    }
+  }
+}

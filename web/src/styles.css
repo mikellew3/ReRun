@@ -228,6 +228,33 @@ th {
   font-weight: 400;
 }
 
+.factors {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.factors dt {
+  color: var(--muted);
+}
+
+.factors dd {
+  margin: 0;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+@media (max-width: 520px) {
+  .factors {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .factors dd {
+    margin-bottom: 6px;
+  }
+}
+
 .note {
   color: var(--muted);
 }

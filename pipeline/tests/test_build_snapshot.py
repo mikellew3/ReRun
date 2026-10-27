@@ -9,7 +9,9 @@ from build_snapshot import (
     build_games,
     haversine_miles,
     kickoff_utc,
+    observed_weather,
     player_status,
+    precip_from_text,
     qb_replacement_deltas,
     tz_shift_hours,
 )
@@ -78,6 +80,10 @@ def test_game_status_is_relative_to_as_of():
         [
             {
                 "game_id": "2024_10_X_KC",
+                "season": 2024,
+                "roof": "outdoors",
+                "temp": 20.0,
+                "wind": 18.0,
                 "gameday": "2024-11-10",
                 "gametime": "13:00",
                 "home_team": "KC",
@@ -91,10 +97,29 @@ def test_game_status_is_relative_to_as_of():
             }
         ]
     )
-    before = build_games(slate, datetime(2024, 11, 9, tzinfo=UTC), Stadiums())
-    after = build_games(slate, datetime(2024, 11, 11, tzinfo=UTC), Stadiums())
+    texts = {"2024_10_X_KC": "Light Snow Temp: 20° F, Wind: N 18 mph"}
+    before = build_games(slate, datetime(2024, 11, 9, tzinfo=UTC), Stadiums(), texts)
+    after = build_games(slate, datetime(2024, 11, 11, tzinfo=UTC), Stadiums(), texts)
     assert before[0]["status"] == "scheduled"
     assert after[0]["status"] == "final"
+    # A game already played carries its game-time weather (backtests).
+    assert before[0]["weather"]["windMph"] == 18.0
+    assert before[0]["weather"]["precip"] == "light_snow"
+
+
+def test_precip_from_text():
+    assert precip_from_text("Rain Temp: 45° F") == "light_rain"
+    assert precip_from_text("Snow showers") == "light_snow"
+    assert precip_from_text("Partly Cloudy Temp: 61° F") == "none"
+    assert precip_from_text(None) == "none"
+
+
+def test_observed_weather_by_roof():
+    game = pd.Series({"roof": "dome", "temp": None, "wind": None})
+    assert observed_weather(game, "Indoors") is None
+    closed = observed_weather(pd.Series({"roof": "closed", "temp": None, "wind": None}), "Rain")
+    assert closed["roofExpected"] == "closed"
+    assert closed["precip"] == "none"
 
 
 # Field names of the TypeScript types in engine/src/types.ts. Keep in sync.
