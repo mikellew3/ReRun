@@ -1,0 +1,184 @@
+{
+  "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
+  "configHash": "3c010050c557afb2",
+  "engineVersion": "0.1.0",
+  "model": {
+    "configVersion": 1,
+    "fitting": {
+      "historyWindows": [
+        "season",
+        "L3",
+        "L4",
+        "L5",
+        "L6",
+        "L7",
+        "L8"
+      ],
+      "recencyHalfLifeGames": 8,
+      "ridgeLambda": 30,
+      "minTeamGamesPerWindow": 2,
+      "minPlayerGamesPerWindow": 2,
+      "priorSeasonCarryoverGames": 4,
+      "explosivePassYds": 20,
+      "explosiveRunYds": 10,
+      "passRateDistanceBuckets": [
+        2,
+        4,
+        7,
+        10,
+        15
+      ]
+    },
+    "shrinkage": {
+      "dvpTargetsK": 60,
+      "receiverTargetsK": 50,
+      "rusherCarriesK": 75,
+      "qbDropbacksK": 150,
+      "kickerAttemptsK": 30
+    },
+    "rules": {
+      "quarterSec": 900,
+      "timeoutsPerHalf": 3,
+      "kickoffFromYardline": 35,
+      "kickoffTouchbackYardline": 35,
+      "puntTouchbackYardline": 20,
+      "safetyFreeKickFromYardline": 20,
+      "patKickYardline": 85,
+      "twoPointYardline": 98,
+      "fgDistanceOffsetYds": 17,
+      "overtime": {
+        "bothTeamsPossess": true,
+        "regularSeason": {
+          "periodSec": 600,
+          "timeouts": 2,
+          "tiesAllowed": true,
+          "maxPeriods": 1
+        },
+        "postseason": {
+          "periodSec": 900,
+          "timeouts": 3,
+          "tiesAllowed": false,
+          "maxPeriods": 99
+        }
+      }
+    },
+    "kicking": {
+      "fgCurve": {
+        "intercept": 6.18,
+        "slopePerYard": -0.098
+      },
+      "maxFgDistance": 66,
+      "xpMakeRate": 0.95
+    },
+    "injuries": {
+      "playProbByStatus": {
+        "active": 1,
+        "questionable": 0.8,
+        "doubtful": 0.2,
+        "out": 0,
+        "ir": 0,
+        "inactive": 0
+      },
+      "qbReplacementEpaPerDropback": -0.15,
+      "olStarterOut": {
+        "sackRateMult": 1.06,
+        "runEpaDelta": -0.01
+      },
+      "secondaryStarterOut": {
+        "passEpaAllowedDelta": 0.015
+      }
+    },
+    "weather": {
+      "windStartMph": 12,
+      "windFullMph": 25,
+      "windFull": {
+        "completionRateDelta": -0.05,
+        "passYdsTiltDelta": -0.08,
+        "fgLogitDelta": -0.9
+      },
+      "fgWindReferenceDistance": 45,
+      "precip": {
+        "light": {
+          "completionRateDelta": -0.01,
+          "fumbleRateMult": 1.1
+        },
+        "heavy": {
+          "completionRateDelta": -0.03,
+          "fumbleRateMult": 1.25
+        }
+      },
+      "snowExtra": {
+        "runYdsTiltDelta": -0.03
+      },
+      "coldThresholdF": 25,
+      "cold": {
+        "completionRateDelta": -0.01,
+        "fgLogitDelta": -0.15
+      }
+    },
+    "venue": {
+      "altitudeThresholdFt": 5000,
+      "altitudeVisitorPenaltyPts": 0.5
+    },
+    "rest": {
+      "shortWeekMaxDays": 4,
+      "shortWeekPenaltyPts": 0.5,
+      "byeMinDays": 13,
+      "byeBonusPts": 0.5,
+      "longTravelMiles": 2000,
+      "longTravelPenaltyPts": 0.25,
+      "tzShiftPenaltyPtsPerHour": 0.1
+    },
+    "homeField": {
+      "minPts": 0,
+      "maxPts": 4,
+      "stepPts": 0.25,
+      "defaultPts": 1.5
+    },
+    "streaks": {
+      "houseUsesStreaks": false
+    },
+    "markets": {
+      "edgeTiers": [
+        {
+          "id": "lean",
+          "minEdge": 0.03
+        },
+        {
+          "id": "play",
+          "minEdge": 0.05
+        },
+        {
+          "id": "strong",
+          "minEdge": 0.08
+        }
+      ],
+      "kellyFraction": 0.25,
+      "maxStakeFraction": 0.03,
+      "preferredSharpBook": "pinnacle",
+      "roleChangeShareThreshold": 0.05,
+      "volumePropMaxMarketBlend": 0.5,
+      "volumePropMarkets": [
+        "player_receptions",
+        "player_pass_attempts",
+        "player_pass_completions",
+        "player_rush_attempts"
+      ]
+    },
+    "oddsApi": {
+      "regions": [
+        "us",
+        "eu"
+      ],
+      "creditFloor": 100,
+      "monthlyCreditTarget": 1500
+    },
+    "locks": {
+      "maxPerUserPerSlate": 25,
+      "verifyProbTolerance": 1e-9
+    },
+    "leaderboard": {
+      "minPicks": 20
+    }
+  }
+}

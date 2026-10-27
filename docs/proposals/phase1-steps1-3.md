@@ -1,6 +1,14 @@
 # Phase 1, steps 1–3 — proposal for review
 
-Status: **awaiting Mike's OK** (CLAUDE.md §16). No code is written until this is approved.
+Status: **approved by Mike, 2026-10-27.** Step 1 implemented.
+
+### Changes made while implementing step 1
+
+- **Node 22, not Node 20.** Node 20 reached end of life in April 2026, and vitest 5 requires Node 22.12+. CI and `.nvmrc` use 22.
+- **`Precip` is a plain string**, `'none' | 'light_rain' | 'heavy_rain' | 'light_snow' | 'heavy_snow'`, instead of a nested object. Simpler, and maps 1:1 to the UI dropdown.
+- **`side` added to `MarketLine` and `CustomLine`** for team totals (which team's total).
+- **`ENGINE_VERSION` is a hand-bumped version** in `engine/src/version.ts`. A golden-output test (step 3) will fail if sim output changes without a bump.
+- **Python config loader and its test moved into step 1** (`pipeline/common/config.py`, `pipeline/tests/test_model_config.py`) so the Python CI job has something to run.
 
 Contents:
 1. Decisions that need a yes/no

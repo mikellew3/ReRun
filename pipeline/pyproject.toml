@@ -1,0 +1,36 @@
+[project]
+name = "rerun-pipeline"
+version = "0.1.0"
+description = "ReRun data pipeline: fetch nflverse, odds and weather; fit params; build slate snapshots."
+requires-python = ">=3.12"
+dependencies = [
+    "nflreadpy>=0.1.5",
+    "pandas>=2.2",
+    "pyarrow>=17",
+    "numpy>=2.0",
+    "scikit-learn>=1.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.12",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["common"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

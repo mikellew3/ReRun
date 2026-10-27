@@ -1,0 +1,17 @@
+{
+  "name": "@rerun/jobs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Node entrypoints that run the engine in batch (house run, lock verification, grading, backtests).",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "export-config": "tsx exportConfig.ts"
+  },
+  "dependencies": {
+    "@rerun/engine": "0.1.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0"
+  }
+}

@@ -1,0 +1,25 @@
+# Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Pipeline working data (fetched and fitted locally or in Actions; never committed)
+pipeline/data/
+
+# Local env
+.env
+.env.*
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
