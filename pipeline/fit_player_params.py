@@ -20,8 +20,9 @@ import pandas as pd
 from common.config import history_windows, model_config
 from common.io import fits_dir, read_json, read_raw, write_json
 from common.plays import before_slate, fg_make_prob, load_pbp
-from common.stats import shrink, solve_tilt
+from common.stats import shrink
 from common.weights import window_weights
+from fit_team_params import tilt_for
 
 SHARE_STATS = {
     # PlayerParams field: (player column, team column)
@@ -300,9 +301,9 @@ def player_params(
         "routeShare": snap_share,
         "catchRate": catch,
         "yardsPerTarget": ypt,
-        "recYdsTilt": solve_tilt(hists["completionYds"], ypr),
+        "recYdsTilt": tilt_for(hists["completionYds"], ypr, priors["all"]["yardsPerReception"]),
         "yardsPerCarry": ypc,
-        "rushYdsTilt": solve_tilt(hists["runYds"], ypc),
+        "rushYdsTilt": tilt_for(hists["runYds"], ypc, priors["all"]["yardsPerCarry"]),
     }
     for field, (num, den) in SHARE_STATS.items():
         out[field] = ratio(r[num], r[den])
@@ -320,7 +321,7 @@ def player_params(
             "yardsPerAttempt": shrink(
                 ratio(r["pass_yds"], r["pass_att"]), r["n_pass_att"], q["yardsPerAttempt"], kq
             ),
-            "passYdsTilt": solve_tilt(hists["completionYds"], ypc_qb),
+            "passYdsTilt": tilt_for(hists["completionYds"], ypc_qb, q["yardsPerCompletion"]),
             "sackRate": shrink(
                 ratio(r["sacks"], r["dropbacks"]), r["n_dropbacks"], q["sackRate"], kq
             ),

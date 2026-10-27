@@ -20,6 +20,33 @@ def yard_histogram(values: pd.Series, lo: int, hi: int, weights: pd.Series | Non
     return {"min": lo, "probs": (counts / total).tolist()}
 
 
+def censored_yard_histogram(values: pd.Series, censored: pd.Series, lo: int, hi: int) -> dict:
+    """Integer-yard histogram that corrects for plays cut short by the end zone.
+
+    A touchdown play's gain is only a lower bound: the play would have gone at least that far.
+    Kaplan-Meier on the integer support recovers the open-field distribution, so the engine can
+    apply its own goal-line cap without counting it twice. Returns the YardHistogram type.
+    """
+    v = np.clip(np.rint(values.to_numpy(dtype=float)), lo, hi).astype(int) - lo
+    c = censored.to_numpy(dtype=bool)
+    n = hi - lo + 1
+    events = np.bincount(v[~c], minlength=n).astype(float)
+    cens = np.bincount(v[c], minlength=n).astype(float)
+    at_risk = np.cumsum((events + cens)[::-1])[::-1]
+    probs = np.zeros(n)
+    survival = 1.0
+    for i in range(n):
+        if at_risk[i] <= 0:
+            break
+        hazard = events[i] / at_risk[i]
+        probs[i] = survival * hazard
+        survival *= 1 - hazard
+    probs[-1] += survival  # whatever survives past the top goes in the "or more" bin
+    if probs.sum() <= 0:
+        raise ValueError("cannot build a histogram from no data")
+    return {"min": lo, "probs": (probs / probs.sum()).tolist()}
+
+
 def histogram_mean(hist: dict, tilt: float = 0.0) -> float:
     x = np.arange(len(hist["probs"])) + hist["min"]
     p = np.asarray(hist["probs"]) * np.exp(tilt * (x - x.mean()))

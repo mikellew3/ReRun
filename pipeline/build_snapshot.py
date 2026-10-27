@@ -9,6 +9,9 @@ schedules, rosters, injuries and depth charts, and writes data/snapshots/{id}.js
 Usage:
   python build_snapshot.py --season 2026 --week 8
   python build_snapshot.py --season 2026 --week 8 --as-of 2026-10-29T12:00:00Z
+
+Without --as-of the snapshot represents now, or, for a slate already played, 90 minutes before
+its first kickoff.
 """
 
 import argparse
@@ -16,7 +19,7 @@ import gzip
 import json
 import math
 import re
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import pandas as pd
@@ -422,32 +425,45 @@ def build_snapshot(season: int, week: int, as_of: datetime, version: int) -> dic
     return round_floats(snapshot, model_config()["fitting"]["snapshotDecimals"])
 
 
+def default_as_of(season: int, week: int) -> datetime:
+    """Now, or for a past slate 90 minutes before its first kickoff (so no results leak in)."""
+    slate = read_raw("schedules", [season])
+    slate = slate[slate["week"] == week]
+    first = min(kickoff_utc(d, t) for d, t in zip(slate["gameday"], slate["gametime"], strict=True))
+    return min(datetime.now(UTC), first - timedelta(minutes=90))
+
+
+def write_snapshot(snapshot: dict) -> str:
+    """Writes the snapshot and returns a one-line summary."""
+    path = SNAPSHOTS_DIR / f"{snapshot['id']}.json"
+    write_json(path, snapshot, compact=True)
+    raw = path.read_bytes()
+    json.loads(raw)  # sanity: valid JSON
+    gz = len(gzip.compress(raw, 9))
+    return (
+        f"Wrote {path}: {len(snapshot['games'])} games, {len(snapshot['teams'])} teams, "
+        f"{len(snapshot['players'])} players, "
+        f"{len(raw) / 1024:.0f} KB raw, {gz / 1024:.0f} KB gzipped"
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build a slate snapshot.")
     parser.add_argument("--season", type=int, required=True)
     parser.add_argument("--week", type=int, required=True)
-    parser.add_argument("--as-of", help="ISO time the snapshot represents (default: now)")
+    parser.add_argument(
+        "--as-of", help="ISO time the snapshot represents (default: now, or pre-kickoff if past)"
+    )
     parser.add_argument("--version", type=int, help="default: next unused version")
     args = parser.parse_args()
 
     as_of = (
         datetime.fromisoformat(args.as_of.replace("Z", "+00:00"))
         if args.as_of
-        else datetime.now(UTC)
+        else default_as_of(args.season, args.week)
     )
     version = args.version or next_version(args.season, args.week)
-    snapshot = build_snapshot(args.season, args.week, as_of, version)
-
-    path = SNAPSHOTS_DIR / f"{snapshot['id']}.json"
-    write_json(path, snapshot, compact=True)
-    raw = path.read_bytes()
-    gz = len(gzip.compress(raw, 9))
-    print(
-        f"Wrote {path}: {len(snapshot['games'])} games, {len(snapshot['teams'])} teams, "
-        f"{len(snapshot['players'])} players, "
-        f"{len(raw) / 1024:.0f} KB raw, {gz / 1024:.0f} KB gzipped"
-    )
-    json.loads(raw)  # sanity: valid JSON
+    print(write_snapshot(build_snapshot(args.season, args.week, as_of, version)))
 
 
 if __name__ == "__main__":

@@ -25,10 +25,9 @@ export function passProbability(ctx: GameCtx, unit: OffenseUnit): number {
   const base = sigmoid(grid[s.down - 1]![distanceBucket(s.distance)]!);
   const withStyle = Math.min(0.99, Math.max(0.01, base + unit.proeShift));
   let x = logit(withStyle);
-  x +=
-    P.scoreDiffLogitPerPt *
-    scoreDiff(s, s.possession) *
-    Math.pow(gameElapsedFraction(s), P.scoreDiffTimePower);
+  const diff = scoreDiff(s, s.possession);
+  const perPt = diff > 0 ? P.scoreLeadingLogitPerPt : P.scoreTrailingLogitPerPt;
+  x += perPt * diff * Math.pow(gameElapsedFraction(s), P.scoreDiffTimePower);
   if (inHurryUp(s, s.possession)) x += P.hurryUpPassLogit;
   return Math.min(P.maxPassRate, Math.max(P.minPassRate, sigmoid(x)));
 }

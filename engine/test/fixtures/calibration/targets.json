@@ -1,0 +1,1432 @@
+{
+  "seasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "weeks": [
+    4,
+    8,
+    12,
+    16
+  ],
+  "game": {
+    "games": 816,
+    "absMarginShare": {
+      "0": 0.0012254901960784314,
+      "1": 0.05269607843137255,
+      "2": 0.056372549019607844,
+      "3": 0.14215686274509803,
+      "4": 0.05024509803921569,
+      "5": 0.051470588235294115,
+      "6": 0.0661764705882353,
+      "7": 0.08333333333333333,
+      "8": 0.04044117647058824,
+      "9": 0.012254901960784314,
+      "10": 0.041666666666666664,
+      "11": 0.011029411764705883,
+      "12": 0.01715686274509804,
+      "13": 0.020833333333333332,
+      "14": 0.04411764705882353,
+      "15": 0.012254901960784314,
+      "16": 0.01715686274509804,
+      "17": 0.049019607843137254,
+      "18": 0.022058823529411766,
+      "19": 0.013480392156862746,
+      "20": 0.01838235294117647,
+      "21": 0.022058823529411766,
+      "22": 0.012254901960784314,
+      "23": 0.0196078431372549,
+      "24": 0.022058823529411766,
+      "25": 0.014705882352941176,
+      "26": 0.007352941176470588,
+      "27": 0.007352941176470588,
+      "28": 0.014705882352941176,
+      "29": 0.003676470588235294,
+      "30": 0.003676470588235294,
+      "31": 0.013480392156862746,
+      "32": 0.006127450980392157,
+      "33": 0.0024509803921568627,
+      "34": 0.011029411764705883,
+      "35": 0.0024509803921568627
+    },
+    "total": {
+      "mean": 45.12867647058823,
+      "sd": 13.569882249245588,
+      "n": 816
+    },
+    "totalQuantiles": {
+      "10": 29.0,
+      "25": 36.0,
+      "50": 44.0,
+      "75": 53.0,
+      "90": 63.0
+    },
+    "homeMargin": {
+      "mean": 2.207107843137255,
+      "sd": 14.339785435950281,
+      "n": 816
+    },
+    "overtimeRate": 0.05269607843137255,
+    "tieRate": 0.0012254901960784314,
+    "teamPoints": {
+      "mean": 22.564338235294116,
+      "sd": 9.929834912469536,
+      "n": 1632
+    }
+  },
+  "plays": {
+    "playsPerGame": {
+      "mean": 124.35539215686275,
+      "sd": 8.14070558694922,
+      "n": 816
+    },
+    "yardsPerPlay": 5.3368547608254335,
+    "attemptShare": 0.5496444804695115,
+    "completionRate": 0.6496082180482136,
+    "turnoversPerTeamGame": 1.173406862745098,
+    "teamYards": {
+      "mean": 331.8333333333333,
+      "sd": 85.00662745709218,
+      "n": 1632
+    }
+  },
+  "starters": {
+    "qb": {
+      "passAtt": {
+        "mean": 31.69485294117647,
+        "sd": 8.084548499568777,
+        "n": 1632
+      },
+      "passYds": {
+        "mean": 225.78063725490196,
+        "sd": 74.14059203272772,
+        "n": 1632
+      },
+      "passTd": {
+        "mean": 1.4270833333333333,
+        "sd": 1.1339807196925245,
+        "n": 1632
+      }
+    },
+    "rb1": {
+      "rushAtt": {
+        "mean": 15.205269607843137,
+        "sd": 5.191975761914427,
+        "n": 1632
+      },
+      "rushYds": {
+        "mean": 65.87745098039215,
+        "sd": 36.04423239948358,
+        "n": 1632
+      }
+    },
+    "topTarget": {
+      "targets": {
+        "mean": 9.191176470588236,
+        "sd": 2.868500885046873,
+        "n": 1632
+      },
+      "rec": {
+        "mean": 6.133578431372549,
+        "sd": 2.4198849106867066,
+        "n": 1632
+      },
+      "recYds": {
+        "mean": 74.74754901960785,
+        "sd": 37.69666590825313,
+        "n": 1632
+      }
+    }
+  },
+  "calibrationGames": [
+    {
+      "gameId": "2023_04_DET_GB",
+      "spreadLine": -2.5,
+      "totalLine": 45.0,
+      "result": -14.0,
+      "total": 54.0
+    },
+    {
+      "gameId": "2023_04_ATL_JAX",
+      "spreadLine": 3.5,
+      "totalLine": 42.5,
+      "result": 16.0,
+      "total": 30.0
+    },
+    {
+      "gameId": "2023_04_MIA_BUF",
+      "spreadLine": 2.5,
+      "totalLine": 53.0,
+      "result": 28.0,
+      "total": 68.0
+    },
+    {
+      "gameId": "2023_04_MIN_CAR",
+      "spreadLine": -4.5,
+      "totalLine": 46.5,
+      "result": -8.0,
+      "total": 34.0
+    },
+    {
+      "gameId": "2023_04_DEN_CHI",
+      "spreadLine": -3.0,
+      "totalLine": 47.0,
+      "result": -3.0,
+      "total": 59.0
+    },
+    {
+      "gameId": "2023_04_BAL_CLE",
+      "spreadLine": -2.0,
+      "totalLine": 38.5,
+      "result": -25.0,
+      "total": 31.0
+    },
+    {
+      "gameId": "2023_04_PIT_HOU",
+      "spreadLine": -3.0,
+      "totalLine": 41.5,
+      "result": 24.0,
+      "total": 36.0
+    },
+    {
+      "gameId": "2023_04_LA_IND",
+      "spreadLine": -1.0,
+      "totalLine": 44.5,
+      "result": -6.0,
+      "total": 52.0
+    },
+    {
+      "gameId": "2023_04_TB_NO",
+      "spreadLine": 4.0,
+      "totalLine": 41.0,
+      "result": -17.0,
+      "total": 35.0
+    },
+    {
+      "gameId": "2023_04_WAS_PHI",
+      "spreadLine": 9.5,
+      "totalLine": 43.0,
+      "result": 3.0,
+      "total": 65.0
+    },
+    {
+      "gameId": "2023_04_CIN_TEN",
+      "spreadLine": -2.5,
+      "totalLine": 41.5,
+      "result": 24.0,
+      "total": 30.0
+    },
+    {
+      "gameId": "2023_04_LV_LAC",
+      "spreadLine": 7.0,
+      "totalLine": 49.0,
+      "result": 7.0,
+      "total": 41.0
+    },
+    {
+      "gameId": "2023_04_NE_DAL",
+      "spreadLine": 6.5,
+      "totalLine": 43.0,
+      "result": 35.0,
+      "total": 41.0
+    },
+    {
+      "gameId": "2023_04_ARI_SF",
+      "spreadLine": 15.0,
+      "totalLine": 44.0,
+      "result": 19.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2023_04_KC_NYJ",
+      "spreadLine": -9.5,
+      "totalLine": 41.5,
+      "result": -3.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2023_04_SEA_NYG",
+      "spreadLine": -2.5,
+      "totalLine": 46.5,
+      "result": -21.0,
+      "total": 27.0
+    },
+    {
+      "gameId": "2023_08_TB_BUF",
+      "spreadLine": 10.0,
+      "totalLine": 43.0,
+      "result": 6.0,
+      "total": 42.0
+    },
+    {
+      "gameId": "2023_08_HOU_CAR",
+      "spreadLine": -3.0,
+      "totalLine": 43.0,
+      "result": 2.0,
+      "total": 28.0
+    },
+    {
+      "gameId": "2023_08_LA_DAL",
+      "spreadLine": 6.5,
+      "totalLine": 44.5,
+      "result": 23.0,
+      "total": 63.0
+    },
+    {
+      "gameId": "2023_08_MIN_GB",
+      "spreadLine": -1.0,
+      "totalLine": 41.5,
+      "result": -14.0,
+      "total": 34.0
+    },
+    {
+      "gameId": "2023_08_NO_IND",
+      "spreadLine": -2.0,
+      "totalLine": 43.5,
+      "result": -11.0,
+      "total": 65.0
+    },
+    {
+      "gameId": "2023_08_NE_MIA",
+      "spreadLine": 7.5,
+      "totalLine": 46.5,
+      "result": 14.0,
+      "total": 48.0
+    },
+    {
+      "gameId": "2023_08_NYJ_NYG",
+      "spreadLine": -3.0,
+      "totalLine": 35.0,
+      "result": -3.0,
+      "total": 23.0
+    },
+    {
+      "gameId": "2023_08_JAX_PIT",
+      "spreadLine": -2.5,
+      "totalLine": 41.0,
+      "result": -10.0,
+      "total": 30.0
+    },
+    {
+      "gameId": "2023_08_ATL_TEN",
+      "spreadLine": -2.5,
+      "totalLine": 35.0,
+      "result": 5.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2023_08_PHI_WAS",
+      "spreadLine": -7.0,
+      "totalLine": 42.5,
+      "result": -7.0,
+      "total": 69.0
+    },
+    {
+      "gameId": "2023_08_CLE_SEA",
+      "spreadLine": 4.0,
+      "totalLine": 39.5,
+      "result": 4.0,
+      "total": 44.0
+    },
+    {
+      "gameId": "2023_08_BAL_ARI",
+      "spreadLine": -9.5,
+      "totalLine": 44.5,
+      "result": -7.0,
+      "total": 55.0
+    },
+    {
+      "gameId": "2023_08_KC_DEN",
+      "spreadLine": -7.0,
+      "totalLine": 45.5,
+      "result": 15.0,
+      "total": 33.0
+    },
+    {
+      "gameId": "2023_08_CIN_SF",
+      "spreadLine": 4.0,
+      "totalLine": 44.0,
+      "result": -14.0,
+      "total": 48.0
+    },
+    {
+      "gameId": "2023_08_CHI_LAC",
+      "spreadLine": 9.5,
+      "totalLine": 46.0,
+      "result": 17.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2023_08_LV_DET",
+      "spreadLine": 7.0,
+      "totalLine": 46.0,
+      "result": 12.0,
+      "total": 40.0
+    },
+    {
+      "gameId": "2023_12_GB_DET",
+      "spreadLine": 8.5,
+      "totalLine": 47.0,
+      "result": -7.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2023_12_WAS_DAL",
+      "spreadLine": 13.0,
+      "totalLine": 48.0,
+      "result": 35.0,
+      "total": 55.0
+    },
+    {
+      "gameId": "2023_12_SF_SEA",
+      "spreadLine": -7.0,
+      "totalLine": 43.5,
+      "result": -18.0,
+      "total": 44.0
+    },
+    {
+      "gameId": "2023_12_MIA_NYJ",
+      "spreadLine": -9.5,
+      "totalLine": 40.0,
+      "result": -21.0,
+      "total": 47.0
+    },
+    {
+      "gameId": "2023_12_NO_ATL",
+      "spreadLine": -2.0,
+      "totalLine": 42.0,
+      "result": 9.0,
+      "total": 39.0
+    },
+    {
+      "gameId": "2023_12_PIT_CIN",
+      "spreadLine": -2.0,
+      "totalLine": 36.0,
+      "result": -6.0,
+      "total": 26.0
+    },
+    {
+      "gameId": "2023_12_JAX_HOU",
+      "spreadLine": -1.0,
+      "totalLine": 48.0,
+      "result": -3.0,
+      "total": 45.0
+    },
+    {
+      "gameId": "2023_12_TB_IND",
+      "spreadLine": 2.5,
+      "totalLine": 45.0,
+      "result": 7.0,
+      "total": 47.0
+    },
+    {
+      "gameId": "2023_12_NE_NYG",
+      "spreadLine": -4.5,
+      "totalLine": 36.5,
+      "result": 3.0,
+      "total": 17.0
+    },
+    {
+      "gameId": "2023_12_CAR_TEN",
+      "spreadLine": 3.5,
+      "totalLine": 36.0,
+      "result": 7.0,
+      "total": 27.0
+    },
+    {
+      "gameId": "2023_12_LA_ARI",
+      "spreadLine": -3.0,
+      "totalLine": 45.0,
+      "result": -23.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2023_12_CLE_DEN",
+      "spreadLine": 1.5,
+      "totalLine": 37.5,
+      "result": 17.0,
+      "total": 41.0
+    },
+    {
+      "gameId": "2023_12_KC_LV",
+      "spreadLine": -9.0,
+      "totalLine": 42.5,
+      "result": -14.0,
+      "total": 48.0
+    },
+    {
+      "gameId": "2023_12_BUF_PHI",
+      "spreadLine": 2.5,
+      "totalLine": 49.0,
+      "result": 3.0,
+      "total": 71.0
+    },
+    {
+      "gameId": "2023_12_BAL_LAC",
+      "spreadLine": -3.0,
+      "totalLine": 49.0,
+      "result": -10.0,
+      "total": 30.0
+    },
+    {
+      "gameId": "2023_12_CHI_MIN",
+      "spreadLine": 3.0,
+      "totalLine": 43.5,
+      "result": -2.0,
+      "total": 22.0
+    },
+    {
+      "gameId": "2023_16_NO_LA",
+      "spreadLine": 4.0,
+      "totalLine": 45.5,
+      "result": 8.0,
+      "total": 52.0
+    },
+    {
+      "gameId": "2023_16_CIN_PIT",
+      "spreadLine": -3.0,
+      "totalLine": 39.5,
+      "result": 23.0,
+      "total": 45.0
+    },
+    {
+      "gameId": "2023_16_BUF_LAC",
+      "spreadLine": -13.0,
+      "totalLine": 44.5,
+      "result": -2.0,
+      "total": 46.0
+    },
+    {
+      "gameId": "2023_16_IND_ATL",
+      "spreadLine": 3.0,
+      "totalLine": 44.0,
+      "result": 19.0,
+      "total": 39.0
+    },
+    {
+      "gameId": "2023_16_GB_CAR",
+      "spreadLine": -3.5,
+      "totalLine": 39.5,
+      "result": -3.0,
+      "total": 63.0
+    },
+    {
+      "gameId": "2023_16_CLE_HOU",
+      "spreadLine": -3.0,
+      "totalLine": 40.0,
+      "result": -14.0,
+      "total": 58.0
+    },
+    {
+      "gameId": "2023_16_DET_MIN",
+      "spreadLine": -2.5,
+      "totalLine": 47.5,
+      "result": -6.0,
+      "total": 54.0
+    },
+    {
+      "gameId": "2023_16_WAS_NYJ",
+      "spreadLine": 3.0,
+      "totalLine": 36.5,
+      "result": 2.0,
+      "total": 58.0
+    },
+    {
+      "gameId": "2023_16_SEA_TEN",
+      "spreadLine": -3.0,
+      "totalLine": 42.0,
+      "result": -3.0,
+      "total": 37.0
+    },
+    {
+      "gameId": "2023_16_JAX_TB",
+      "spreadLine": -2.0,
+      "totalLine": 43.0,
+      "result": 18.0,
+      "total": 42.0
+    },
+    {
+      "gameId": "2023_16_ARI_CHI",
+      "spreadLine": 4.5,
+      "totalLine": 42.0,
+      "result": 11.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2023_16_DAL_MIA",
+      "spreadLine": 1.5,
+      "totalLine": 48.5,
+      "result": 2.0,
+      "total": 42.0
+    },
+    {
+      "gameId": "2023_16_NE_DEN",
+      "spreadLine": 7.0,
+      "totalLine": 37.5,
+      "result": -3.0,
+      "total": 49.0
+    },
+    {
+      "gameId": "2023_16_LV_KC",
+      "spreadLine": 11.0,
+      "totalLine": 40.5,
+      "result": -6.0,
+      "total": 34.0
+    },
+    {
+      "gameId": "2023_16_NYG_PHI",
+      "spreadLine": 14.0,
+      "totalLine": 41.0,
+      "result": 8.0,
+      "total": 58.0
+    },
+    {
+      "gameId": "2023_16_BAL_SF",
+      "spreadLine": 6.5,
+      "totalLine": 47.5,
+      "result": -14.0,
+      "total": 52.0
+    },
+    {
+      "gameId": "2024_04_DAL_NYG",
+      "spreadLine": -5.5,
+      "totalLine": 45.0,
+      "result": -5.0,
+      "total": 35.0
+    },
+    {
+      "gameId": "2024_04_NO_ATL",
+      "spreadLine": 2.5,
+      "totalLine": 41.5,
+      "result": 2.0,
+      "total": 50.0
+    },
+    {
+      "gameId": "2024_04_CIN_CAR",
+      "spreadLine": -4.5,
+      "totalLine": 47.0,
+      "result": -10.0,
+      "total": 58.0
+    },
+    {
+      "gameId": "2024_04_LA_CHI",
+      "spreadLine": 3.0,
+      "totalLine": 40.0,
+      "result": 6.0,
+      "total": 42.0
+    },
+    {
+      "gameId": "2024_04_MIN_GB",
+      "spreadLine": 2.5,
+      "totalLine": 44.0,
+      "result": -2.0,
+      "total": 60.0
+    },
+    {
+      "gameId": "2024_04_JAX_HOU",
+      "spreadLine": 5.5,
+      "totalLine": 44.5,
+      "result": 4.0,
+      "total": 44.0
+    },
+    {
+      "gameId": "2024_04_PIT_IND",
+      "spreadLine": -2.5,
+      "totalLine": 40.0,
+      "result": 3.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2024_04_DEN_NYJ",
+      "spreadLine": 7.5,
+      "totalLine": 39.5,
+      "result": -1.0,
+      "total": 19.0
+    },
+    {
+      "gameId": "2024_04_PHI_TB",
+      "spreadLine": -1.0,
+      "totalLine": 42.0,
+      "result": 17.0,
+      "total": 49.0
+    },
+    {
+      "gameId": "2024_04_WAS_ARI",
+      "spreadLine": 3.5,
+      "totalLine": 49.0,
+      "result": -28.0,
+      "total": 56.0
+    },
+    {
+      "gameId": "2024_04_NE_SF",
+      "spreadLine": 10.5,
+      "totalLine": 41.5,
+      "result": 17.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2024_04_KC_LAC",
+      "spreadLine": -7.5,
+      "totalLine": 41.5,
+      "result": -7.0,
+      "total": 27.0
+    },
+    {
+      "gameId": "2024_04_CLE_LV",
+      "spreadLine": -2.5,
+      "totalLine": 36.5,
+      "result": 4.0,
+      "total": 36.0
+    },
+    {
+      "gameId": "2024_04_BUF_BAL",
+      "spreadLine": 2.5,
+      "totalLine": 46.5,
+      "result": 25.0,
+      "total": 45.0
+    },
+    {
+      "gameId": "2024_04_TEN_MIA",
+      "spreadLine": 2.5,
+      "totalLine": 37.0,
+      "result": -19.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2024_04_SEA_DET",
+      "spreadLine": 3.5,
+      "totalLine": 46.5,
+      "result": 13.0,
+      "total": 71.0
+    },
+    {
+      "gameId": "2024_08_MIN_LA",
+      "spreadLine": -3.0,
+      "totalLine": 47.5,
+      "result": 10.0,
+      "total": 50.0
+    },
+    {
+      "gameId": "2024_08_PHI_CIN",
+      "spreadLine": 2.5,
+      "totalLine": 47.5,
+      "result": -20.0,
+      "total": 54.0
+    },
+    {
+      "gameId": "2024_08_BAL_CLE",
+      "spreadLine": -7.5,
+      "totalLine": 44.5,
+      "result": 5.0,
+      "total": 53.0
+    },
+    {
+      "gameId": "2024_08_TEN_DET",
+      "spreadLine": 12.5,
+      "totalLine": 45.0,
+      "result": 38.0,
+      "total": 66.0
+    },
+    {
+      "gameId": "2024_08_IND_HOU",
+      "spreadLine": 5.0,
+      "totalLine": 45.0,
+      "result": 3.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2024_08_GB_JAX",
+      "spreadLine": -3.5,
+      "totalLine": 49.0,
+      "result": -3.0,
+      "total": 57.0
+    },
+    {
+      "gameId": "2024_08_ARI_MIA",
+      "spreadLine": 4.0,
+      "totalLine": 46.5,
+      "result": -1.0,
+      "total": 55.0
+    },
+    {
+      "gameId": "2024_08_NYJ_NE",
+      "spreadLine": -7.0,
+      "totalLine": 41.0,
+      "result": 3.0,
+      "total": 47.0
+    },
+    {
+      "gameId": "2024_08_ATL_TB",
+      "spreadLine": -1.5,
+      "totalLine": 47.0,
+      "result": -5.0,
+      "total": 57.0
+    },
+    {
+      "gameId": "2024_08_NO_LAC",
+      "spreadLine": 7.0,
+      "totalLine": 41.5,
+      "result": 18.0,
+      "total": 34.0
+    },
+    {
+      "gameId": "2024_08_BUF_SEA",
+      "spreadLine": -3.0,
+      "totalLine": 45.5,
+      "result": -21.0,
+      "total": 41.0
+    },
+    {
+      "gameId": "2024_08_CAR_DEN",
+      "spreadLine": 13.0,
+      "totalLine": 40.5,
+      "result": 14.0,
+      "total": 42.0
+    },
+    {
+      "gameId": "2024_08_KC_LV",
+      "spreadLine": -9.0,
+      "totalLine": 42.0,
+      "result": -7.0,
+      "total": 47.0
+    },
+    {
+      "gameId": "2024_08_CHI_WAS",
+      "spreadLine": 1.5,
+      "totalLine": 46.5,
+      "result": 3.0,
+      "total": 33.0
+    },
+    {
+      "gameId": "2024_08_DAL_SF",
+      "spreadLine": 5.5,
+      "totalLine": 48.0,
+      "result": 6.0,
+      "total": 54.0
+    },
+    {
+      "gameId": "2024_08_NYG_PIT",
+      "spreadLine": 6.0,
+      "totalLine": 37.5,
+      "result": 8.0,
+      "total": 44.0
+    },
+    {
+      "gameId": "2024_12_PIT_CLE",
+      "spreadLine": -3.5,
+      "totalLine": 36.5,
+      "result": 5.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2024_12_KC_CAR",
+      "spreadLine": -11.0,
+      "totalLine": 43.0,
+      "result": -3.0,
+      "total": 57.0
+    },
+    {
+      "gameId": "2024_12_MIN_CHI",
+      "spreadLine": -3.0,
+      "totalLine": 39.5,
+      "result": -3.0,
+      "total": 57.0
+    },
+    {
+      "gameId": "2024_12_TEN_HOU",
+      "spreadLine": 8.0,
+      "totalLine": 40.5,
+      "result": -5.0,
+      "total": 59.0
+    },
+    {
+      "gameId": "2024_12_DET_IND",
+      "spreadLine": -7.0,
+      "totalLine": 50.5,
+      "result": -18.0,
+      "total": 30.0
+    },
+    {
+      "gameId": "2024_12_NE_MIA",
+      "spreadLine": 7.5,
+      "totalLine": 46.0,
+      "result": 19.0,
+      "total": 49.0
+    },
+    {
+      "gameId": "2024_12_TB_NYG",
+      "spreadLine": -6.5,
+      "totalLine": 40.5,
+      "result": -23.0,
+      "total": 37.0
+    },
+    {
+      "gameId": "2024_12_DAL_WAS",
+      "spreadLine": 10.5,
+      "totalLine": 45.0,
+      "result": -8.0,
+      "total": 60.0
+    },
+    {
+      "gameId": "2024_12_DEN_LV",
+      "spreadLine": -6.5,
+      "totalLine": 41.5,
+      "result": -10.0,
+      "total": 48.0
+    },
+    {
+      "gameId": "2024_12_SF_GB",
+      "spreadLine": 6.5,
+      "totalLine": 44.5,
+      "result": 28.0,
+      "total": 48.0
+    },
+    {
+      "gameId": "2024_12_ARI_SEA",
+      "spreadLine": -1.0,
+      "totalLine": 46.5,
+      "result": 10.0,
+      "total": 22.0
+    },
+    {
+      "gameId": "2024_12_PHI_LA",
+      "spreadLine": -3.0,
+      "totalLine": 49.0,
+      "result": -17.0,
+      "total": 57.0
+    },
+    {
+      "gameId": "2024_12_BAL_LAC",
+      "spreadLine": -3.0,
+      "totalLine": 51.0,
+      "result": -7.0,
+      "total": 53.0
+    },
+    {
+      "gameId": "2024_16_DEN_LAC",
+      "spreadLine": 3.0,
+      "totalLine": 41.5,
+      "result": 7.0,
+      "total": 61.0
+    },
+    {
+      "gameId": "2024_16_HOU_KC",
+      "spreadLine": 3.5,
+      "totalLine": 42.5,
+      "result": 8.0,
+      "total": 46.0
+    },
+    {
+      "gameId": "2024_16_PIT_BAL",
+      "spreadLine": 7.0,
+      "totalLine": 44.5,
+      "result": 17.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2024_16_NYG_ATL",
+      "spreadLine": 9.5,
+      "totalLine": 42.5,
+      "result": 27.0,
+      "total": 41.0
+    },
+    {
+      "gameId": "2024_16_ARI_CAR",
+      "spreadLine": -5.5,
+      "totalLine": 47.0,
+      "result": 6.0,
+      "total": 66.0
+    },
+    {
+      "gameId": "2024_16_DET_CHI",
+      "spreadLine": -7.0,
+      "totalLine": 47.5,
+      "result": -17.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2024_16_CLE_CIN",
+      "spreadLine": 10.0,
+      "totalLine": 46.5,
+      "result": 18.0,
+      "total": 30.0
+    },
+    {
+      "gameId": "2024_16_TEN_IND",
+      "spreadLine": 4.0,
+      "totalLine": 42.5,
+      "result": 8.0,
+      "total": 68.0
+    },
+    {
+      "gameId": "2024_16_LA_NYJ",
+      "spreadLine": -3.0,
+      "totalLine": 47.0,
+      "result": -10.0,
+      "total": 28.0
+    },
+    {
+      "gameId": "2024_16_PHI_WAS",
+      "spreadLine": -4.0,
+      "totalLine": 47.0,
+      "result": 3.0,
+      "total": 69.0
+    },
+    {
+      "gameId": "2024_16_MIN_SEA",
+      "spreadLine": -2.5,
+      "totalLine": 43.0,
+      "result": -3.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2024_16_NE_BUF",
+      "spreadLine": 14.0,
+      "totalLine": 48.0,
+      "result": 3.0,
+      "total": 45.0
+    },
+    {
+      "gameId": "2024_16_JAX_LV",
+      "spreadLine": 2.5,
+      "totalLine": 41.5,
+      "result": 5.0,
+      "total": 33.0
+    },
+    {
+      "gameId": "2024_16_SF_MIA",
+      "spreadLine": -2.0,
+      "totalLine": 44.0,
+      "result": 12.0,
+      "total": 46.0
+    },
+    {
+      "gameId": "2024_16_TB_DAL",
+      "spreadLine": -4.5,
+      "totalLine": 47.5,
+      "result": 2.0,
+      "total": 50.0
+    },
+    {
+      "gameId": "2024_16_NO_GB",
+      "spreadLine": 14.0,
+      "totalLine": 44.0,
+      "result": 34.0,
+      "total": 34.0
+    },
+    {
+      "gameId": "2025_04_SEA_ARI",
+      "spreadLine": -1.5,
+      "totalLine": 43.5,
+      "result": -3.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2025_04_MIN_PIT",
+      "spreadLine": -2.5,
+      "totalLine": 41.5,
+      "result": 3.0,
+      "total": 45.0
+    },
+    {
+      "gameId": "2025_04_WAS_ATL",
+      "spreadLine": 2.5,
+      "totalLine": 43.5,
+      "result": 7.0,
+      "total": 61.0
+    },
+    {
+      "gameId": "2025_04_NO_BUF",
+      "spreadLine": 15.5,
+      "totalLine": 48.5,
+      "result": 12.0,
+      "total": 50.0
+    },
+    {
+      "gameId": "2025_04_CLE_DET",
+      "spreadLine": 10.0,
+      "totalLine": 44.5,
+      "result": 24.0,
+      "total": 44.0
+    },
+    {
+      "gameId": "2025_04_TEN_HOU",
+      "spreadLine": 7.5,
+      "totalLine": 39.5,
+      "result": 26.0,
+      "total": 26.0
+    },
+    {
+      "gameId": "2025_04_CAR_NE",
+      "spreadLine": 5.5,
+      "totalLine": 42.5,
+      "result": 29.0,
+      "total": 55.0
+    },
+    {
+      "gameId": "2025_04_LAC_NYG",
+      "spreadLine": -6.0,
+      "totalLine": 43.5,
+      "result": 3.0,
+      "total": 39.0
+    },
+    {
+      "gameId": "2025_04_PHI_TB",
+      "spreadLine": -3.5,
+      "totalLine": 44.5,
+      "result": -6.0,
+      "total": 56.0
+    },
+    {
+      "gameId": "2025_04_IND_LA",
+      "spreadLine": 3.5,
+      "totalLine": 49.5,
+      "result": 7.0,
+      "total": 47.0
+    },
+    {
+      "gameId": "2025_04_JAX_SF",
+      "spreadLine": 3.5,
+      "totalLine": 45.5,
+      "result": -5.0,
+      "total": 47.0
+    },
+    {
+      "gameId": "2025_04_BAL_KC",
+      "spreadLine": -2.5,
+      "totalLine": 48.5,
+      "result": 17.0,
+      "total": 57.0
+    },
+    {
+      "gameId": "2025_04_CHI_LV",
+      "spreadLine": 1.5,
+      "totalLine": 47.5,
+      "result": -1.0,
+      "total": 49.0
+    },
+    {
+      "gameId": "2025_04_GB_DAL",
+      "spreadLine": -7.0,
+      "totalLine": 47.5,
+      "result": 0.0,
+      "total": 80.0
+    },
+    {
+      "gameId": "2025_04_NYJ_MIA",
+      "spreadLine": 2.5,
+      "totalLine": 44.5,
+      "result": 6.0,
+      "total": 48.0
+    },
+    {
+      "gameId": "2025_04_CIN_DEN",
+      "spreadLine": 7.5,
+      "totalLine": 44.5,
+      "result": 25.0,
+      "total": 31.0
+    },
+    {
+      "gameId": "2025_08_MIN_LAC",
+      "spreadLine": 3.0,
+      "totalLine": 45.5,
+      "result": 27.0,
+      "total": 47.0
+    },
+    {
+      "gameId": "2025_08_MIA_ATL",
+      "spreadLine": 7.0,
+      "totalLine": 44.5,
+      "result": -24.0,
+      "total": 44.0
+    },
+    {
+      "gameId": "2025_08_CHI_BAL",
+      "spreadLine": 2.5,
+      "totalLine": 45.5,
+      "result": 14.0,
+      "total": 46.0
+    },
+    {
+      "gameId": "2025_08_BUF_CAR",
+      "spreadLine": -7.0,
+      "totalLine": 47.5,
+      "result": -31.0,
+      "total": 49.0
+    },
+    {
+      "gameId": "2025_08_NYJ_CIN",
+      "spreadLine": 5.5,
+      "totalLine": 43.5,
+      "result": -1.0,
+      "total": 77.0
+    },
+    {
+      "gameId": "2025_08_SF_HOU",
+      "spreadLine": 2.5,
+      "totalLine": 41.5,
+      "result": 11.0,
+      "total": 41.0
+    },
+    {
+      "gameId": "2025_08_CLE_NE",
+      "spreadLine": 7.0,
+      "totalLine": 40.5,
+      "result": 19.0,
+      "total": 45.0
+    },
+    {
+      "gameId": "2025_08_NYG_PHI",
+      "spreadLine": 7.0,
+      "totalLine": 43.5,
+      "result": 18.0,
+      "total": 58.0
+    },
+    {
+      "gameId": "2025_08_TB_NO",
+      "spreadLine": -4.5,
+      "totalLine": 46.5,
+      "result": -20.0,
+      "total": 26.0
+    },
+    {
+      "gameId": "2025_08_DAL_DEN",
+      "spreadLine": 3.5,
+      "totalLine": 51.5,
+      "result": 20.0,
+      "total": 68.0
+    },
+    {
+      "gameId": "2025_08_TEN_IND",
+      "spreadLine": 15.5,
+      "totalLine": 47.5,
+      "result": 24.0,
+      "total": 52.0
+    },
+    {
+      "gameId": "2025_08_GB_PIT",
+      "spreadLine": -3.0,
+      "totalLine": 46.5,
+      "result": -10.0,
+      "total": 60.0
+    },
+    {
+      "gameId": "2025_08_WAS_KC",
+      "spreadLine": 10.5,
+      "totalLine": 48.5,
+      "result": 21.0,
+      "total": 35.0
+    },
+    {
+      "gameId": "2025_12_BUF_HOU",
+      "spreadLine": -5.5,
+      "totalLine": 43.5,
+      "result": 4.0,
+      "total": 42.0
+    },
+    {
+      "gameId": "2025_12_NYJ_BAL",
+      "spreadLine": 14.0,
+      "totalLine": 44.5,
+      "result": 13.0,
+      "total": 33.0
+    },
+    {
+      "gameId": "2025_12_PIT_CHI",
+      "spreadLine": 3.0,
+      "totalLine": 46.5,
+      "result": 3.0,
+      "total": 59.0
+    },
+    {
+      "gameId": "2025_12_NE_CIN",
+      "spreadLine": -7.5,
+      "totalLine": 50.5,
+      "result": -6.0,
+      "total": 46.0
+    },
+    {
+      "gameId": "2025_12_NYG_DET",
+      "spreadLine": 14.0,
+      "totalLine": 50.5,
+      "result": 7.0,
+      "total": 61.0
+    },
+    {
+      "gameId": "2025_12_MIN_GB",
+      "spreadLine": 6.5,
+      "totalLine": 41.5,
+      "result": 17.0,
+      "total": 29.0
+    },
+    {
+      "gameId": "2025_12_IND_KC",
+      "spreadLine": 3.5,
+      "totalLine": 50.5,
+      "result": 3.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2025_12_SEA_TEN",
+      "spreadLine": -12.5,
+      "totalLine": 41.5,
+      "result": -6.0,
+      "total": 54.0
+    },
+    {
+      "gameId": "2025_12_JAX_ARI",
+      "spreadLine": -2.5,
+      "totalLine": 47.5,
+      "result": -3.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2025_12_CLE_LV",
+      "spreadLine": 3.0,
+      "totalLine": 35.5,
+      "result": -14.0,
+      "total": 34.0
+    },
+    {
+      "gameId": "2025_12_PHI_DAL",
+      "spreadLine": -3.0,
+      "totalLine": 47.5,
+      "result": 3.0,
+      "total": 45.0
+    },
+    {
+      "gameId": "2025_12_ATL_NO",
+      "spreadLine": 1.5,
+      "totalLine": 41.5,
+      "result": -14.0,
+      "total": 34.0
+    },
+    {
+      "gameId": "2025_12_TB_LA",
+      "spreadLine": 7.0,
+      "totalLine": 49.5,
+      "result": 27.0,
+      "total": 41.0
+    },
+    {
+      "gameId": "2025_12_CAR_SF",
+      "spreadLine": 7.5,
+      "totalLine": 48.5,
+      "result": 11.0,
+      "total": 29.0
+    },
+    {
+      "gameId": "2025_16_LA_SEA",
+      "spreadLine": 1.5,
+      "totalLine": 42.5,
+      "result": 1.0,
+      "total": 75.0
+    },
+    {
+      "gameId": "2025_16_PHI_WAS",
+      "spreadLine": -7.0,
+      "totalLine": 43.5,
+      "result": -11.0,
+      "total": 47.0
+    },
+    {
+      "gameId": "2025_16_GB_CHI",
+      "spreadLine": 1.5,
+      "totalLine": 45.5,
+      "result": 6.0,
+      "total": 38.0
+    },
+    {
+      "gameId": "2025_16_TB_CAR",
+      "spreadLine": -3.0,
+      "totalLine": 44.5,
+      "result": 3.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2025_16_BUF_CLE",
+      "spreadLine": -10.5,
+      "totalLine": 41.5,
+      "result": -3.0,
+      "total": 43.0
+    },
+    {
+      "gameId": "2025_16_LAC_DAL",
+      "spreadLine": 1.5,
+      "totalLine": 50.5,
+      "result": -17.0,
+      "total": 51.0
+    },
+    {
+      "gameId": "2025_16_CIN_MIA",
+      "spreadLine": -3.5,
+      "totalLine": 48.5,
+      "result": -24.0,
+      "total": 66.0
+    },
+    {
+      "gameId": "2025_16_NYJ_NO",
+      "spreadLine": 6.5,
+      "totalLine": 39.5,
+      "result": 23.0,
+      "total": 35.0
+    },
+    {
+      "gameId": "2025_16_MIN_NYG",
+      "spreadLine": -2.5,
+      "totalLine": 41.5,
+      "result": -3.0,
+      "total": 29.0
+    },
+    {
+      "gameId": "2025_16_KC_TEN",
+      "spreadLine": -3.5,
+      "totalLine": 37.5,
+      "result": 17.0,
+      "total": 35.0
+    },
+    {
+      "gameId": "2025_16_ATL_ARI",
+      "spreadLine": -2.5,
+      "totalLine": 48.5,
+      "result": -7.0,
+      "total": 45.0
+    },
+    {
+      "gameId": "2025_16_JAX_DEN",
+      "spreadLine": 3.5,
+      "totalLine": 46.5,
+      "result": -14.0,
+      "total": 54.0
+    },
+    {
+      "gameId": "2025_16_PIT_DET",
+      "spreadLine": 7.5,
+      "totalLine": 52.5,
+      "result": -5.0,
+      "total": 53.0
+    },
+    {
+      "gameId": "2025_16_LV_HOU",
+      "spreadLine": 14.5,
+      "totalLine": 39.5,
+      "result": 2.0,
+      "total": 44.0
+    },
+    {
+      "gameId": "2025_16_NE_BAL",
+      "spreadLine": 3.5,
+      "totalLine": 48.5,
+      "result": -4.0,
+      "total": 52.0
+    },
+    {
+      "gameId": "2025_16_SF_IND",
+      "spreadLine": -4.5,
+      "totalLine": 46.5,
+      "result": -21.0,
+      "total": 75.0
+    }
+  ]
+}

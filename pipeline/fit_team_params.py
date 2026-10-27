@@ -9,7 +9,8 @@ Method (opponent adjustment):
    allowed rate minus its opponent's offense effect.
 4. Average adjusted games over each history window, weighted by recency and play count.
 
-Yardage tilts are solved so the league histogram, tilted, has the team's adjusted mean.
+Yardage tilts move the league's open-field histogram by the team's adjusted gap to the league
+average (tilt_for).
 PROE, pace and no-huddle rate are style numbers and are not opponent-adjusted.
 
 Writes data/fits/{season}-W{week}/teams.json.
@@ -23,7 +24,7 @@ import pandas as pd
 from common.config import history_windows, model_config
 from common.io import fits_dir, read_json, read_raw, write_json
 from common.plays import add_pace, before_slate, load_pbp, red_zone_drives
-from common.stats import ridge_team_effects, solve_tilt
+from common.stats import histogram_mean, ridge_team_effects, solve_tilt
 from common.weights import window_weights
 
 # Opponent-adjusted unit rates: name -> (numerator column, denominator column).
@@ -186,6 +187,12 @@ def unit_window_values(adj: pd.DataFrame, side: str, season: int) -> pd.DataFram
     return result
 
 
+def tilt_for(hist: dict, team_mean: float, league_mean: float) -> float:
+    """Tilt that moves the open-field histogram by the team's gap to the league average.
+    (Observed means include goal-line-shortened plays, so only the gap carries over.)"""
+    return solve_tilt(hist, histogram_mean(hist) + team_mean - league_mean)
+
+
 def unit_params(row: pd.Series, league: dict[str, float], hists: dict) -> dict:
     def val(name: str) -> float:
         v = row.get(name)
@@ -200,9 +207,9 @@ def unit_params(row: pd.Series, league: dict[str, float], hists: dict) -> dict:
         "scrambleRate": val("scrambleRate"),
         "intRate": val("intRate"),
         "completionRate": val("completionRate"),
-        "passYdsTilt": solve_tilt(hists["completionYds"], val("compYds")),
+        "passYdsTilt": tilt_for(hists["completionYds"], val("compYds"), league["compYds"]),
         "explosivePassRate": val("explosivePassRate"),
-        "runYdsTilt": solve_tilt(hists["runYds"], val("runYds")),
+        "runYdsTilt": tilt_for(hists["runYds"], val("runYds"), league["runYds"]),
         "explosiveRunRate": val("explosiveRunRate"),
         "fumbleLostRate": val("fumbleLostRate"),
         "redZoneTdRate": val("redZoneTdRate"),

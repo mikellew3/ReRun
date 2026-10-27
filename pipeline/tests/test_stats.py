@@ -2,7 +2,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from common.stats import histogram_mean, ridge_team_effects, shrink, solve_tilt, yard_histogram
+from common.stats import (
+    censored_yard_histogram,
+    histogram_mean,
+    ridge_team_effects,
+    shrink,
+    solve_tilt,
+    yard_histogram,
+)
 
 
 def test_histogram_sums_to_one_and_clips_tails():
@@ -68,3 +75,17 @@ def test_ridge_shrinks_toward_zero_with_large_penalty():
     ]
     _, off, _ = ridge_team_effects(pd.DataFrame(rows), "rate", "n", "w", lam=1e6)
     assert abs(off["A"]) < 1e-3
+
+
+def test_censored_histogram_recovers_open_field_distribution():
+    # True gains: uniform 0..19. Plays from the 10 are cut short at 10 (touchdowns).
+    rng = np.random.default_rng(1)
+    gains = rng.integers(0, 20, 20000)
+    to_goal = np.where(rng.random(20000) < 0.5, 10, 100)
+    observed = np.minimum(gains, to_goal)
+    cut_short = gains >= to_goal
+    naive = yard_histogram(pd.Series(observed), 0, 30)
+    fixed = censored_yard_histogram(pd.Series(observed), pd.Series(cut_short), 0, 30)
+    assert histogram_mean(naive) < 8.5  # shortened by the end zone
+    assert histogram_mean(fixed) == pytest.approx(9.5, abs=0.15)  # true mean of 0..19
+    assert sum(fixed["probs"]) == pytest.approx(1.0)

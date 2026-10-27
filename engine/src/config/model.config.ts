@@ -106,12 +106,17 @@ export const MODEL_CONFIG = {
     proeWeight: 1,
     /** User pass-rate tilt of +1 adds this to the expected pass rate. */
     passRateTiltPerUnit: 0.08,
-    /** Score effect: logit shift = perPt * scoreDiff * (elapsed game fraction)^power. start */
-    scoreDiffLogitPerPt: -0.045,
-    scoreDiffTimePower: 2,
-    /** Hurry-up: trailing or tied in the last N seconds of a half. */
+    /**
+     * Game script: logit shift = perPt * scoreDiff * (elapsed game fraction)^power, with separate
+     * slopes when leading and trailing (leading teams lean on the run far more than trailing
+     * teams lean on the pass). Fitted by logistic regression on 2023-2025 play-by-play.
+     */
+    scoreLeadingLogitPerPt: -0.156,
+    scoreTrailingLogitPerPt: -0.047,
+    scoreDiffTimePower: 4,
+    /** Hurry-up: last 2 min of the first half (anyone), last 5 min of the game if trailing/tied. */
     hurryUpSecLeft: { firstHalf: 120, secondHalf: 300 },
-    hurryUpPassLogit: 1.6,
+    hurryUpPassLogit: 0.99,
     /** Pass-rate bounds, so no situation is ever a certainty. */
     minPassRate: 0.03,
     maxPassRate: 0.97,
