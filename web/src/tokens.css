@@ -1,0 +1,82 @@
+/*
+ * ReRun design tokens (design system v1.0). Every color, type size, radius, space, shadow and
+ * motion value the app uses comes from here. Copper text on white must be Copper 600 or darker
+ * (AA); Copper 500 is for fills, icons, chart highlights and large numbers.
+ */
+:root {
+  /* Copper */
+  --rr-copper-50: #fbf6f1;
+  --rr-copper-100: #f6ece2;
+  --rr-copper-500: #b87333; /* primary fill */
+  --rr-copper-600: #9a5b24; /* hover, copper text */
+  --rr-copper-700: #7c4a1e; /* pressed, emphasis */
+
+  /* Neutrals (warm) */
+  --rr-bg: #ffffff;
+  --rr-surface: #faf8f6;
+  --rr-surface-2: #f2efec;
+  --rr-border: #ece7e2;
+  --rr-border-strong: #d9d1c9;
+  --rr-text: #1c1917;
+  --rr-text-secondary: #57534e;
+  --rr-text-muted: #a8a29e; /* placeholder and disabled only */
+
+  /* Semantic */
+  --rr-positive: #2f855a;
+  --rr-positive-tint: #e9f5ee;
+  --rr-negative: #c2410c;
+  --rr-negative-tint: #fcede6;
+  --rr-push: #78716c;
+  --rr-push-tint: #f2efec;
+  --rr-warning: #b7791f;
+  --rr-warning-ink: #8a5a12; /* warning text on the tint, passes AA at 12px */
+  --rr-warning-tint: #fbf3e4;
+
+  /* Data viz */
+  --rr-chart-bar: #e7e2dd;
+  --rr-chart-grid: #f2efec;
+  --rr-chart-line: #1c1917;
+
+  /* Typography */
+  --rr-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --rr-text-display: 600 40px/48px var(--rr-font);
+  --rr-text-h1: 600 32px/40px var(--rr-font);
+  --rr-text-h2: 600 24px/32px var(--rr-font);
+  --rr-text-h3: 600 18px/26px var(--rr-font);
+  --rr-text-body: 400 16px/24px var(--rr-font);
+  --rr-text-small: 400 14px/20px var(--rr-font);
+  --rr-text-caption: 500 12px/16px var(--rr-font);
+  --rr-tracking-heading: -0.01em;
+
+  /* Radius */
+  --rr-radius-input: 8px;
+  --rr-radius-btn: 12px;
+  --rr-radius-card: 16px;
+  --rr-radius-panel: 24px;
+  --rr-radius-pill: 999px;
+
+  /* Spacing (4px scale) */
+  --rr-space-1: 4px;
+  --rr-space-2: 8px;
+  --rr-space-3: 12px;
+  --rr-space-4: 16px;
+  --rr-space-6: 24px;
+  --rr-space-8: 32px;
+  --rr-space-12: 48px;
+  --rr-space-16: 64px;
+
+  /* Depth */
+  --rr-shadow-card: 0 1px 2px rgba(28, 25, 23, 0.04), 0 4px 16px rgba(28, 25, 23, 0.06);
+  --rr-shadow-raised: 0 8px 32px rgba(28, 25, 23, 0.1);
+
+  /* Motion */
+  --rr-ease: cubic-bezier(0, 0, 0.2, 1);
+  --rr-duration-fast: 150ms;
+  --rr-duration: 200ms;
+  --rr-duration-slow: 250ms;
+
+  /* Layout */
+  --rr-max-width: 1200px;
+  --rr-gutter: 16px;
+  --rr-controls-width: 360px;
+}

@@ -18,6 +18,7 @@ export interface PlayerAgg {
 }
 
 export interface Aggregate {
+  gameId: string;
   done: number;
   total: number;
   homeWins: number;
@@ -44,6 +45,7 @@ self.onmessage = (event: MessageEvent<WorkerIn>) => {
   const { snapshot, request } = event.data;
   const t0 = performance.now();
   const agg: Aggregate = {
+    gameId: request.gameId,
     done: 0,
     total: request.nSims,
     homeWins: 0,

@@ -15,9 +15,10 @@ import type {
   SlateSnapshot,
   SnapshotGame,
 } from '@rerun/engine';
+import { AltLadder, MarginHistogram, TotalHistogram, WinProbability, pct, signed } from './charts';
+import type { Counts } from './charts';
+import { Icon } from './icons';
 import type { Aggregate, WorkerOut } from './sim.worker';
-
-const KEY_NUMBERS = new Set([3, 6, 7, 10, 14]);
 
 function kickoffLabel(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -26,8 +27,6 @@ function kickoffLabel(iso: string): string {
     minute: '2-digit',
   });
 }
-
-const pct = (x: number) => `${(100 * x).toFixed(1)}%`;
 
 function makeRequest(
   snapshot: SlateSnapshot,
@@ -46,6 +45,10 @@ function makeRequest(
   };
 }
 
+// ---------------------------------------------------------------------------
+// Game card
+// ---------------------------------------------------------------------------
+
 const PTS_LABELS: Record<Exclude<keyof AdjustmentSummary['pts']['home'], 'total'>, string> = {
   homeField: 'home field',
   altitude: 'altitude',
@@ -54,217 +57,139 @@ const PTS_LABELS: Record<Exclude<keyof AdjustmentSummary['pts']['home'], 'total'
   streaks: 'streaks',
 };
 
-function ptsLine(pts: AdjustmentSummary['pts']['home']): string {
+function ptsParts(pts: AdjustmentSummary['pts']['home']): string {
   const parts = Object.entries(PTS_LABELS)
     .map(([key, label]) => [pts[key as keyof typeof PTS_LABELS], label] as const)
     .filter(([v]) => Math.abs(v) >= 0.005)
-    .map(([v, label]) => `${v > 0 ? '+' : ''}${v.toFixed(1)} ${label}`);
+    .map(([v, label]) => `${signed(v)} ${label}`);
   return parts.length ? parts.join(', ') : 'none';
 }
 
-function conditionsLine(c: ResolvedConditions, hasForecast: boolean): string {
-  if (c.indoor) return 'Indoors: no weather effect';
-  if (!hasForecast) return 'No forecast in this snapshot yet';
-  const precip = c.precip === 'none' ? 'dry' : c.precip.replace('_', ' ');
-  return `${Math.round(c.windMph)} mph wind, ${Math.round(c.tempF)}°F, ${precip}`;
+function weatherValue(c: ResolvedConditions, hasForecast: boolean): string {
+  if (c.indoor) return 'Indoors';
+  if (!hasForecast) return 'No forecast yet';
+  return `${Math.round(c.tempF)}°F`;
 }
 
-function injuryLine(snapshot: SlateSnapshot, team: string): string {
-  const hurt = Object.values(snapshot.players).filter(
-    (p) => p.team === team && p.status !== 'active',
+function Chip(props: { icon: Parameters<typeof Icon>[0]['name']; children: string }) {
+  return (
+    <span className="chip warning">
+      <Icon name={props.icon} size={14} />
+      {props.children}
+    </span>
   );
-  if (hurt.length === 0) return 'no skill players listed';
-  return hurt
-    .sort((a, b) => a.status.localeCompare(b.status))
-    .map((p) => `${p.name} (${p.position}, ${p.status})`)
-    .join(', ');
 }
 
-function GameFactors({ snapshot, game }: { snapshot: SlateSnapshot; game: SnapshotGame }) {
+function GameCard({ snapshot, game }: { snapshot: SlateSnapshot; game: SnapshotGame }) {
   const inputs = useMemo(
     () => prepareRun(makeRequest(snapshot, game, GAME_CONTROLS.nSims.default, 0), snapshot),
     [snapshot, game],
   );
   const { pts } = inputs.adjustments;
-  return (
-    <section className="panel">
-      <h2>Game factors</h2>
-      <dl className="factors">
-        <dt>{game.away} points</dt>
-        <dd>{ptsLine(pts.away)}</dd>
-        <dt>{game.home} points</dt>
-        <dd>{ptsLine(pts.home)}</dd>
-        <dt>Weather</dt>
-        <dd>{conditionsLine(inputs.conditions, game.weather !== null)}</dd>
-        <dt>{game.away} injuries</dt>
-        <dd>{injuryLine(snapshot, game.away)}</dd>
-        <dt>{game.home} injuries</dt>
-        <dd>{injuryLine(snapshot, game.home)}</dd>
-      </dl>
-      <p className="muted small">
-        Points are each side&apos;s edge from home field, altitude, rest and travel. Injured
-        players&apos; usage goes mostly to teammates at the same position; backup QBs play at backup
-        level.
-      </p>
-    </section>
-  );
-}
-
-/** Share of sims where the value satisfies `test`. */
-function shareWhere(counts: Record<number, number>, n: number, test: (x: number) => boolean) {
-  let k = 0;
-  for (const [x, c] of Object.entries(counts)) if (test(Number(x))) k += c;
-  return k / Math.max(1, n);
-}
-
-/** Value at quantile q of a count table. */
-function quantile(counts: Record<number, number>, n: number, q: number): number {
-  const xs = Object.keys(counts)
-    .map(Number)
-    .sort((a, b) => a - b);
-  let seen = 0;
-  for (const x of xs) {
-    seen += counts[x]!;
-    if (seen >= q * n) return x;
+  const c = inputs.conditions;
+  const hurt = (team: string) =>
+    Object.values(snapshot.players)
+      .filter((p) => p.team === team && p.status !== 'active')
+      .sort((a, b) => a.status.localeCompare(b.status));
+  const hurtAway = hurt(game.away);
+  const hurtHome = hurt(game.home);
+  const edge = pts.home.total - pts.away.total;
+  const chips: { icon: Parameters<typeof Icon>[0]['name']; text: string }[] = [];
+  if (!c.indoor && game.weather && c.windMph >= 12) {
+    chips.push({ icon: 'wind', text: `Wind ${Math.round(c.windMph)} mph` });
   }
-  return xs[xs.length - 1] ?? 0;
-}
+  if (!c.indoor && game.weather && c.precip !== 'none') {
+    chips.push({
+      icon: 'rain',
+      text: c.precip.replace('_', ' ').replace(/^./, (s) => s.toUpperCase()),
+    });
+  }
+  if (pts.away.altitude < 0) chips.push({ icon: 'mountain', text: 'Altitude' });
+  if (hurtAway.length + hurtHome.length > 0) {
+    chips.push({ icon: 'injury', text: `${hurtAway.length + hurtHome.length} injury listed` });
+  }
 
-function Histogram(props: {
-  counts: Record<number, number>;
-  from: number;
-  to: number;
-  n: number;
-  highlight?: (x: number) => boolean;
-  label: (x: number) => string;
-  ticks: number[];
-  /** Vertical reference lines (e.g. 0 margin, median total). */
-  markers?: number[];
-}) {
-  const { counts, from, to, n, highlight, label, ticks, markers = [] } = props;
-  const xs = Array.from({ length: to - from + 1 }, (_, i) => from + i);
-  const max = Math.max(1, ...xs.map((x) => counts[x] ?? 0));
-  const w = 100 / xs.length;
-  const center = (x: number) => (x - from + 0.5) * w;
-  return (
-    <div className="hist">
-      <svg viewBox="0 0 100 40" preserveAspectRatio="none" role="img">
-        {xs.map((x, i) => {
-          const h = (38 * (counts[x] ?? 0)) / max;
-          return (
-            <rect
-              key={x}
-              x={i * w + w * 0.1}
-              y={40 - h}
-              width={w * 0.8}
-              height={h}
-              className={highlight?.(x) ? 'bar key' : 'bar'}
-            >
-              <title>{`${label(x)}: ${pct((counts[x] ?? 0) / Math.max(1, n))}`}</title>
-            </rect>
-          );
-        })}
-        {markers.map((m) => (
-          <line
-            key={m}
-            x1={center(m)}
-            x2={center(m)}
-            y1={0}
-            y2={40}
-            className="marker"
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
-      </svg>
-      <div className="ticks">
-        {ticks.map((t) => (
-          <span key={t} style={{ left: `${center(t)}%` }}>
-            {label(t)}
-          </span>
-        ))}
+  const teamRow = (team: string, side: 'home' | 'away') => (
+    <div className="team-row">
+      <div className="team-name">
+        <span className="abbr">{team}</span>
+        <span>{side === 'home' ? 'Home' : 'Away'}</span>
       </div>
+      <span className="num muted">{signed(pts[side].total)} pts</span>
     </div>
   );
-}
 
-function MarginChart(props: {
-  counts: Record<number, number>;
-  n: number;
-  home: string;
-  away: string;
-}) {
-  const { counts, n, home, away } = props;
-  const buckets = [
-    { label: `${away} by 8+`, p: shareWhere(counts, n, (m) => m <= -8) },
-    { label: `${away} by 1–7`, p: shareWhere(counts, n, (m) => m < 0 && m > -8) },
-    { label: 'Tie', p: shareWhere(counts, n, (m) => m === 0) },
-    { label: `${home} by 1–7`, p: shareWhere(counts, n, (m) => m > 0 && m < 8) },
-    { label: `${home} by 8+`, p: shareWhere(counts, n, (m) => m >= 8) },
-  ].filter((b) => b.label !== 'Tie' || b.p >= 0.005);
   return (
-    <>
-      <div className="sides">
-        <span>← {away} wins</span>
-        <span>{home} wins →</span>
+    <article className="card game-card">
+      <div className="game-card-top">
+        <span className="small muted with-icon">
+          <Icon name="clock" />
+          {kickoffLabel(game.kickoff)}
+        </span>
+        <div className="chips">
+          {chips.map((ch) => (
+            <Chip key={ch.text} icon={ch.icon}>
+              {ch.text}
+            </Chip>
+          ))}
+        </div>
       </div>
-      <Histogram
-        counts={counts}
-        from={-35}
-        to={35}
-        n={n}
-        highlight={(x) => KEY_NUMBERS.has(Math.abs(x))}
-        label={(x) => (x === 0 ? 'Even' : String(Math.abs(x)))}
-        ticks={[-28, -21, -14, -7, 0, 7, 14, 21, 28]}
-        markers={[0]}
-      />
-      <div className="buckets num">
-        {buckets.map((b) => (
-          <div key={b.label}>
-            <strong>{pct(b.p)}</strong>
-            <span>{b.label}</span>
-          </div>
-        ))}
+      <div className="teams">
+        {teamRow(game.away, 'away')}
+        {teamRow(game.home, 'home')}
       </div>
-      <p className="muted small">
-        Each bar is one final margin; taller means more likely. Orange bars are 3, 6, 7, 10 and 14
-        points, the margins football games end on most often.
-      </p>
-    </>
+      <div className="tiles num">
+        <div>
+          <span className="caption">Weather</span>
+          <strong>{weatherValue(c, game.weather !== null)}</strong>
+        </div>
+        <div>
+          <span className="caption">Wind</span>
+          <strong>{c.indoor || !game.weather ? '–' : `${Math.round(c.windMph)} mph`}</strong>
+        </div>
+        <div>
+          <span className="caption">Edge</span>
+          <strong>
+            {Math.abs(edge) < 0.05
+              ? 'Even'
+              : `${edge > 0 ? game.home : game.away} ${signed(Math.abs(edge))}`}
+          </strong>
+        </div>
+      </div>
+      <dl className="details small">
+        <dt>{game.away}</dt>
+        <dd>{ptsParts(pts.away)}</dd>
+        <dt>{game.home}</dt>
+        <dd>{ptsParts(pts.home)}</dd>
+        <dt>Venue</dt>
+        <dd>
+          {game.stadium.name} · {game.stadium.roof}
+        </dd>
+        {[...hurtAway, ...hurtHome].length > 0 && (
+          <>
+            <dt>Injuries</dt>
+            <dd>
+              {[...hurtAway, ...hurtHome]
+                .map((p) => `${p.name} (${p.team} ${p.position}, ${p.status})`)
+                .join(', ')}
+            </dd>
+          </>
+        )}
+      </dl>
+    </article>
   );
 }
 
-function TotalChart(props: { counts: Record<number, number>; n: number }) {
-  const { counts, n } = props;
-  const median = quantile(counts, n, 0.5);
-  const low = quantile(counts, n, 0.25);
-  const high = quantile(counts, n, 0.75);
-  const mid = Math.floor(median) + 0.5;
-  const lines = [mid - 7, mid, mid + 7];
-  return (
-    <>
-      <Histogram
-        counts={counts}
-        from={10}
-        to={80}
-        n={n}
-        label={String}
-        ticks={[20, 30, 40, 50, 60, 70]}
-        markers={[median]}
-      />
-      <div className="buckets num">
-        {lines.map((l) => (
-          <div key={l}>
-            <strong>{pct(shareWhere(counts, n, (t) => t > l))}</strong>
-            <span>Over {l}</span>
-          </div>
-        ))}
-      </div>
-      <p className="muted small">
-        Combined points for both teams. The line marks the middle game ({median} points); half of
-        games land between {low} and {high}.
-      </p>
-    </>
-  );
+// ---------------------------------------------------------------------------
+// Results
+// ---------------------------------------------------------------------------
+
+/** Margins re-expressed from the favorite's side (positive = favorite wins). */
+function fromSide(margins: Counts, favoriteIsHome: boolean): Counts {
+  if (favoriteIsHome) return margins;
+  const out: Counts = {};
+  for (const [m, c] of Object.entries(margins)) out[-Number(m)] = c;
+  return out;
 }
 
 export function App() {
@@ -322,13 +247,17 @@ export function App() {
     worker.postMessage({ snapshot, request });
   }
 
+  // Results belong to the game they were run on.
+  const shown = agg && game && agg.gameId === game.gameId ? agg : null;
+
   const summary = useMemo(() => {
-    if (!agg || agg.done === 0 || !snapshot) return null;
-    const n = agg.done;
-    const margins = Object.entries(agg.margins).flatMap(([m, c]) => Array(c).fill(Number(m)));
-    margins.sort((a, b) => a - b);
-    const median = margins[Math.floor(margins.length / 2)] ?? 0;
-    const players = agg.players
+    if (!shown || shown.done === 0 || !snapshot || !game) return null;
+    const n = shown.done;
+    const homeWin = shown.homeWins / n;
+    const tie = shown.ties / n;
+    const awayWin = 1 - homeWin - tie;
+    const favoriteIsHome = homeWin >= awayWin;
+    const players = shown.players
       .map((p) => {
         const info = snapshot.players[p.id];
         return {
@@ -343,33 +272,45 @@ export function App() {
       .slice(0, 12);
     return {
       n,
-      homeWin: agg.homeWins / n,
-      tie: agg.ties / n,
-      home: agg.sumHome / n,
-      away: agg.sumAway / n,
-      median,
+      tie,
+      home: shown.sumHome / n,
+      away: shown.sumAway / n,
+      favorite: favoriteIsHome ? game.home : game.away,
+      underdog: favoriteIsHome ? game.away : game.home,
+      favWin: favoriteIsHome ? homeWin : awayWin,
+      dogWin: favoriteIsHome ? awayWin : homeWin,
+      margins: fromSide(shown.margins, favoriteIsHome),
       players,
     };
-  }, [agg, snapshot]);
+  }, [shown, snapshot, game]);
+
+  const progress = agg && running ? agg.done / agg.total : 0;
 
   return (
     <div className="page">
-      <header>
+      <header className="site-header">
         <div className="brand">
-          Re<span>Run</span>
+          <span className="logo-tile">
+            <Icon name="logo" size={24} />
+          </span>
+          <span className="brand-text">
+            <span className="wordmark">ReRun</span>
+            <span className="caption">Betting Simulator</span>
+          </span>
         </div>
-        <div className="tagline">Every game, 10,000 times. Your way.</div>
+        <h1 className="display">Every game, 10,000 times. Your way.</h1>
       </header>
 
       {loadError && <p className="error">Could not load the slate: {loadError}</p>}
       {!snapshot && !loadError && <p className="muted">Loading the slate…</p>}
 
       {snapshot && (
-        <>
-          <section className="panel">
-            <div className="row">
-              <label>
-                Game
+        <div className="layout">
+          <aside className="controls">
+            <section className="card">
+              <h3>Run a game</h3>
+              <label className="field">
+                <span className="caption">Game</span>
                 <select value={gameId} onChange={(e) => setGameId(e.target.value)}>
                   {snapshot.games.map((g) => (
                     <option key={g.gameId} value={g.gameId}>
@@ -378,8 +319,8 @@ export function App() {
                   ))}
                 </select>
               </label>
-              <label>
-                Sims
+              <label className="field">
+                <span className="caption">Sims</span>
                 <select
                   value={nSims}
                   onChange={(e) => setNSims(Number(e.target.value) as SimCount)}
@@ -391,109 +332,144 @@ export function App() {
                   ))}
                 </select>
               </label>
-              <button onClick={run} disabled={running || !game}>
-                {running ? 'Running…' : 'Run'}
+              <button
+                type="button"
+                className="btn-run num"
+                onClick={run}
+                disabled={!game}
+                aria-busy={running}
+              >
+                {running && <span className="sweep" style={{ width: `${100 * progress}%` }} />}
+                <span className="btn-run-label">
+                  {running ? (
+                    `Running… ${(agg?.done ?? 0).toLocaleString()} / ${nSims.toLocaleString()}`
+                  ) : (
+                    <>
+                      <Icon name="play" size={20} />
+                      Run {nSims.toLocaleString()} sims
+                    </>
+                  )}
+                </span>
               </button>
-            </div>
-            {game && (
-              <div className="meta num">
-                {game.stadium.name} · {game.stadium.roof} · slate {snapshot.id} · engine{' '}
-                {ENGINE_VERSION}
-              </div>
+              <span className="caption muted meta">
+                Slate {snapshot.id} · engine {ENGINE_VERSION}
+                {seed !== null && ` · seed ${seed}`}
+              </span>
+            </section>
+            {game && <GameCard snapshot={snapshot} game={game} />}
+          </aside>
+
+          <main className="results">
+            {runError && <p className="error">{runError}</p>}
+
+            {!summary && !runError && (
+              <section className="card empty">
+                <h2>No results yet</h2>
+                <p className="muted">
+                  Pick a game and run the sims. Each sim plays the whole game play by play; the
+                  charts fill in as they finish.
+                </p>
+              </section>
             )}
-          </section>
 
-          {game && <GameFactors snapshot={snapshot} game={game} />}
-
-          {runError && <p className="error">{runError}</p>}
-
-          {summary && game && agg && (
-            <>
-              <section className="panel">
-                <div className="progress">
-                  <div style={{ width: pct(agg.done / agg.total) }} />
-                </div>
-                <div className="meta num">
-                  {agg.done.toLocaleString()} / {agg.total.toLocaleString()} sims ·{' '}
-                  {(agg.elapsedMs / 1000).toFixed(1)}s · seed {seed}
-                </div>
-                <div className="score">
-                  <div>
-                    <div className="team">{game.away}</div>
-                    <div className="pts num">{summary.away.toFixed(1)}</div>
-                    <div className="muted num">win {pct(1 - summary.homeWin - summary.tie)}</div>
+            {summary && game && (
+              <>
+                <section className="card">
+                  <div className="card-head">
+                    <div className="head-text">
+                      <h2>Projected score</h2>
+                      <span className="small muted num">
+                        Average over {summary.n.toLocaleString()} sims ·{' '}
+                        {(summary.home + summary.away).toFixed(1)} total points
+                        {summary.tie >= 0.005 && ` · tie ${pct(summary.tie)}`}
+                      </span>
+                    </div>
                   </div>
-                  <div className="at">@</div>
-                  <div>
-                    <div className="team">{game.home}</div>
-                    <div className="pts num">{summary.home.toFixed(1)}</div>
-                    <div className="muted num">win {pct(summary.homeWin)}</div>
-                  </div>
-                </div>
-                <div className="stats num">
-                  <span>
-                    {summary.home >= summary.away ? game.home : game.away} by{' '}
-                    {Math.abs(summary.home - summary.away).toFixed(1)} on average
-                  </span>
-                  <span>{(summary.home + summary.away).toFixed(1)} total points</span>
-                  <span>Tie {pct(summary.tie)}</span>
-                </div>
-              </section>
-
-              <section className="panel">
-                <h2>Who wins, and by how much</h2>
-                <MarginChart counts={agg.margins} n={summary.n} home={game.home} away={game.away} />
-              </section>
-
-              <section className="panel">
-                <h2>Total points</h2>
-                <TotalChart counts={agg.totals} n={summary.n} />
-              </section>
-
-              <section className="panel">
-                <h2>Player projections</h2>
-                <table className="num">
-                  <thead>
-                    <tr>
-                      <th>Player</th>
-                      <th>Pass</th>
-                      <th>Rush</th>
-                      <th>Rec</th>
-                      <th>Catches</th>
-                      <th>Any TD</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {summary.players.map((p) => (
-                      <tr key={p.id}>
-                        <td>
-                          {p.name} <span className="muted">{`${p.team} ${p.position}`}</span>
-                        </td>
-                        <td>{p.passYds ? (p.passYds / summary.n).toFixed(0) : '–'}</td>
-                        <td>{p.rushYds ? (p.rushYds / summary.n).toFixed(0) : '–'}</td>
-                        <td>{p.recYds ? (p.recYds / summary.n).toFixed(0) : '–'}</td>
-                        <td>{p.rec ? (p.rec / summary.n).toFixed(1) : '–'}</td>
-                        <td>{pct(p.anyTd / summary.n)}</td>
-                      </tr>
+                  <div className="score num">
+                    {(['away', 'home'] as const).map((side) => (
+                      <div key={side} className="score-side">
+                        <span
+                          className={
+                            game[side] === summary.favorite ? 'score-pts copper' : 'score-pts'
+                          }
+                        >
+                          {summary[side].toFixed(1)}
+                        </span>
+                        <span className="caption">{game[side]}</span>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
-                <p className="muted small">Mean per game across all sims.</p>
-              </section>
-            </>
-          )}
+                  </div>
+                </section>
 
-          <section className="panel note small">
-            Early preview with default model settings. Injuries, weather, altitude and rest are in
-            the model. Live weather forecasts are in. Market lines, edges and the full Sim Lab
-            controls are coming. Injury reports update when teams publish them.
-          </section>
-        </>
+                <WinProbability
+                  favorite={summary.favorite}
+                  underdog={summary.underdog}
+                  favWin={summary.favWin}
+                  dogWin={summary.dogWin}
+                />
+
+                <MarginHistogram
+                  margins={summary.margins}
+                  n={summary.n}
+                  favorite={summary.favorite}
+                  underdog={summary.underdog}
+                />
+
+                <div className="pair">
+                  <TotalHistogram totals={shown!.totals} n={summary.n} />
+                  <AltLadder margins={summary.margins} n={summary.n} favorite={summary.favorite} />
+                </div>
+
+                <section className="card">
+                  <div className="card-head baseline">
+                    <h2>Player projections</h2>
+                    <span className="caption muted">Average per game</span>
+                  </div>
+                  <div className="table-wrap">
+                    <table className="num">
+                      <thead>
+                        <tr>
+                          <th scope="col">Player</th>
+                          <th scope="col">Pass</th>
+                          <th scope="col">Rush</th>
+                          <th scope="col">Rec</th>
+                          <th scope="col">Catches</th>
+                          <th scope="col">Any TD</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {summary.players.map((p) => (
+                          <tr key={p.id}>
+                            <th scope="row">
+                              {p.name} <span className="muted">{`${p.team} ${p.position}`}</span>
+                            </th>
+                            <td>{p.passYds ? (p.passYds / summary.n).toFixed(0) : '–'}</td>
+                            <td>{p.rushYds ? (p.rushYds / summary.n).toFixed(0) : '–'}</td>
+                            <td>{p.recYds ? (p.recYds / summary.n).toFixed(0) : '–'}</td>
+                            <td>{p.rec ? (p.rec / summary.n).toFixed(1) : '–'}</td>
+                            <td>{pct(p.anyTd / summary.n)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              </>
+            )}
+
+            <section className="card note small">
+              Early preview with default model settings. Injuries, weather, altitude and rest are in
+              the model, and weather forecasts are live. Market lines, edges and the full Sim Lab
+              controls are coming.
+            </section>
+          </main>
+        </div>
       )}
 
-      <footer className="small muted">
-        21+ only. Simulations are estimates, not guarantees. If gambling stops being fun, call
-        1-800-GAMBLER. A GMDHC property.
+      <footer className="site-footer caption">
+        ReRun is a simulation tool for entertainment and research. 21+ only. Please gamble
+        responsibly — if you or someone you know has a gambling problem, call 1-800-GAMBLER. A GMDHC
+        property.
       </footer>
     </div>
   );

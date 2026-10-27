@@ -292,7 +292,7 @@ Users read public data and their own rows. Only jobs, with the service role key,
 
 ## 13. Front end (`web/`)
 
-Design: light background, plain system sans-serif font everywhere (no monospace or "terminal" fonts; use tabular numbers for aligned figures), copper amber `#b45309` accent, no gradients, no emoji. Mobile-first. (Mike's preference, replacing the original dark IBM Plex terminal look.)
+Design: **ReRun design system v1.0** (Mike's design canvas, replacing the original dark IBM Plex terminal look). Calm, premium, simple, a consumer finance app, not a sportsbook. Plus Jakarta Sans for everything (no monospace; tabular figures for numbers), white ground with warm neutrals, copper as the single highlight (#B87333 fills, #9A5B24+ for copper text), soft card shadows instead of heavy borders, 44px touch targets, Lucide-style outlined icons, no gradients, no emoji. All values live in `web/src/tokens.css` (`--rr-*`). Mobile-first.
 
 Pages:
 1. **Slate** — every game this week with market lines, weather, injury and role-change flags, and the house build's numbers; tap a game to open the Sim Lab
