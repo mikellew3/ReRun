@@ -164,7 +164,10 @@ export function App() {
   useEffect(() => {
     (async () => {
       try {
-        const latest = (await (await fetch('/snapshots/latest.json')).json()) as { path: string };
+        // no-store: a new snapshot is published twice a day; always ask for the newest.
+        const latest = (await (
+          await fetch('/snapshots/latest.json', { cache: 'no-store' })
+        ).json()) as { path: string };
         const snap = (await (await fetch(latest.path)).json()) as SlateSnapshot;
         setSnapshot(snap);
         const first = snap.games.find((g) => g.status === 'scheduled') ?? snap.games[0];
