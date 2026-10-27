@@ -444,7 +444,14 @@ export type PlayOutcome = OutcomeBase &
       }
     | { kind: 'punt'; punter: PlayerId; netYards: number; touchback: boolean; returnTd: boolean }
     | { kind: 'fieldGoal'; kicker: PlayerId; distance: number; made: boolean }
-    | { kind: 'kickoff'; touchback: boolean; receiveYardline: number; returnTd: boolean }
+    | {
+        kind: 'kickoff';
+        touchback: boolean;
+        /** Receiving team's yardline (or the kicking team's, if it recovered an onside kick). */
+        receiveYardline: number;
+        returnTd: boolean;
+        onsideRecovered?: boolean;
+      }
     | { kind: 'pat'; type: 'kick' | 'twoPoint'; success: boolean }
     | { kind: 'kneel' }
     | { kind: 'spike' }

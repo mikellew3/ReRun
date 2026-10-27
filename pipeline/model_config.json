@@ -1,6 +1,6 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "3c33cfc911c03012",
+  "configHash": "8d217ffbf01fa748",
   "engineVersion": "0.1.0",
   "model": {
     "configVersion": 1,
@@ -99,6 +99,164 @@
           "maxPeriods": 99
         }
       }
+    },
+    "playCall": {
+      "proeWeight": 1,
+      "passRateTiltPerUnit": 0.08,
+      "scoreDiffLogitPerPt": -0.045,
+      "scoreDiffTimePower": 2,
+      "hurryUpSecLeft": {
+        "firstHalf": 120,
+        "secondHalf": 300
+      },
+      "hurryUpPassLogit": 1.6,
+      "minPassRate": 0.03,
+      "maxPassRate": 0.97
+    },
+    "clock": {
+      "playDurationSec": {
+        "run": 5,
+        "passComplete": 6,
+        "passIncomplete": 5,
+        "interception": 7,
+        "sack": 5,
+        "scramble": 6,
+        "punt": 9,
+        "fieldGoal": 5,
+        "kickoffReturn": 6,
+        "kneel": 2,
+        "spike": 1
+      },
+      "averagePlaySec": 5.5,
+      "paceTiltFraction": 0.15,
+      "hurryUpSecPerSnap": 17,
+      "milkSecPerSnap": 44,
+      "milkSecLeft": 600,
+      "twoMinuteWarningSec": 120,
+      "outOfBoundsStopsSecLeft": {
+        "firstHalf": 120,
+        "secondHalf": 300
+      },
+      "outOfBoundsRate": {
+        "run": 0.06,
+        "completion": 0.18,
+        "scramble": 0.3
+      },
+      "kneelBurnSec": 42,
+      "defenseTimeoutSecLeft": 180,
+      "offenseTimeoutSecLeft": 60,
+      "spikeSecLeft": 25
+    },
+    "pointsToEfficiency": {
+      "passYdsTiltPerPt": 0.0035,
+      "runYdsTiltPerPt": 0.005,
+      "completionLogitPerPt": 0.015
+    },
+    "penalties": {
+      "offense": {
+        "yards": [
+          5,
+          10,
+          15
+        ],
+        "probs": [
+          0.6,
+          0.35,
+          0.05
+        ]
+      },
+      "defense": {
+        "yards": [
+          5,
+          10,
+          15
+        ],
+        "probs": [
+          0.45,
+          0.2,
+          0.35
+        ]
+      },
+      "defenseAutoFirstDownRate": 0.45
+    },
+    "turnovers": {
+      "interceptionDepthYds": 12,
+      "interceptionReturnMeanYds": 10,
+      "pickSixRate": 0.07,
+      "sackFumbleLostRate": 0.035
+    },
+    "punts": {
+      "overshootTouchbackRate": 0.45,
+      "pinnedYardline": 10
+    },
+    "fourthDown": {
+      "zoneUpperYardline": [
+        39,
+        59,
+        79,
+        99
+      ],
+      "ydsToGoUpper": [
+        1,
+        2,
+        4,
+        7,
+        99
+      ],
+      "goProb": [
+        [
+          0.12,
+          0.04,
+          0.02,
+          0.01,
+          0
+        ],
+        [
+          0.62,
+          0.38,
+          0.22,
+          0.08,
+          0.02
+        ],
+        [
+          0.72,
+          0.5,
+          0.3,
+          0.15,
+          0.05
+        ],
+        [
+          0.58,
+          0.35,
+          0.2,
+          0.08,
+          0.03
+        ]
+      ],
+      "maxFgDistance": 57,
+      "desperationSecLeft": 300,
+      "endOfHalfFgSecLeft": 12
+    },
+    "pat": {
+      "twoPointSuccessRate": 0.48,
+      "twoPointBaseRate": 0.06,
+      "twoPointLateDiffs": [
+        -2,
+        -5,
+        -10,
+        -13,
+        -16,
+        1,
+        5,
+        12
+      ]
+    },
+    "kickoffs": {
+      "onsideMaxDeficit": 16,
+      "onsideSecLeft": 180,
+      "onsideRecoveryRate": 0.12,
+      "onsideRecoveredYardline": 45,
+      "safetyKickStartYardline": 40
     },
     "kicking": {
       "fgCurve": {

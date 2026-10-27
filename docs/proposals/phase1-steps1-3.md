@@ -1,6 +1,6 @@
 # Phase 1, steps 1–3 — proposal for review
 
-Status: **approved by Mike, 2026-10-27.** Steps 1 and 2 implemented.
+Status: **approved by Mike, 2026-10-27.** Steps 1–3 implemented.
 
 ### Changes made while implementing step 1
 
@@ -9,6 +9,17 @@ Status: **approved by Mike, 2026-10-27.** Steps 1 and 2 implemented.
 - **`side` added to `MarketLine` and `CustomLine`** for team totals (which team's total).
 - **`ENGINE_VERSION` is a hand-bumped version** in `engine/src/version.ts`. A golden-output test (step 3) will fail if sim output changes without a bump.
 - **Python config loader and its test moved into step 1** (`pipeline/common/config.py`, `pipeline/tests/test_model_config.py`) so the Python CI job has something to run.
+
+### Changes made while implementing step 3
+
+- **Extra engine files:** `context.ts` (per-game state and stats) and `rules.ts` (scoring, possession changes, overtime) alongside the planned `clock.ts`, `decisions.ts` and `playCall.ts`.
+- **How team and player numbers combine:** offense and defense rates are combined in logit space against the league average. If the starting QB is not the team's usual QB, the gap between the two QBs' own numbers is added. Each receiver's catch odds and yardage, and each rusher's yardage, are set relative to the team average, so the team totals are preserved.
+- **Points-equivalent effects** (home field now; rest, travel and altitude in step 5) become small shifts in completion odds and yardage. The conversion rates live in `MODEL_CONFIG.pointsToEfficiency` and are tuned in step 4.
+- **Questionable players** are drawn in or out per sim with their play probability. Each sim's in/out draw comes from its own random stream, so results stay identical however a run is split.
+- **Not yet applied** (steps 5 and 6): weather, rest, travel, altitude, defense-vs-position matchups, streaks, backup-player efficiency, OL/secondary injuries and market-implied usage. Conditions are already resolved (forecast or user override) and passed through.
+- **Kickoff outcome** gained an optional `onsideRecovered` flag for the replay.
+- **Uncalibrated results on the 2026 week-8 slate:** the sim's margins correlate 0.88 with market spreads, but totals run about 3 points low and margins are too spread out. Key-number spikes at 3 and 7 are present. Step 4 fixes the level and spread.
+- **Speed:** 10,000 sims of one game take about 1.1 s in Node on the CI-class machine. A phone will likely be 3–5x slower, which is close to the 5-second target, so the Web Worker in Phase 2 will be benchmarked on a real phone.
 
 ### Changes made while implementing step 2
 
