@@ -45,7 +45,7 @@ The rule for weather: keep an effect at its measured value if it is at least 1.5
 - **Snow** had too few plays to measure on its own, so it uses the rain values.
 - **Domes and closed roofs** have no weather.
 - **The `conditionsWeight` lens** scales every effect (the Weatherman preset uses 1.5).
-- **Historical snapshots now carry game-time weather** from nflverse (`source: 'observed'`), standing in for the forecast a live snapshot will carry (step 6). Live snapshots carry none until then.
+- **Historical snapshots now carry game-time weather** from nflverse (`source: 'observed'`), standing in for the forecast a live snapshot carries. Live snapshots get forecasts from `pipeline/fetch_weather.py`: the National Weather Service for US stadiums, Open-Meteo for international games or when NWS fails. Conditions are averaged over the 3 hours from kickoff.
 
 ### Venue (`adjust/venue.ts`, switch: `adjustments.venue`)
 

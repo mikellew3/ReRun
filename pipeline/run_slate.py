@@ -17,13 +17,15 @@ from fit_player_params import fit_players
 from fit_team_params import fit_teams
 
 
-def run_slate(season: int, week: int, version: int | None = None) -> str:
+def run_slate(season: int, week: int, version: int | None = None, weather: bool = True) -> str:
     out = fits_dir(season, week)
     write_json(out / "league_base.json", fit_league(season, week))
     write_json(out / "teams.json", fit_teams(season, week))
     write_json(out / "players.json", fit_players(season, week))
     as_of = default_as_of(season, week)
-    snapshot = build_snapshot(season, week, as_of, version or next_version(season, week))
+    snapshot = build_snapshot(
+        season, week, as_of, version or next_version(season, week), weather=weather
+    )
     return write_snapshot(snapshot)
 
 
@@ -34,9 +36,12 @@ def main() -> None:
     group.add_argument("--week", type=int)
     group.add_argument("--weeks", type=int, nargs="+")
     parser.add_argument("--version", type=int, help="default: next unused version")
+    parser.add_argument(
+        "--no-weather", action="store_true", help="skip live forecasts (offline builds)"
+    )
     args = parser.parse_args()
     for week in args.weeks or [args.week]:
-        print(run_slate(args.season, week, args.version))
+        print(run_slate(args.season, week, args.version, weather=not args.no_weather))
 
 
 if __name__ == "__main__":

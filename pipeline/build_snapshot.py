@@ -381,13 +381,26 @@ def played_weather_text(season: int) -> dict[str, str]:
     return dict(zip(first["game_id"], first["weather"], strict=True))
 
 
+def game_weather(g, site: dict, kickoff: datetime, texts: dict, forecast):
+    """Played games: game-time weather from nflverse (backtests). Upcoming games: the forecast,
+    when this is a live build."""
+    if pd.notna(g["result"]):
+        return observed_weather(g, texts.get(g["game_id"]))
+    if forecast is not None and kickoff > datetime.now(UTC):
+        return forecast(Stadiums.facts(site), kickoff)
+    return None
+
+
 def build_games(
     slate: pd.DataFrame,
     as_of: datetime,
     stadiums: Stadiums,
     weather_texts: dict[str, str] | None = None,
+    forecast=None,
 ) -> list[dict]:
-    """weather_texts: game_id -> nflverse weather text; read from play-by-play if not given."""
+    """weather_texts: game_id -> nflverse weather text; read from play-by-play if not given.
+    forecast: (stadium facts, kickoff) -> weather dict or None, for games not yet played
+    (fetch_weather.forecast_for on live builds); None = no forecasts."""
     texts = (
         weather_texts
         if weather_texts is not None
@@ -414,9 +427,7 @@ def build_games(
                 "status": status,
                 "neutralSite": g["location"] == "Neutral",
                 "stadium": Stadiums.facts(site),
-                "weather": observed_weather(g, texts.get(g["game_id"]))
-                if pd.notna(g["result"])
-                else None,
+                "weather": game_weather(g, site, kickoff, texts, forecast),
                 "context": {
                     "restDays": {"home": int(g["home_rest"]), "away": int(g["away_rest"])},
                     "awayTravelMiles": haversine_miles(away_home, site),
@@ -435,7 +446,11 @@ def next_version(season: int, week: int) -> int:
     return max(found, default=0) + 1
 
 
-def build_snapshot(season: int, week: int, as_of: datetime, version: int) -> dict:
+def build_snapshot(
+    season: int, week: int, as_of: datetime, version: int, weather: bool = True
+) -> dict:
+    """weather: fetch forecasts for games that haven't kicked off yet. Games already played
+    always carry observed game-time weather (backtests)."""
     fdir = fits_dir(season, week)
     base = read_json(fdir / "league_base.json")
     teams_fit = read_json(fdir / "teams.json")
@@ -450,6 +465,17 @@ def build_snapshot(season: int, week: int, as_of: datetime, version: int) -> dic
     players, teams = build_players_and_teams(
         season, week, as_of, slate_teams, teams_fit, players_fit
     )
+    now = datetime.now(UTC)
+    upcoming = any(
+        kickoff_utc(d, t) > now for d, t in zip(slate["gameday"], slate["gametime"], strict=True)
+    )
+    live = weather and upcoming
+    forecast = None
+    if live:
+        from fetch_weather import forecast_for
+
+        forecast = forecast_for
+    games = build_games(slate, as_of, Stadiums(), forecast=forecast)
     manifest = read_manifest()
     nflverse_as_of = manifest.get(f"pbp_{season}", iso(as_of))
 
@@ -466,12 +492,12 @@ def build_snapshot(season: int, week: int, as_of: datetime, version: int) -> dic
             "nflverse": nflverse_as_of,
             "injuries": manifest.get(f"injuries_{season}", nflverse_as_of),
             "odds": None,
-            "weather": None,
+            "weather": iso(now) if live else None,
         },
         "league": league_block(base, teams_fit),
         "teams": teams,
         "players": players,
-        "games": build_games(slate, as_of, Stadiums()),
+        "games": games,
     }
     return round_floats(snapshot, model_config()["fitting"]["snapshotDecimals"])
 

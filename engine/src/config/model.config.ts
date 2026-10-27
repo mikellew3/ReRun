@@ -393,6 +393,22 @@ export const MODEL_CONFIG = {
   },
 
   /**
+   * Live forecasts (pipeline/fetch_weather.py): National Weather Service hourly forecast for US
+   * stadiums, Open-Meteo for international games or when NWS fails. Conditions are averaged
+   * over the game window starting at kickoff.
+   */
+  weatherForecast: {
+    gameWindowHours: 3,
+    /** NWS: precipitation counts when the chance in the game window reaches this (%). */
+    precipProbThreshold: 50,
+    /** Open-Meteo: mm per hour in the game window for light / heavy precipitation. */
+    lightPrecipMmPerHour: 0.3,
+    heavyPrecipMmPerHour: 4,
+    /** NWS hourly forecasts reach about 7 days out; beyond this the game gets no forecast. */
+    maxLeadDays: 7,
+  },
+
+  /**
    * Defense vs position (matchupWeight lens, 0 by default). Shrinkage k is
    * shrinkage.dvpTargetsK. Split-half check, 2022-2025 (measure_adjustments.py): a defense's
    * positional target-share and yards-per-target pattern in weeks 1-9 has correlation 0.003

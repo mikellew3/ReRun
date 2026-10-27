@@ -1,6 +1,6 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "52f105dc2256e420",
+  "configHash": "c2a5850cad263a83",
   "engineVersion": "0.3.0",
   "model": {
     "configVersion": 1,
@@ -418,6 +418,13 @@
         "yardsPerCompletion": -0.79,
         "fgLogit": 0
       }
+    },
+    "weatherForecast": {
+      "gameWindowHours": 3,
+      "precipProbThreshold": 50,
+      "lightPrecipMmPerHour": 0.3,
+      "heavyPrecipMmPerHour": 4,
+      "maxLeadDays": 7
     },
     "matchup": {
       "minMultiplier": 0.8,
