@@ -20,7 +20,16 @@ import { MODEL_CONFIG } from './config/model.config';
 import { parseRunRequest } from './config/settings.schema';
 import type { GameOverrides, RunRequest, SimSettings } from './config/settings.schema';
 import type { Rng } from './rng';
-import { WeightedPicker, YardSampler, combineRates, logit, sigmoid } from './samplers';
+import {
+  ShiftedSamplers,
+  WeightedPicker,
+  YardSampler,
+  centeredProbs,
+  centeredTilts,
+  combineRates,
+  logit,
+  standardNormal,
+} from './samplers';
 import type {
   HistoryWindow,
   LeagueParams,
@@ -66,16 +75,26 @@ export interface OffenseUnit {
   /** Per play. */
   fumbleLostRate: number;
   receivers: Int32Array;
+  /** Final shares (pickers are built from these; usage noise perturbs them per sim). */
+  targetShares: Float64Array;
+  rzTargetShares: Float64Array;
+  carryShares: Float64Array;
+  rzCarryShares: Float64Array;
+  glCarryShares: Float64Array;
   targetPicker: WeightedPicker | null;
   rzTargetPicker: WeightedPicker | null;
-  /** P(complete | target, not intercepted), per receiver. */
+  /** P(complete | target, not intercepted), per receiver; red-zone version inside the 20. */
   completionProb: Float64Array;
-  receiverYds: YardSampler[];
+  rzCompletionProb: Float64Array;
+  /** Yardage by (situational tilt shift, receiver): late-game script, down. See play.ts. */
+  receiverYds: ShiftedSamplers;
+  rzReceiverYds: ShiftedSamplers;
   rushers: Int32Array;
   carryPicker: WeightedPicker | null;
   rzCarryPicker: WeightedPicker | null;
   glCarryPicker: WeightedPicker | null;
-  rusherYds: YardSampler[];
+  rusherYds: ShiftedSamplers;
+  rzRusherYds: ShiftedSamplers;
   /** -1 = none available. */
   kicker: number;
   punter: number;
@@ -186,6 +205,32 @@ function availabilityOf(
   }
 }
 
+export function picker(shares: Float64Array): WeightedPicker | null {
+  return shares.length > 0 && shares.some((s) => s > 0) ? new WeightedPicker(shares) : null;
+}
+
+/**
+ * This sim's version of a unit with per-game usage noise: every player's share is multiplied by
+ * a lognormal factor (mean 1), the same factor for his normal, red-zone and goal-line shares.
+ */
+export function withUsageNoise(unit: OffenseUnit, rng: Rng): OffenseUnit {
+  const sd = MODEL_CONFIG.usage.shareNoiseSd;
+  if (sd <= 0) return unit;
+  const factors = (n: number) =>
+    Float64Array.from({ length: n }, () => Math.exp(sd * standardNormal(rng) - (sd * sd) / 2));
+  const rec = factors(unit.receivers.length);
+  const rush = factors(unit.rushers.length);
+  const scale = (shares: Float64Array, f: Float64Array) => shares.map((s, i) => s * f[i]!);
+  return {
+    ...unit,
+    targetPicker: picker(scale(unit.targetShares, rec)),
+    rzTargetPicker: picker(scale(unit.rzTargetShares, rec)),
+    carryPicker: picker(scale(unit.carryShares, rush)),
+    rzCarryPicker: picker(scale(unit.rzCarryShares, rush)),
+    glCarryPicker: picker(scale(unit.glCarryShares, rush)),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Offense builder
 // ---------------------------------------------------------------------------
@@ -251,7 +296,10 @@ function buildOffense(
 
   // --- Receivers
   const receivers = own.players.filter((p) => isIn(p) && RECEIVER_POSITIONS.has(p.entry.position));
-  const targetHist = receivers.map((p) => p.params?.targetShare ?? 0);
+  const targetHist = receivers.map(
+    (p) =>
+      (p.params?.targetShare ?? 0) * (p.entry.depth === 1 ? 1 + cfg.usage.starterTargetBonus : 1),
+  );
   const targetShares = allocateShares(
     receivers.map((p, i) => ({
       hist: targetHist[i]!,
@@ -266,26 +314,34 @@ function buildOffense(
     targetShares,
   );
   const catchLogits = receivers.map((p) => logit(p.params?.catchRate ?? league.completionRate));
-  const recTilts = receivers.map((p) => p.params?.recYdsTilt ?? 0);
-  let meanCatchLogit = 0;
-  let meanRecTilt = 0;
-  receivers.forEach((_, i) => {
-    meanCatchLogit += targetShares[i]! * catchLogits[i]!;
-    meanRecTilt += targetShares[i]! * recTilts[i]!;
-  });
-  const completionProb = Float64Array.from(receivers, (_, i) => {
-    const p = sigmoid(logit(teamCompletion) + catchLogits[i]! - meanCatchLogit);
-    return Math.min(0.99, p / (1 - intRate));
-  });
-  const receiverYds = receivers.map(
-    (_, i) => new YardSampler(inputs.league.completionYds, passTilt + recTilts[i]! - meanRecTilt),
+  const rz = cfg.redZone;
+  const completionAt = (shift: number) =>
+    centeredProbs(teamCompletion, catchLogits, targetShares, shift).map((p) =>
+      Math.min(0.99, p / (1 - intRate)),
+    );
+  const completionProb = completionAt(0);
+  const rzCompletionProb = completionAt(rz.completionLogitShift);
+  const recTilts = centeredTilts(
+    inputs.league.completionYds,
+    passTilt,
+    receivers.map((p) => p.params?.recYdsTilt ?? 0),
+    Float64Array.from(receivers, (_, i) => targetShares[i]! * completionProb[i]!),
+  );
+  const receiverYds = new ShiftedSamplers(inputs.league.completionYds, recTilts);
+  const rzReceiverYds = new ShiftedSamplers(
+    inputs.league.completionYds,
+    recTilts.map((t) => t + rz.passYdsTiltShift),
   );
 
   // --- Rushers (starting QB included through his designed-run share)
   const rushers = own.players.filter(
     (p) => isIn(p) && (RUSHER_POSITIONS.has(p.entry.position) || p === starter),
   );
-  const carryHist = rushers.map((p) => p.params?.carryShare ?? 0);
+  const carryHist = rushers.map(
+    (p) =>
+      (p.params?.carryShare ?? 0) *
+      (p.entry.position === 'RB' && p.entry.depth === 1 ? 1 + cfg.usage.starterCarryBonus : 1),
+  );
   const carryShares = allocateShares(
     rushers.map((p, i) => ({
       hist: carryHist[i]!,
@@ -305,11 +361,16 @@ function buildOffense(
     carryBefore,
     carryShares,
   );
-  const rushTilts = rushers.map((p) => p.params?.rushYdsTilt ?? 0);
-  let meanRushTilt = 0;
-  rushers.forEach((_, i) => (meanRushTilt += carryShares[i]! * rushTilts[i]!));
-  const rusherYds = rushers.map(
-    (_, i) => new YardSampler(inputs.league.runYds, runTilt + rushTilts[i]! - meanRushTilt),
+  const rushTilts = centeredTilts(
+    inputs.league.runYds,
+    runTilt,
+    rushers.map((p) => p.params?.rushYdsTilt ?? 0),
+    carryShares,
+  );
+  const rusherYds = new ShiftedSamplers(inputs.league.runYds, rushTilts);
+  const rzRusherYds = new ShiftedSamplers(
+    inputs.league.runYds,
+    rushTilts.map((t) => t + rz.runYdsTiltShift),
   );
 
   // --- Specialists
@@ -320,9 +381,6 @@ function buildOffense(
   const tilt = settings.lenses.script[side];
   const pen = cfg.penalties;
 
-  const picker = (shares: Float64Array) =>
-    shares.length > 0 && shares.some((s) => s > 0) ? new WeightedPicker(shares) : null;
-
   return {
     side,
     team: own.team,
@@ -332,15 +390,23 @@ function buildOffense(
     intRate,
     fumbleLostRate,
     receivers: Int32Array.from(receivers, (p) => p.idx),
+    targetShares,
+    rzTargetShares,
+    carryShares,
+    rzCarryShares,
+    glCarryShares,
     targetPicker: picker(targetShares),
     rzTargetPicker: picker(rzTargetShares),
     completionProb,
+    rzCompletionProb,
     receiverYds,
+    rzReceiverYds,
     rushers: Int32Array.from(rushers, (p) => p.idx),
     carryPicker: picker(carryShares),
     rzCarryPicker: picker(rzCarryShares),
     glCarryPicker: picker(glCarryShares),
     rusherYds,
+    rzRusherYds,
     kicker: kicker ? kicker.idx : -1,
     punter: punter ? punter.idx : -1,
     fgMakeShift: kicker?.params?.kicker?.fgMakeOverExpected ?? 0,
@@ -348,8 +414,14 @@ function buildOffense(
     proeShift:
       own.params.proe * cfg.playCall.proeWeight + tilt.passRate * cfg.playCall.passRateTiltPerUnit,
     secPerSnap: own.params.neutralSecPerPlay * (1 - tilt.pace * cfg.clock.paceTiltFraction),
-    offensePenaltyRate: Math.min(0.15, off.penaltyYdsPerPlay / meanOf(pen.offense)),
-    defensePenaltyRate: Math.min(0.15, def.penaltyYdsPerPlay / meanOf(pen.defense)),
+    offensePenaltyRate: Math.min(
+      0.15,
+      (pen.offenseRateScale * off.penaltyYdsPerPlay) / meanOf(pen.offense),
+    ),
+    defensePenaltyRate: Math.min(
+      0.15,
+      (pen.defenseRateScale * def.penaltyYdsPerPlay) / meanOf(pen.defense),
+    ),
   };
 }
 

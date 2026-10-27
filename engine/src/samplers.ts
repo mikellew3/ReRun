@@ -69,6 +69,81 @@ export function tiltedProbs(hist: YardHistogram, tilt: number): Float64Array {
   return out;
 }
 
+export function tiltedMean(hist: YardHistogram, tilt: number): number {
+  const probs = tiltedProbs(hist, tilt);
+  let m = 0;
+  for (let i = 0; i < probs.length; i++) m += probs[i]! * (hist.min + i);
+  return m;
+}
+
+/**
+ * Per-player tilts that keep the team's average gain. Each player gets baseTilt + his own
+ * relative tilt + one shared shift c, chosen so the weighted average of the players' mean gains
+ * equals the mean at baseTilt. (Centering in tilt space instead would push the team average
+ * up, because the mean grows faster than linearly with the tilt.)
+ */
+export function centeredTilts(
+  hist: YardHistogram,
+  baseTilt: number,
+  playerTilts: ArrayLike<number>,
+  weights: ArrayLike<number>,
+): number[] {
+  const n = playerTilts.length;
+  let total = 0;
+  for (let i = 0; i < n; i++) total += Math.max(0, weights[i]!);
+  if (n === 0 || total <= 0) return Array.from(playerTilts, (t) => baseTilt + t);
+  const target = tiltedMean(hist, baseTilt);
+  const avgAt = (c: number) => {
+    let m = 0;
+    for (let i = 0; i < n; i++) {
+      m += (Math.max(0, weights[i]!) / total) * tiltedMean(hist, baseTilt + playerTilts[i]! + c);
+    }
+    return m;
+  };
+  let lo = -1;
+  let hi = 1;
+  for (let k = 0; k < 40; k++) {
+    const mid = (lo + hi) / 2;
+    if (avgAt(mid) < target) lo = mid;
+    else hi = mid;
+  }
+  const c = (lo + hi) / 2;
+  return Array.from(playerTilts, (t) => baseTilt + t + c);
+}
+
+/**
+ * Per-player probabilities around a team rate: sigmoid(teamLogit + playerLogit + c), with one
+ * shared shift c chosen so the weighted average equals the team rate exactly.
+ */
+export function centeredProbs(
+  teamRate: number,
+  playerLogits: ArrayLike<number>,
+  weights: ArrayLike<number>,
+  extraLogit = 0,
+): Float64Array {
+  const n = playerLogits.length;
+  let total = 0;
+  for (let i = 0; i < n; i++) total += Math.max(0, weights[i]!);
+  const base = logit(teamRate);
+  const at = (c: number) =>
+    Float64Array.from({ length: n }, (_, i) => sigmoid(base + playerLogits[i]! + c));
+  if (n === 0 || total <= 0) return at(extraLogit);
+  const avg = (c: number) => {
+    const p = at(c);
+    let m = 0;
+    for (let i = 0; i < n; i++) m += (Math.max(0, weights[i]!) / total) * p[i]!;
+    return m;
+  };
+  let lo = -5;
+  let hi = 5;
+  for (let k = 0; k < 50; k++) {
+    const mid = (lo + hi) / 2;
+    if (avg(mid) < teamRate) lo = mid;
+    else hi = mid;
+  }
+  return at((lo + hi) / 2 + extraLogit);
+}
+
 /** Samples integer yards from a (possibly tilted) histogram. */
 export class YardSampler {
   private readonly table: AliasTable;
@@ -112,6 +187,13 @@ export class WeightedPicker {
   }
 }
 
+/** Standard normal draw (Box-Muller, one value per call). */
+export function standardNormal(rng: Rng): number {
+  const u = 1 - rng.next();
+  const v = rng.next();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
 /** Exponential with the given mean, rounded to whole yards. */
 export function sampleExponentialYds(rng: Rng, mean: number): number {
   return Math.round(-mean * Math.log(1 - rng.next()));
@@ -129,4 +211,28 @@ export function sigmoid(x: number): number {
 /** Offense rate vs defense rate, both relative to league, combined additively in logit space. */
 export function combineRates(off: number, def: number, league: number, extraLogit = 0): number {
   return sigmoid(logit(off) + logit(def) - logit(league) + extraLogit);
+}
+
+/**
+ * Yardage samplers per player, each player's tilt shifted by a common amount, built on first use
+ * and cached by that shift. Used for situational shifts (late-game script, down). Most plays use
+ * a handful of shifts, so only those are ever built.
+ */
+export class ShiftedSamplers {
+  private readonly cache = new Map<number, YardSampler[]>();
+
+  constructor(
+    private readonly hist: YardHistogram,
+    private readonly tilts: number[],
+  ) {}
+
+  get(tiltShift: number, player: number): YardSampler {
+    const key = Math.round(tiltShift * 1e6);
+    let row = this.cache.get(key);
+    if (!row) {
+      row = this.tilts.map((t) => new YardSampler(this.hist, t + key / 1e6));
+      this.cache.set(key, row);
+    }
+    return row[player]!;
+  }
 }

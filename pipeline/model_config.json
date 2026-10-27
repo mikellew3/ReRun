@@ -1,7 +1,7 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "8d217ffbf01fa748",
-  "engineVersion": "0.1.0",
+  "configHash": "9e45b30141e3952f",
+  "engineVersion": "0.2.0",
   "model": {
     "configVersion": 1,
     "fitting": {
@@ -62,6 +62,7 @@
           99
         ]
       },
+      "histogramRunMinYdsToGo": 3,
       "puntHistogramMinYardline": 60,
       "kickoffMinDistance": 40,
       "starterOutPlayProb": 0.5,
@@ -103,13 +104,14 @@
     "playCall": {
       "proeWeight": 1,
       "passRateTiltPerUnit": 0.08,
-      "scoreDiffLogitPerPt": -0.045,
-      "scoreDiffTimePower": 2,
+      "scoreLeadingLogitPerPt": -0.156,
+      "scoreTrailingLogitPerPt": -0.047,
+      "scoreDiffTimePower": 4,
       "hurryUpSecLeft": {
         "firstHalf": 120,
         "secondHalf": 300
       },
-      "hurryUpPassLogit": 1.6,
+      "hurryUpPassLogit": 0.99,
       "minPassRate": 0.03,
       "maxPassRate": 0.97
     },
@@ -148,9 +150,81 @@
       "spikeSecLeft": 25
     },
     "pointsToEfficiency": {
-      "passYdsTiltPerPt": 0.0035,
-      "runYdsTiltPerPt": 0.005,
-      "completionLogitPerPt": 0.015
+      "passYdsTiltPerPt": 0.0028,
+      "runYdsTiltPerPt": 0.004,
+      "completionLogitPerPt": 0.012
+    },
+    "passBySituation": {
+      "earlyDowns": {
+        "completionLogit": 0.1,
+        "sackLogit": -0.22,
+        "intLogit": -0.12
+      },
+      "lateDownDistanceUpper": [
+        3,
+        6,
+        10,
+        99
+      ],
+      "lateDowns": {
+        "completionLogit": [
+          -0.15,
+          -0.27,
+          -0.39,
+          -0.04
+        ],
+        "sackLogit": [
+          0.11,
+          0.37,
+          0.55,
+          0.45
+        ],
+        "intLogit": [
+          0.16,
+          0.18,
+          0.32,
+          0.36
+        ],
+        "sticksCatchRate": [
+          0,
+          0.2,
+          0.32,
+          0.08
+        ]
+      }
+    },
+    "redZone": {
+      "passYdsTiltShift": -0.035,
+      "runYdsTiltShift": -0.04,
+      "completionLogitShift": -0.12
+    },
+    "gameScript": {
+      "diffUpper": [
+        -17,
+        -9,
+        -1,
+        0,
+        8,
+        16,
+        99
+      ],
+      "ptsShift": [
+        -5,
+        7,
+        2,
+        -3,
+        -6,
+        0,
+        0
+      ],
+      "timePower": 8,
+      "ptsPerLevel": 1.5,
+      "maxLevel": 6
+    },
+    "usage": {
+      "shareNoiseSd": 0.15,
+      "starterCarryBonus": 0.25,
+      "starterTargetBonus": 0.05
     },
     "penalties": {
       "offense": {
@@ -160,24 +234,28 @@
           15
         ],
         "probs": [
-          0.6,
-          0.35,
-          0.05
+          0.592,
+          0.344,
+          0.064
         ]
       },
       "defense": {
         "yards": [
           5,
           10,
-          15
+          15,
+          25
         ],
         "probs": [
-          0.45,
-          0.2,
-          0.35
+          0.551,
+          0.089,
+          0.265,
+          0.095
         ]
       },
-      "defenseAutoFirstDownRate": 0.45
+      "defenseAutoFirstDownRate": 0.78,
+      "offenseRateScale": 0.92,
+      "defenseRateScale": 0.87
     },
     "turnovers": {
       "interceptionDepthYds": 12,
@@ -205,32 +283,32 @@
       ],
       "goProb": [
         [
-          0.12,
-          0.04,
-          0.02,
+          0.15,
+          0.05,
+          0.03,
           0.01,
           0
         ],
         [
+          0.78,
+          0.48,
+          0.28,
+          0.1,
+          0.03
+        ],
+        [
+          0.9,
           0.62,
           0.38,
-          0.22,
-          0.08,
-          0.02
+          0.19,
+          0.06
         ],
         [
           0.72,
-          0.5,
-          0.3,
-          0.15,
-          0.05
-        ],
-        [
-          0.58,
-          0.35,
-          0.2,
-          0.08,
-          0.03
+          0.44,
+          0.25,
+          0.1,
+          0.04
         ]
       ],
       "maxFgDistance": 57,
@@ -239,16 +317,13 @@
     },
     "pat": {
       "twoPointSuccessRate": 0.48,
-      "twoPointBaseRate": 0.06,
+      "twoPointBaseRate": 0.05,
       "twoPointLateDiffs": [
         -2,
         -5,
         -10,
-        -13,
         -16,
-        1,
-        5,
-        12
+        1
       ]
     },
     "kickoffs": {
@@ -264,7 +339,7 @@
         "slopePerYard": -0.098
       },
       "maxFgDistance": 66,
-      "xpMakeRate": 0.95
+      "xpMakeRate": 0.96
     },
     "injuries": {
       "playProbByStatus": {

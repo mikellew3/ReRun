@@ -23,5 +23,5 @@ const seed = Number(arg('seed', '2026'));
 const t0 = performance.now();
 const { targets, snapshots } = loadCalibrationSet();
 const sims = simulateCalibrationSet(snapshots, targets, n, seed);
-console.log(formatReport([...measure(sims, targets), ...measureEvents(sims, targets, 3, seed)]));
+console.log(formatReport([...measure(sims, targets), ...measureEvents(sims, targets, 5, seed)]));
 console.log(`${sims.length} games x ${n} sims in ${((performance.now() - t0) / 1000).toFixed(1)}s`);

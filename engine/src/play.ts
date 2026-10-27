@@ -12,10 +12,14 @@ import type { OffenseUnit } from './applySettings';
 import { outOfBoundsStopsClock, playDuration } from './clock';
 import { MODEL_CONFIG } from './config/model.config';
 import type { GameCtx } from './context';
-import { sampleExponentialYds } from './samplers';
+import { scriptLevel } from './context';
+import { logit, sampleExponentialYds, sigmoid } from './samplers';
 import type { PlayOutcome } from './types';
 
 const T = MODEL_CONFIG.turnovers;
+const SITUATION = MODEL_CONFIG.passBySituation;
+const P2E = MODEL_CONFIG.pointsToEfficiency;
+const SCRIPT = MODEL_CONFIG.gameScript;
 const OOB = MODEL_CONFIG.clock.outOfBoundsRate;
 const PEN = MODEL_CONFIG.penalties;
 const GOAL_LINE = 100 - MODEL_CONFIG.fitting.goalLineYardline;
@@ -23,6 +27,35 @@ const RED_ZONE = 100 - MODEL_CONFIG.fitting.redZoneYardline;
 
 function id(ctx: GameCtx, idx: number): string {
   return idx >= 0 ? ctx.inputs.playerIds[idx]! : '';
+}
+
+/** Logit shifts for completion, sack and interception odds in this down and distance. */
+function passShifts(
+  down: number,
+  distance: number,
+): {
+  completion: number;
+  sack: number;
+  int: number;
+  sticksCatch: number;
+} {
+  if (down <= 2) {
+    const e = SITUATION.earlyDowns;
+    return { completion: e.completionLogit, sack: e.sackLogit, int: e.intLogit, sticksCatch: 0 };
+  }
+  let i = SITUATION.lateDownDistanceUpper.findIndex((upper) => distance <= upper);
+  if (i < 0) i = SITUATION.lateDownDistanceUpper.length - 1;
+  const l = SITUATION.lateDowns;
+  return {
+    completion: l.completionLogit[i]!,
+    sack: l.sackLogit[i]!,
+    int: l.intLogit[i]!,
+    sticksCatch: l.sticksCatchRate[i]!,
+  };
+}
+
+function shiftRate(p: number, logitShift: number): number {
+  return logitShift === 0 ? p : sigmoid(logit(p) + logitShift);
 }
 
 function pickFrom(dist: { yards: readonly number[]; probs: readonly number[] }, u: number): number {
@@ -75,9 +108,11 @@ export function simulatePass(ctx: GameCtx, unit: OffenseUnit): PlayOutcome {
   const team = stats.team[side];
   const qb = unit.qb;
   const toGoal = 100 - s.yardline;
+  const shifts = passShifts(s.down, s.distance);
+  const sackRate = shiftRate(unit.sackRate, shifts.sack);
   const u = rng.next();
 
-  if (u < unit.sackRate) {
+  if (u < sackRate) {
     let yards = inputs.sackYds.sample(rng);
     const safety = s.yardline + yards <= 0;
     if (safety) yards = -s.yardline;
@@ -94,7 +129,7 @@ export function simulatePass(ctx: GameCtx, unit: OffenseUnit): PlayOutcome {
     };
   }
 
-  if (u < unit.sackRate + unit.scrambleRate) {
+  if (u < sackRate + unit.scrambleRate) {
     let yards = Math.min(inputs.scrambleYds.sample(rng), toGoal);
     if (s.yardline + yards <= 0) yards = 1 - s.yardline;
     const td = yards >= toGoal;
@@ -140,7 +175,7 @@ export function simulatePass(ctx: GameCtx, unit: OffenseUnit): PlayOutcome {
   const rec = unit.receivers[ri]!;
   stats.targets[rec]! += 1;
 
-  if (rng.chance(unit.intRate)) {
+  if (rng.chance(shiftRate(unit.intRate, shifts.int))) {
     stats.passInt[qb]! += 1;
     const defensiveTd = rng.chance(T.pickSixRate);
     return {
@@ -154,8 +189,18 @@ export function simulatePass(ctx: GameCtx, unit: OffenseUnit): PlayOutcome {
     };
   }
 
-  if (rng.chance(unit.completionProb[ri]!)) {
-    let yards = Math.min(unit.receiverYds[ri]!.sample(rng), toGoal);
+  const inRedZone = s.yardline >= RED_ZONE;
+  const level = scriptLevel(s);
+  const completionProb = inRedZone ? unit.rzCompletionProb : unit.completionProb;
+  const completionShift = shifts.completion + level * SCRIPT.ptsPerLevel * P2E.completionLogitPerPt;
+  if (rng.chance(shiftRate(completionProb[ri]!, completionShift))) {
+    const tiltShift = level * SCRIPT.ptsPerLevel * P2E.passYdsTiltPerPt;
+    const sampler = (inRedZone ? unit.rzReceiverYds : unit.receiverYds).get(tiltShift, ri);
+    let yards = sampler.sample(rng);
+    if (yards < s.distance && shifts.sticksCatch > 0 && rng.chance(shifts.sticksCatch)) {
+      yards = s.distance + rng.int(3);
+    }
+    yards = Math.min(yards, toGoal);
     if (s.yardline + yards <= 0) yards = 1 - s.yardline;
     const td = yards >= toGoal;
     const fumbleLost = !td && rng.chance(unit.fumbleLostRate);
@@ -207,7 +252,9 @@ export function simulateRun(ctx: GameCtx, unit: OffenseUnit): PlayOutcome {
     unit.carryPicker!;
   const ri = picker.pick(rng);
   const rusher = unit.rushers[ri]!;
-  let yards = Math.min(unit.rusherYds[ri]!.sample(rng), toGoal);
+  const tiltShift = scriptLevel(s) * SCRIPT.ptsPerLevel * P2E.runYdsTiltPerPt;
+  const sampler = (s.yardline >= RED_ZONE ? unit.rzRusherYds : unit.rusherYds).get(tiltShift, ri);
+  let yards = Math.min(sampler.sample(rng), toGoal);
   const safety = s.yardline + yards <= 0;
   if (safety) yards = -s.yardline;
   const td = yards >= toGoal;

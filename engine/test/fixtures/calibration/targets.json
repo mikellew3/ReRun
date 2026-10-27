@@ -139,6 +139,49 @@
       }
     }
   },
+  "events": {
+    "touchdownsPerGame": 5.004901960784314,
+    "fieldGoalAttemptsPerGame": 3.9987745098039214,
+    "fieldGoalRate": 0.8516702421084891,
+    "puntsPerGame": 7.6495098039215685,
+    "twoPointTriesPerGame": 0.47794117647058826,
+    "fourthDownGoRate": 0.20906908966226642,
+    "thirdDownDistance": 6.970436708556021,
+    "offensePenaltiesPerGame": 6.432598039215686,
+    "defensePenaltiesPerGame": 4.453431372549019
+  },
+  "lateDrivePoints": {
+    "trail17+": {
+      "mean": 1.3369175627240144,
+      "sd": 2.732912740490718,
+      "n": 279
+    },
+    "trail9-16": {
+      "mean": 2.3424657534246576,
+      "sd": 3.1029048714768597,
+      "n": 292
+    },
+    "trail1-8": {
+      "mean": 1.8686868686868687,
+      "sd": 2.8152073106526396,
+      "n": 594
+    },
+    "tied": {
+      "mean": 1.5208333333333333,
+      "sd": 2.1482428988472306,
+      "n": 144
+    },
+    "lead1-8": {
+      "mean": 0.8571428571428571,
+      "sd": 1.9879392266837026,
+      "n": 399
+    },
+    "lead9+": {
+      "mean": 1.210382513661202,
+      "sd": 2.3552916501766874,
+      "n": 366
+    }
+  },
   "calibrationGames": [
     {
       "gameId": "2023_04_DET_GB",

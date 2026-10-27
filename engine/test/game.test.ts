@@ -90,15 +90,15 @@ describe('determinism', () => {
     });
     expect(summary(results)).toMatchInlineSnapshot(`
       {
-        "engine": "0.1.0",
+        "engine": "0.2.0",
         "first": [
-          "20-19",
-          "14-7",
-          "13-14",
-          "20-17",
-          "6-15",
+          "18-24",
+          "23-20",
+          "17-28",
+          "21-13",
+          "34-31",
         ],
-        "meanTotal": 38.6,
+        "meanTotal": 41.3,
       }
     `);
   });

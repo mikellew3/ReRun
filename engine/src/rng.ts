@@ -2,7 +2,8 @@
  * Seeded pseudo-random numbers: xoshiro128** (Blackman & Vigna), seeded with splitmix32.
  *
  * Determinism rules:
- * - A run has one 32-bit seed. Each simulated game i gets its own stream: createRng(seed, i).
+ * - A run has one 32-bit seed. Sim i of game g gets its own stream:
+ *   createRng(gameSeed(seed, g), i).
  *   Results are therefore identical no matter how a run is split across workers or chunks,
  *   and Replay can re-create any single sim from (seed, i) alone.
  * - Never use Math.random() in the engine. randomSeed() is only for picking an "auto" seed
@@ -96,6 +97,19 @@ export function createRng(seed: number, stream = 0): Rng {
   const w3 = a[3] ^ rotl(b[3], 16);
   if ((w0 | w1 | w2 | w3) === 0) w0 = 1; // practically unreachable; keeps the state valid
   return new Rng(w0, w1, w2, w3);
+}
+
+/**
+ * Seed for one game of a run: the run seed mixed with the game id. Different games in the same
+ * run (e.g. a whole slate on one seed) then get independent streams instead of identical ones.
+ */
+export function gameSeed(seed: number, gameId: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < gameId.length; i++) {
+    h ^= gameId.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return splitmix32((seed ^ h) >>> 0)[1];
 }
 
 /** A fresh random 32-bit seed for "auto" runs. Not used inside a sim. */

@@ -48,7 +48,11 @@ export interface Targets {
     twoPointTriesPerGame: number;
     fourthDownGoRate: number;
     thirdDownDistance: number;
+    offensePenaltiesPerGame: number;
+    defensePenaltiesPerGame: number;
   };
+  /** Points per drive for drives starting in the last 7 minutes of the 4th, by score state. */
+  lateDrivePoints: Record<string, { mean: number; sd: number; n: number }>;
   calibrationGames: {
     gameId: string;
     spreadLine: number;
@@ -173,7 +177,10 @@ export function measure(sims: GameSims[], targets: Targets): Metric[] {
   const g = targets.game;
   add('scores', 'total points: mean', mean(total), g.total.mean, 1.5);
   add('scores', 'total points: sd', sd(total), g.total.sd, 1.5);
-  add('scores', 'home margin: mean', mean(margin), g.homeMargin.mean, 1.0);
+  // Home margin is compared with the closing spreads of these same games (league-wide results
+  // would mix in which teams happen to be in the sample).
+  const spreadMean = mean(targets.calibrationGames.map((x) => x.spreadLine));
+  add('scores', 'home margin: mean (vs closing spreads)', mean(margin), spreadMean, 1.0);
   add('scores', 'margin: sd', sd(margin), g.homeMargin.sd, 1.5);
   add(
     'scores',
@@ -305,13 +312,15 @@ export function measure(sims: GameSims[], targets: Targets): Metric[] {
     totalLine.push(t.totalLine);
   }
   add('market', 'sim margin vs spread: slope', slope(spread, simMargin), 1, 0.15);
-  add(
-    'market',
-    'sim margin vs spread: correlation >= 0.8',
-    Math.min(corr(spread, simMargin), 0.8),
-    0.8,
-    0,
-  );
+  const r = corr(spread, simMargin);
+  metrics.push({
+    group: 'market',
+    name: 'sim margin vs spread: correlation (min 0.8)',
+    sim: r,
+    target: 0.8,
+    tolerance: 0,
+    pass: r >= 0.8,
+  });
   add(
     'market',
     'sim total - total line: mean',
@@ -343,7 +352,21 @@ export function measureEvents(
   let fourthGo = 0;
   let thirdDist = 0;
   let thirdN = 0;
+  const penalties = { offense: 0, defense: 0 };
   const snapKinds = new Set(['pass', 'interception', 'sack', 'scramble', 'run']);
+  const late: Record<string, { drives: number; pts: number; sq: number }> = {};
+  const lateBucket = (d: number) =>
+    d <= -17
+      ? 'trail17+'
+      : d <= -9
+        ? 'trail9-16'
+        : d <= -1
+          ? 'trail1-8'
+          : d === 0
+            ? 'tied'
+            : d <= 8
+              ? 'lead1-8'
+              : 'lead9+';
   for (const gs of sims) {
     for (let i = 0; i < replaysPerGame; i++) {
       const { plays } = replayGame(
@@ -360,6 +383,26 @@ export function measureEvents(
         i,
       );
       games++;
+      const seenDrives = new Set<number>();
+      plays.forEach(({ before: b, outcome: o }, j) => {
+        if (o.kind === 'kickoff' || o.kind === 'pat' || seenDrives.has(b.driveIndex)) return;
+        seenDrives.add(b.driveIndex);
+        if (b.quarter !== 4 || b.clockSec > 420) return;
+        const side = b.possession;
+        const key = lateBucket(b.score[side] - b.score[side === 'home' ? 'away' : 'home']);
+        let end = b.score[side];
+        for (let k = j; k < plays.length; k++) {
+          if (plays[k]!.before.driveIndex !== b.driveIndex) {
+            end = plays[k]!.before.score[side];
+            break;
+          }
+        }
+        const pts = Math.min(end - b.score[side], 7);
+        late[key] ??= { drives: 0, pts: 0, sq: 0 };
+        late[key].drives++;
+        late[key].pts += pts;
+        late[key].sq += pts * pts;
+      });
       for (const { before, outcome: o } of plays) {
         if ((o.kind === 'pass' || o.kind === 'run' || o.kind === 'scramble') && o.td) tds++;
         if (o.kind === 'interception' && o.defensiveTd) tds++;
@@ -369,6 +412,7 @@ export function measureEvents(
           if (o.made) fgm++;
         }
         if (o.kind === 'punt') punts++;
+        if (o.kind === 'penalty') penalties[o.against]++;
         if (o.kind === 'pat' && o.type === 'twoPoint') twoPt++;
         if (
           before.down === 4 &&
@@ -386,6 +430,22 @@ export function measureEvents(
   }
   const e = targets.events;
   const rows: Metric[] = [];
+  // Late-drive buckets are small samples on both sides, so each tolerance is 2.5 combined
+  // standard errors (at least 0.3 points per drive).
+  for (const [name, v] of Object.entries(late)) {
+    const t = targets.lateDrivePoints[name]!;
+    const simMean = v.pts / v.drives;
+    const simSd = Math.sqrt(Math.max(v.sq / v.drives - simMean ** 2, 0));
+    const tolerance = Math.max(0.3, 2.5 * Math.sqrt(simSd ** 2 / v.drives + t.sd ** 2 / t.n));
+    rows.push({
+      group: 'late drives',
+      name: `points per drive, last 7 min, ${name}`,
+      sim: simMean,
+      target: t.mean,
+      tolerance: Math.round(tolerance * 100) / 100,
+      pass: Math.abs(simMean - t.mean) <= tolerance,
+    });
+  }
   const add = (name: string, sim: number, target: number, tolerance: number) =>
     rows.push({
       group: 'events',
@@ -402,6 +462,8 @@ export function measureEvents(
   add('two-point tries per game', twoPt / games, e.twoPointTriesPerGame, 0.15);
   add('4th-down go rate', fourthGo / fourth, e.fourthDownGoRate, 0.04);
   add('3rd-down distance', thirdDist / thirdN, e.thirdDownDistance, 0.5);
+  add('offense penalties per game', penalties.offense / games, e.offensePenaltiesPerGame, 0.5);
+  add('defense penalties per game', penalties.defense / games, e.defensePenaltiesPerGame, 0.5);
   return rows;
 }
 
@@ -410,7 +472,7 @@ export function formatReport(metrics: Metric[]): string {
     (m) =>
       `${m.pass ? ' ok ' : 'FAIL'}  ${m.group.padEnd(12)} ${m.name.padEnd(42)} ` +
       `sim ${m.sim.toFixed(3).padStart(9)}  target ${m.target.toFixed(3).padStart(9)}  ` +
-      `±${m.tolerance}`,
+      `±${Number(m.tolerance.toPrecision(3))}`,
   );
   const failed = metrics.filter((m) => !m.pass).length;
   return `${rows.join('\n')}\n${metrics.length - failed}/${metrics.length} pass`;

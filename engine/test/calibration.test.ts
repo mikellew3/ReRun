@@ -23,8 +23,8 @@ import {
 } from './calibration/measure';
 
 const SIMS_PER_GAME = 300;
-const GROUPS = ['scores', 'key numbers', 'plays', 'starters', 'events', 'market'];
-const REPLAYS_PER_GAME = 3;
+const GROUPS = ['scores', 'key numbers', 'plays', 'starters', 'events', 'late drives', 'market'];
+const REPLAYS_PER_GAME = 5;
 
 describe('calibration against 2023-2025 NFL games', () => {
   let metrics: Metric[] = [];

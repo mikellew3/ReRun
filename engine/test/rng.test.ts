@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Rng, createRng, randomSeed } from '../src/rng';
+import { Rng, createRng, gameSeed, randomSeed } from '../src/rng';
 
 describe('xoshiro128** core', () => {
   it('matches the reference algorithm for state [1, 2, 3, 4]', () => {
@@ -103,6 +103,21 @@ describe('distribution', () => {
     const n = 100_000;
     for (let i = 0; i < n; i++) if (rng.chance(0.3)) hits++;
     expect(Math.abs(hits / n - 0.3)).toBeLessThan(0.006);
+  });
+});
+
+describe('gameSeed', () => {
+  it('gives different games in the same run different streams', () => {
+    const a = gameSeed(42, '2026_08_KC_DEN');
+    const b = gameSeed(42, '2026_08_NE_MIA');
+    expect(a).not.toBe(b);
+    expect(createRng(a, 0).nextU32()).not.toBe(createRng(b, 0).nextU32());
+  });
+
+  it('is deterministic and unsigned 32-bit', () => {
+    expect(gameSeed(42, 'g')).toBe(gameSeed(42, 'g'));
+    const s = gameSeed(0xffffffff, 'x');
+    expect(Number.isInteger(s) && s >= 0 && s <= 0xffffffff).toBe(true);
   });
 });
 

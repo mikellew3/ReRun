@@ -4,10 +4,11 @@
  */
 
 import type { GameInputs } from './applySettings';
+import { withUsageNoise } from './applySettings';
 import { GameStats, newGameState, other, recordPlay, snapshotState } from './context';
 import type { GameCtx } from './context';
 import { playDrive } from './drive';
-import { createRng } from './rng';
+import { createRng, gameSeed } from './rng';
 import { setupKickoff, startOvertime } from './rules';
 import { kickoff, pat } from './specialTeams';
 import type { GameState, PlayRecord, PlayerGameLine, SimGameResult, Side } from './types';
@@ -90,11 +91,17 @@ function buildResult(ctx: GameCtx, simIndex: number): SimGameResult {
 
 /** Sets up one sim: its RNG stream, who is available, the offenses and the coin toss. */
 export function createGameCtx(inputs: GameInputs, simIndex: number, record = false): GameCtx {
-  const rng = createRng(inputs.request.seed, simIndex);
+  const rng = createRng(gameSeed(inputs.request.seed, inputs.request.gameId), simIndex);
   const availability = inputs.drawAvailability(rng);
   const units = {
-    home: inputs.offense('home', availability.home.available, availability.home.key),
-    away: inputs.offense('away', availability.away.available, availability.away.key),
+    home: withUsageNoise(
+      inputs.offense('home', availability.home.available, availability.home.key),
+      rng,
+    ),
+    away: withUsageNoise(
+      inputs.offense('away', availability.away.available, availability.away.key),
+      rng,
+    ),
   };
   const firstReceiver: Side = rng.chance(0.5) ? 'home' : 'away';
   const ctx: GameCtx = {

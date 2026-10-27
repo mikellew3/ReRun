@@ -4,6 +4,7 @@
  */
 
 import type { GameInputs, OffenseUnit } from './applySettings';
+import { MODEL_CONFIG } from './config/model.config';
 import type { Rng } from './rng';
 import type { GameState, PlayOutcome, PlayRecord, Side } from './types';
 
@@ -120,4 +121,15 @@ export function cloneState(s: GameState): GameState {
 /** A copy of the state, only when replaying. */
 export function snapshotState(ctx: GameCtx): GameState | null {
   return ctx.record ? cloneState(ctx.state) : null;
+}
+
+/** Late-game script level for the offense in possession: -maxLevel..maxLevel, 0 = neutral. */
+export function scriptLevel(state: GameState): number {
+  const g = MODEL_CONFIG.gameScript;
+  if (state.quarter < 4) return 0;
+  const diff = scoreDiff(state, state.possession);
+  let bucket = g.diffUpper.findIndex((upper) => diff <= upper);
+  if (bucket < 0) bucket = g.diffUpper.length - 1;
+  const pts = g.ptsShift[bucket]! * Math.pow(gameElapsedFraction(state), g.timePower);
+  return Math.max(-g.maxLevel, Math.min(g.maxLevel, Math.round(pts / g.ptsPerLevel)));
 }

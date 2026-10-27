@@ -1,6 +1,6 @@
 # Phase 1, steps 1–3 — proposal for review
 
-Status: **approved by Mike, 2026-10-27.** Steps 1–3 implemented.
+Status: **approved by Mike, 2026-10-27.** Steps 1–3 implemented. Step 4 (calibration): see [`docs/calibration.md`](../calibration.md).
 
 ### Changes made while implementing step 1
 
@@ -16,6 +16,7 @@ Status: **approved by Mike, 2026-10-27.** Steps 1–3 implemented.
 - **How team and player numbers combine:** offense and defense rates are combined in logit space against the league average. If the starting QB is not the team's usual QB, the gap between the two QBs' own numbers is added. Each receiver's catch odds and yardage, and each rusher's yardage, are set relative to the team average, so the team totals are preserved.
 - **Points-equivalent effects** (home field now; rest, travel and altitude in step 5) become small shifts in completion odds and yardage. The conversion rates live in `MODEL_CONFIG.pointsToEfficiency` and are tuned in step 4.
 - **Questionable players** are drawn in or out per sim with their play probability. Each sim's in/out draw comes from its own random stream, so results stay identical however a run is split.
+- **Random streams (fixed in step 4):** sim *i* of game *g* uses `createRng(gameSeed(seed, g), i)`. Originally the stream ignored the game, so different games in one run were correlated.
 - **Not yet applied** (steps 5 and 6): weather, rest, travel, altitude, defense-vs-position matchups, streaks, backup-player efficiency, OL/secondary injuries and market-implied usage. Conditions are already resolved (forecast or user override) and passed through.
 - **Kickoff outcome** gained an optional `onsideRecovered` flag for the replay.
 - **Uncalibrated results on the 2026 week-8 slate:** the sim's margins correlate 0.88 with market spreads, but totals run about 3 points low and margins are too spread out. Key-number spikes at 3 and 7 are present. Step 4 fixes the level and spread.

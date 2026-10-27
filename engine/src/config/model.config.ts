@@ -53,6 +53,9 @@ export const MODEL_CONFIG = {
       puntNetYds: [-10, 80],
       kickoffStartYardline: [1, 99],
     },
+    /** Completion/run/scramble histograms use open-field plays only: outside the red zone (the
+     *  engine's redZone shifts cover it) and, for runs, not short yardage (sneaks, stacked boxes). */
+    histogramRunMinYdsToGo: 3,
     /** Punts used for the net-yards histogram: snapped at least this far from the opponent goal. */
     puntHistogramMinYardline: 60,
     /** Kicks shorter than this are treated as onside or squib attempts and left out. */
@@ -164,17 +167,74 @@ export const MODEL_CONFIG = {
   /** Points-equivalent adjustments (home field, rest, travel...) become efficiency shifts.
    *  Per point of advantage given to an offense. Tuned in step 4 so 1 pt ~ 1 pt of margin. */
   pointsToEfficiency: {
-    passYdsTiltPerPt: 0.0035,
-    runYdsTiltPerPt: 0.005,
-    completionLogitPerPt: 0.015,
+    passYdsTiltPerPt: 0.0028,
+    runYdsTiltPerPt: 0.004,
+    completionLogitPerPt: 0.012,
+  },
+
+  /** Passing by situation: early downs (play action, fewer sacks) vs 3rd/4th down by yards to
+   *  go (more sacks and incompletions, least of all on very short and very long). Logit shifts vs
+   *  the all-situations rate, measured on 2023-2025 open-field play-by-play. */
+  passBySituation: {
+    earlyDowns: { completionLogit: 0.1, sackLogit: -0.22, intLogit: -0.12 },
+    lateDownDistanceUpper: [3, 6, 10, 99],
+    lateDowns: {
+      completionLogit: [-0.15, -0.27, -0.39, -0.04],
+      sackLogit: [0.11, 0.37, 0.55, 0.45],
+      intLogit: [0.16, 0.18, 0.32, 0.36],
+      /** Throws aimed at the sticks: a completion that would fall short of the line to gain is
+       *  instead caught at or just past it (0-2 yards) this often. Sized from 3rd/4th-down
+       *  conversion rates by distance (2023-2025). */
+      sticksCatchRate: [0, 0.2, 0.32, 0.08],
+    },
+  },
+
+  /** Inside the opponent's 20 the field is compressed: shorter gains, lower completion odds. */
+  redZone: {
+    passYdsTiltShift: -0.035,
+    runYdsTiltShift: -0.04,
+    completionLogitShift: -0.12,
+  },
+
+  /**
+   * Late-game script efficiency: in the last minutes, teams nursing a one-score lead (or tied)
+   * play it safe, teams down two scores face prevent defenses, and teams down three scores fade.
+   * Points-equivalent shift on the offense, by score bucket (offense minus defense; upper
+   * bounds), times (elapsed fraction)^timePower so it only bites late in the 4th quarter.
+   * Applied in steps of ptsPerLevel, up to maxLevel steps either way.
+   */
+  gameScript: {
+    diffUpper: [-17, -9, -1, 0, 8, 16, 99],
+    ptsShift: [-5, 7, 2, -3, -6, 0, 0],
+    timePower: 8,
+    ptsPerLevel: 1.5,
+    maxLevel: 6,
+  },
+
+  /** Usage. Real per-game shares swing more than a fixed share implies (game plan, rotation,
+   *  in-game injuries): each sim multiplies every player's share by a lognormal factor with
+   *  this sd (then renormalizes). Tuned on RB1 carries and top-target lines (step 4). */
+  usage: {
+    shareNoiseSd: 0.15,
+    /** Depth-chart starters' historical shares get this bonus before teammates are rescaled
+     *  (role changes and absent teammates' work flow to the starter first). Fitted by
+     *  likelihood on 2023-2025 calibration weeks: carries go to the RB1, targets to any
+     *  position's starter. */
+    starterCarryBonus: 0.25,
+    starterTargetBonus: 0.05,
   },
 
   /** Penalties, drawn before each snap. Rates come from team penalty yards per snap. */
   penalties: {
-    offense: { yards: [5, 10, 15], probs: [0.6, 0.35, 0.05] },
-    defense: { yards: [5, 10, 15], probs: [0.45, 0.2, 0.35] },
+    /** Yardage mixes and first-down share measured on 2023-2025 play-by-play. */
+    offense: { yards: [5, 10, 15], probs: [0.592, 0.344, 0.064] },
+    defense: { yards: [5, 10, 15, 25], probs: [0.551, 0.089, 0.265, 0.095] },
     /** Share of defensive penalties that give an automatic first down. */
-    defenseAutoFirstDownRate: 0.45,
+    defenseAutoFirstDownRate: 0.78,
+    /** Team penalty yards per snap become a per-snap rate via the mean yards above; these
+     *  scales correct that conversion so penalty counts per game match 2023-2025 (step 4). */
+    offenseRateScale: 0.92,
+    defenseRateScale: 0.87,
   },
 
   /** Turnovers. */
@@ -200,10 +260,10 @@ export const MODEL_CONFIG = {
     zoneUpperYardline: [39, 59, 79, 99],
     ydsToGoUpper: [1, 2, 4, 7, 99],
     goProb: [
-      [0.12, 0.04, 0.02, 0.01, 0.0],
-      [0.62, 0.38, 0.22, 0.08, 0.02],
-      [0.72, 0.5, 0.3, 0.15, 0.05],
-      [0.58, 0.35, 0.2, 0.08, 0.03],
+      [0.15, 0.05, 0.03, 0.01, 0.0],
+      [0.78, 0.48, 0.28, 0.1, 0.03],
+      [0.9, 0.62, 0.38, 0.19, 0.06],
+      [0.72, 0.44, 0.25, 0.1, 0.04],
     ],
     /** Longest FG a team normally attempts (yards). */
     maxFgDistance: 57,
@@ -218,8 +278,8 @@ export const MODEL_CONFIG = {
     twoPointSuccessRate: 0.48,
     /** Go for two at a random rate, plus always in the 4th quarter/OT when the score
      *  difference after the TD (offense minus defense) is in this list. */
-    twoPointBaseRate: 0.06,
-    twoPointLateDiffs: [-2, -5, -10, -13, -16, 1, 5, 12],
+    twoPointBaseRate: 0.05,
+    twoPointLateDiffs: [-2, -5, -10, -16, 1],
   },
 
   /** Kickoffs beyond the fitted league rates. */
@@ -240,7 +300,7 @@ export const MODEL_CONFIG = {
     fgCurve: { intercept: 6.18, slopePerYard: -0.098 },
     maxFgDistance: 66,
     /** start */
-    xpMakeRate: 0.95,
+    xpMakeRate: 0.96,
   },
 
   /** Injuries and roster. */

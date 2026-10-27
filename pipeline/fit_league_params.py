@@ -1,9 +1,9 @@
 """League-wide baselines for one slate: yardage histograms, expected pass-rate grid and
 special-teams rates. Pooled over the prior season and this season before the slate.
 
-Completion, run and scramble histograms are open-field distributions: touchdown plays are
-treated as cut short by the end zone (censored_yard_histogram), because the engine applies its
-own goal-line cap.
+Completion, run and scramble histograms are open-field distributions: plays outside the red
+zone (runs: not short yardage either), with touchdown plays treated as cut short by the end zone
+(censored_yard_histogram), because the engine applies its own goal-line cap and red-zone shifts.
 
 Writes data/fits/{season}-W{week}/league_base.json. League-average rates and defense-vs-position
 are averaged from team params in build_snapshot.py.
@@ -65,16 +65,19 @@ def histograms(plays: pd.DataFrame) -> dict:
         100 - kicks["yardline_100"] - kicks["kick_distance"] + kicks["return_yards"].fillna(0)
     )
 
+    open_field_rows = plays["yardline_100"] > fitting["redZoneYardline"]
+    standard_down = plays["ydstogo"] >= fitting["histogramRunMinYdsToGo"]
+
     def open_field(name: str, mask: pd.Series) -> dict:
-        """Gains with touchdown plays treated as cut short by the end zone."""
+        """Open-field gains, with touchdown plays treated as cut short by the end zone."""
         lo, hi = ranges[name]
-        rows = plays[mask]
+        rows = plays[mask & open_field_rows]
         cut_short = rows["yards_gained"] >= rows["yardline_100"]
         return censored_yard_histogram(rows["yards_gained"], cut_short, lo, hi)
 
     return {
         "completionYds": open_field("completionYds", plays["is_complete"]),
-        "runYds": open_field("runYds", plays["is_designed_run"]),
+        "runYds": open_field("runYds", plays["is_designed_run"] & standard_down),
         "scrambleYds": open_field("scrambleYds", plays["is_scramble"]),
         "sackYds": hist("sackYds", plays.loc[plays["is_sack"], "yards_gained"]),
         "puntNetYds": hist("puntNetYds", pd.Series(punt_net)),

@@ -127,7 +127,40 @@ def event_targets(pbp: pd.DataFrame) -> dict:
         "twoPointTriesPerGame": float(p["two_point_attempt"].sum() / games),
         "fourthDownGoRate": float(fourth["play_type"].isin(["pass", "run"]).mean()),
         "thirdDownDistance": float(third["ydstogo"].mean()),
+        "offensePenaltiesPerGame": float(penalties_on(p, "posteam") / games),
+        "defensePenaltiesPerGame": float(penalties_on(p, "defteam") / games),
     }
+
+
+def penalties_on(p: pd.DataFrame, side: str) -> int:
+    """Accepted penalties with yardage on scrimmage snaps, committed by `side`."""
+    pen = p[p["penalty"] & p["is_snap"] & (p["penalty_yards"].fillna(0) > 0)]
+    return int((pen["penalty_team"] == pen[side]).sum())
+
+
+LATE_BUCKETS = [
+    (-99, -17, "trail17+"),
+    (-16, -9, "trail9-16"),
+    (-8, -1, "trail1-8"),
+    (0, 0, "tied"),
+    (1, 8, "lead1-8"),
+    (9, 99, "lead9+"),
+]
+
+
+def late_drive_targets(pbp: pd.DataFrame) -> dict:
+    """Points per drive for drives starting in the last 7 minutes of the 4th, by score state."""
+    p = pbp[
+        pbp["posteam"].notna() & (pbp["is_play"] | pbp["play_type"].isin(["punt", "field_goal"]))
+    ]
+    first = p.groupby(["game_id", "fixed_drive"]).first().reset_index()
+    late = first[(first["qtr"] == 4) & (first["quarter_seconds_remaining"] <= 420)]
+    pts = late["fixed_drive_result"].map({"Touchdown": 7, "Field goal": 3}).fillna(0)
+    out = {}
+    for lo, hi, name in LATE_BUCKETS:
+        m = late["score_differential"].between(lo, hi)
+        out[name] = {"mean": float(pts[m].mean()), "sd": float(pts[m].std()), "n": int(m.sum())}
+    return out
 
 
 def calibration_games(sched: pd.DataFrame, weeks: list[int]) -> list[dict]:
@@ -153,11 +186,13 @@ def main() -> None:
 
     sched = read_raw("schedules", args.seasons)
     sched = sched[(sched["game_type"] == "REG") & sched["result"].notna()]
-    pbp = read_raw("pbp", args.seasons, columns=[*PBP_COLUMNS, "touchdown"])
+    extra = ["touchdown", "score_differential", "quarter_seconds_remaining"]
+    pbp = read_raw("pbp", args.seasons, columns=[*PBP_COLUMNS, *extra])
     pbp = pbp[pbp["season_type"] == "REG"]
     pbp["touchdown"] = pbp["touchdown"].fillna(0).astype(int)
     pbp = add_flags(pbp)
     events = event_targets(pbp)
+    late_drives = late_drive_targets(pbp)
     # Passing TDs only for the QB line.
     pbp["touchdown"] = np.where(pbp["is_complete"], pbp["touchdown"], 0)
 
@@ -168,6 +203,7 @@ def main() -> None:
         "plays": play_targets(pbp),
         "starters": starter_targets(pbp),
         "events": events,
+        "lateDrivePoints": late_drives,
         "calibrationGames": calibration_games(sched, args.weeks),
     }
     write_json(OUT, targets)
