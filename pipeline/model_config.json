@@ -1,6 +1,6 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "4bfd6d58936de9fc",
+  "configHash": "6212b47b698e7576",
   "engineVersion": "0.3.0",
   "model": {
     "configVersion": 1,
@@ -514,6 +514,17 @@
         12,
         18,
         23
+      ],
+      "bookmakers": [
+        "pinnacle",
+        "betmgm",
+        "williamhill_us",
+        "espnbet",
+        "fanatics",
+        "betrivers",
+        "bovada",
+        "betonlineag",
+        "lowvig"
       ]
     },
     "sharpApi": {

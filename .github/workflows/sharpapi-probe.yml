@@ -1,13 +1,26 @@
-# One-off: checks the SharpAPI and The Odds API keys and prints response shapes (never the keys).
-# Run from the Actions tab ("API probe" -> Run workflow).
+# Inspects SharpAPI responses (never prints the key), so pipeline code is written against
+# real data. Run from the Actions tab ("API probe" -> Run workflow).
 name: API probe
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'paths (GET each path) or census (count /odds rows by market type)'
+        default: paths
+      paths:
+        description: 'paths mode: comma-separated, e.g. /odds?league=nfl&limit=2,/sports'
+        default: /account
+      query:
+        description: 'census mode: /odds query, e.g. league=nfl&market_type=moneyline'
+        default: league=nfl
+      pages:
+        description: 'census mode: max pages of 200 rows'
+        default: '8'
 
 jobs:
   probe:
-    name: Probe endpoints
+    name: Probe SharpAPI
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -20,6 +33,7 @@ jobs:
       - run: python probe_sharpapi.py
         env:
           SHARPAPI_KEY: ${{ secrets.SHARPAPI_KEY }}
-      - run: echo skip odds api
-        env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          PROBE_MODE: ${{ inputs.mode }}
+          PROBE_PATHS: ${{ inputs.paths }}
+          PROBE_QUERY: ${{ inputs.query }}
+          PROBE_PAGES: ${{ inputs.pages }}

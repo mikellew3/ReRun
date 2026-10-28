@@ -530,6 +530,22 @@ export const MODEL_CONFIG = {
     monthlyCreditTarget: 1500,
     /** Pinnacle pulls (h2h, spreads, totals = 3 credits each) run at these UTC hours. */
     sharpPullHoursUtc: [12, 18, 23],
+    /**
+     * Books per pull. Up to 10 books cost the same as one region, so this list costs the same
+     * 3 credits as Pinnacle alone. DraftKings and FanDuel are left out: SharpAPI tracks them
+     * every 30 minutes, and mixing two feeds for one book would create fake line moves.
+     */
+    bookmakers: [
+      'pinnacle',
+      'betmgm',
+      'williamhill_us',
+      'espnbet',
+      'fanatics',
+      'betrivers',
+      'bovada',
+      'betonlineag',
+      'lowvig',
+    ],
   },
 
   /** SharpAPI (free tier: DraftKings + FanDuel, 60s delayed, 12 requests/minute). */

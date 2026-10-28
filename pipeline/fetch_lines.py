@@ -3,8 +3,9 @@
 Two sources, both server-side only:
 - SharpAPI (free tier, env SHARPAPI_KEY): DraftKings and FanDuel main lines for spreads,
   totals and moneylines, 60s delayed. Polled often; costs no credits.
-- The Odds API (env ODDS_API_KEY): Pinnacle, the sharp reference, a few times a day
-  (config oddsApi.sharpPullHoursUtc). 3 credits per pull. Credits left are logged on every
+- The Odds API (env ODDS_API_KEY): Pinnacle (the sharp reference) plus other US books
+  (config oddsApi.bookmakers), a few times a day (config oddsApi.sharpPullHoursUtc). 3
+  credits per pull for up to 10 books. Credits left are logged on every
   call, and the pull is skipped below config oddsApi.creditFloor.
 
 Every pull is merged into a history file: per game, per book, per market, a tick is kept only
@@ -197,12 +198,11 @@ def fetch_pinnacle(key: str, history: dict) -> list[Quote]:
     if remaining is not None and remaining < floor:
         print(f"The Odds API: {remaining} credits left, below the floor of {floor}; skipping")
         return []
-    book = cfg["lineMovement"]["sharpBook"]
+    books = cfg["oddsApi"]["bookmakers"]
     params = {
         "apiKey": key,
-        "regions": "eu",
         "markets": "h2h,spreads,totals",
-        "bookmakers": book,
+        "bookmakers": ",".join(books),
         "oddsFormat": "american",
     }
     url = f"{ODDS_API_BASE}/sports/americanfootball_nfl/odds?{urllib.parse.urlencode(params)}"
@@ -219,8 +219,8 @@ def fetch_pinnacle(key: str, history: dict) -> list[Quote]:
         f"The Odds API: {usage['creditsLast']} credits used, "
         f"{usage['creditsRemaining']} left this month"
     )
-    quotes = odds_api_events_to_quotes(events, book)
-    print(f"The Odds API: {len(quotes)} {book} quotes")
+    quotes = [q for book in books for q in odds_api_events_to_quotes(events, book)]
+    print(f"The Odds API: {len(quotes)} quotes from {len({q['book'] for q in quotes})} books")
     return quotes
 
 

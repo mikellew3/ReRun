@@ -1,23 +1,24 @@
-"""One-off: print what SharpAPI returns for NFL odds, books and events, so the odds job can
-be written against the real response. Prints status codes, rate-limit headers, the top-level
-shape and a couple of sample records. Never prints the key.
+"""Inspects SharpAPI responses, so pipeline code is written against real data. Never prints
+the key. Driven by environment variables (set from the "API probe" workflow's inputs):
 
-    SHARPAPI_KEY=... python probe_sharpapi.py
+    PROBE_MODE=paths   PROBE_PATHS="/odds?league=nfl&limit=2,/sports"
+        GET each path; print status, rate-limit headers, the JSON shape and two samples.
+    PROBE_MODE=census  PROBE_QUERY="league=nfl"  PROBE_PAGES=20
+        Page through /odds and count rows by (market_type, main line, player prop, book).
+
+    SHARPAPI_KEY=... PROBE_MODE=paths PROBE_PATHS=/account python probe_sharpapi.py
 """
 
 from __future__ import annotations
 
 import json
 import os
+import time
 import urllib.error
 import urllib.request
+from collections import Counter
 
 BASE = "https://api.sharpapi.io/api/v1"
-PATHS = [
-    "/odds?league=nfl&limit=1",
-    "/odds?league=nfl&sportsbook=pinnacle&limit=2",
-    "/odds?league=nfl&market_type=point_spread&limit=4",
-]
 
 
 def shape(x, depth: int = 0):
@@ -31,72 +32,79 @@ def shape(x, depth: int = 0):
     return type(x).__name__
 
 
-def get(path: str, key: str) -> None:
+def fetch(path: str, key: str) -> tuple[int, dict, object]:
     req = urllib.request.Request(
         BASE + path, headers={"X-API-Key": key, "Accept": "application/json"}
     )
-    print(f"\n===== GET {path}")
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
-            status, headers, body = resp.status, resp.headers, resp.read().decode("utf-8")
+            status, headers, body = resp.status, dict(resp.headers), resp.read().decode("utf-8")
     except urllib.error.HTTPError as err:
-        status, headers, body = err.code, err.headers, err.read().decode("utf-8", "replace")
-    print("status:", status)
-    for h, v in headers.items():
-        if any(s in h.lower() for s in ("ratelimit", "rate-limit", "remaining", "quota", "credit")):
-            print(f"header {h}: {v}")
+        status, headers, body = err.code, dict(err.headers), err.read().decode("utf-8", "replace")
     try:
-        data = json.loads(body)
+        return status, headers, json.loads(body)
     except json.JSONDecodeError:
-        print("body (not JSON):", body[:500])
+        return status, headers, body[:500]
+
+
+def show(path: str, key: str) -> None:
+    status, headers, data = fetch(path, key)
+    print(f"\n===== GET {path}\nstatus: {status}")
+    for h, v in headers.items():
+        if "ratelimit" in h.lower():
+            print(f"header {h}: {v}")
+    if not isinstance(data, (dict, list)):
+        print("body:", data)
         return
-    print("shape:", json.dumps(shape(data), indent=1)[:4000])
-    sample = data
+    print("shape:", json.dumps(shape(data), indent=1)[:3000])
     if isinstance(data, dict):
-        for k in ("data", "splits", "results", "events"):
-            if isinstance(data.get(k), list):
-                sample = data[k]
-                break
-    if isinstance(data, dict) and "meta" in data:
-        print("meta:", json.dumps(data["meta"], indent=1))
-    if isinstance(data, dict) and "pagination" in data:
-        print("pagination:", json.dumps(data["pagination"]))
-    if isinstance(sample, list):
-        print("samples:", json.dumps(sample[:2], indent=1)[:5000])
-    else:
-        print("body:", json.dumps(data, indent=1)[:3000])
+        for k in ("meta", "pagination"):
+            if k in data:
+                print(f"{k}:", json.dumps(data[k])[:800])
+        rows = data.get("data")
+        if isinstance(rows, list):
+            print("samples:", json.dumps(rows[:2], indent=1)[:4000])
+        elif rows is not None:
+            print("data:", json.dumps(rows, indent=1)[:4000])
 
 
-def market_census(key: str) -> None:
-    """Pages through NFL odds and counts market types (main lines vs alternates)."""
-    from collections import Counter
-
+def census(key: str, query: str, pages: int) -> None:
     counts: Counter = Counter()
-    url = f"{BASE}/odds?league=nfl&limit=500"
-    pages = 0
-    while url and pages < 8:
-        req = urllib.request.Request(url, headers={"X-API-Key": key})
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        for r in data.get("data", []):
+    path = f"/odds?{query}&limit=200"
+    for page in range(1, pages + 1):
+        status, _, data = fetch(path, key)
+        if status != 200 or not isinstance(data, dict):
+            print("stopped:", status, str(data)[:300])
+            break
+        rows = data.get("data", [])
+        events = {r["event_id"] for r in rows}
+        for r in rows:
             counts[(r["market_type"], r["is_main_line"], r["is_player_prop"], r["sportsbook"])] += 1
-        pages += 1
-        cursor = (data.get("pagination") or {}).get("next_cursor")
-        has_more = (data.get("pagination") or {}).get("has_more")
-        url = f"{BASE}/odds?league=nfl&limit=500&cursor={cursor}" if has_more and cursor else None
-        print("page", pages, "rows", len(data.get("data", [])), "limit", data.get("pagination"))
+        info = data.get("pagination") or {}
+        print(f"page {page}: {len(rows)} rows, events {sorted(events)[:3]}")
+        if not info.get("has_more") or not info.get("next_cursor"):
+            break
+        path = f"/odds?{query}&limit=200&cursor={info['next_cursor']}"
+        time.sleep(5.2)  # free tier: 12 requests/minute
     print("\nmarket_type | main | prop | book | rows")
     for k, v in sorted(counts.items()):
-        if not k[2]:
-            print(*k, v, sep=" | ")
-    print("player-prop rows:", sum(v for k, v in counts.items() if k[2]))
+        print(*k, v, sep=" | ")
 
 
 def main() -> None:
     key = os.environ.get("SHARPAPI_KEY", "").strip()
     if not key:
         raise SystemExit("SHARPAPI_KEY is not set")
-    market_census(key)
+    mode = os.environ.get("PROBE_MODE", "paths")
+    if mode == "census":
+        census(
+            key,
+            os.environ.get("PROBE_QUERY", "league=nfl"),
+            int(os.environ.get("PROBE_PAGES", "8")),
+        )
+    else:
+        for path in filter(None, os.environ.get("PROBE_PATHS", "/account").split(",")):
+            show(path.strip(), key)
 
 
 if __name__ == "__main__":
