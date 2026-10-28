@@ -148,17 +148,17 @@ function views(
     full: {
       label: 'Full game',
       cols: [
-        { market: 'spreads', head: `${game.home} spread (${game.home} / ${game.away})` },
+        { market: 'spreads', head: `${game.home} spread` },
         { market: 'totals', head: 'Total' },
-        { market: 'h2h', head: `ML ${game.home} / ${game.away}` },
+        { market: 'h2h', head: 'Moneyline' },
       ],
     },
     h1: {
       label: '1st half',
       cols: [
-        { market: 'spreads_h1', head: `${game.home} spread (${game.home} / ${game.away})` },
+        { market: 'spreads_h1', head: `${game.home} spread` },
         { market: 'totals_h1', head: 'Total' },
-        { market: 'h2h_h1', head: `ML ${game.home} / ${game.away}` },
+        { market: 'h2h_h1', head: 'Moneyline' },
       ],
     },
     tt: {
@@ -209,30 +209,30 @@ export function MarketCard({ game, sims }: { game: SnapshotGame; sims?: Aggregat
     const b = books.find((x) => x.book === book && x.market === market);
     if (!b) return <td key={market}>–</td>;
     const t = b.current;
+    const ou = market.startsWith('totals') || market.startsWith('team_totals');
+    const label = (side: 'a' | 'b') =>
+      ou ? (side === 'a' ? 'O' : 'U') : side === 'a' ? game.home : game.away;
     const price = (side: 'a' | 'b') => (
       <Price
+        label={label(side)}
         american={side === 'a' ? t.a : t.b}
         chances={sims ? lineChances(sims, market, side, t.line) : null}
       />
     );
-    if (market.startsWith('h2h')) {
-      return (
-        <td key={market}>
-          {price('a')} / {price('b')}
-        </td>
-      );
-    }
     const spread = market.startsWith('spreads');
     const fmt = (v: number | null) => (spread ? signed(v ?? 0) : String(v));
-    const moved = t.line !== b.open.line;
+    const moved = t.line !== null && t.line !== b.open.line;
     return (
-      <td key={market}>
-        <strong>{fmt(t.line)}</strong>{' '}
-        <span className="muted">
-          {spread ? '' : 'o '}
-          {price('a')} / {spread ? '' : 'u '}
+      <td key={market} className="quote">
+        {t.line !== null && (
+          <span className="quote-line">
+            <strong>{fmt(t.line)}</strong>
+            {moved && <span className="muted"> · open {fmt(b.open.line)}</span>}
+          </span>
+        )}
+        <span className="quote-prices">
+          {price('a')}
           {price('b')}
-          {moved && ` · open ${fmt(b.open.line)}`}
         </span>
       </td>
     );

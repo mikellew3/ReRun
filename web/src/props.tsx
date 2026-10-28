@@ -64,13 +64,14 @@ function Quote(props: {
   return (
     <>
       {showLine && q.line !== null && `${q.line}: `}
-      <Price american={q.over} chances={chances(true)} />
-      {q.under !== null && (
-        <>
-          {' / '}
-          <Price american={q.under} chances={chances(false)} />
-        </>
-      )}
+      <span className="quote-prices">
+        <Price
+          label={q.under === null ? undefined : 'O'}
+          american={q.over}
+          chances={chances(true)}
+        />
+        {q.under !== null && <Price label="U" american={q.under} chances={chances(false)} />}
+      </span>
     </>
   );
 }

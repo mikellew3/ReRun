@@ -3,5 +3,10 @@
   "framework": "vite",
   "installCommand": "npm ci",
   "buildCommand": "npm run build -w @rerun/web",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "git": {
+    "deploymentEnabled": {
+      "claude/*": false
+    }
+  }
 }

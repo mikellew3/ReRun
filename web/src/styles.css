@@ -927,17 +927,50 @@ tbody tr:last-child td {
 
 /* ---------------------------------------------------------- Value shading */
 
-/* A price with value at the sim's odds (see value.tsx). */
+/* A price with value at the sim's odds (see value.tsx): soft green fill. */
 .price.value {
-  display: inline-block;
-  padding: 0 var(--rr-space-1);
-  border-radius: 4px;
   background: var(--rr-positive-tint);
   color: var(--rr-positive);
   font-weight: 600;
-  font-style: normal;
+}
+
+.price.value .price-label {
+  color: var(--rr-positive);
 }
 
 .value-note {
   display: block;
+}
+
+.quote {
+  vertical-align: top;
+}
+
+.quote-line {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.quote-prices {
+  display: inline-flex;
+  gap: var(--rr-space-1);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  color: var(--rr-text-secondary);
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.price-label {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--rr-text-tertiary, var(--rr-text-secondary));
 }

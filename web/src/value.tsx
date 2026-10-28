@@ -139,10 +139,21 @@ export function propChances(
 export const shadeProps = (market: MarketKey) =>
   CFG.enabled && (CFG.propMarkets as readonly string[]).includes(market);
 
-/** A price, shaded green when it has value at the sim's chances. */
-export function Price(props: { american: number; chances?: { win: number; push: number } | null }) {
-  const { american, chances: c } = props;
-  if (!CFG.enabled || !c) return <span>{odds(american)}</span>;
+/** A price (with an optional side label such as "O" or "GB"), shaded green when it has value
+ *  at the sim's chances. */
+export function Price(props: {
+  american: number;
+  chances?: { win: number; push: number } | null;
+  label?: string;
+}) {
+  const { american, chances: c, label } = props;
+  const text = (
+    <>
+      {label && <span className="price-label">{label}</span>}
+      {odds(american)}
+    </>
+  );
+  if (!CFG.enabled || !c) return <span className="price">{text}</span>;
   const v = priceValue(c.win, c.push, american);
   const good = v.ev >= CFG.minEv;
   return (
@@ -152,7 +163,7 @@ export function Price(props: { american: number; chances?: { win: number; push: 
         v.breakEven,
       )} · EV ${v.ev >= 0 ? '+' : '−'}${Math.abs(100 * v.ev).toFixed(1)}%`}
     >
-      {odds(american)}
+      {text}
     </span>
   );
 }
