@@ -1,6 +1,6 @@
-# One-off: prints what SharpAPI returns for NFL odds, books and events (never the key).
-# Run from the Actions tab ("SharpAPI probe" -> Run workflow).
-name: SharpAPI probe
+# One-off: checks the SharpAPI and The Odds API keys and prints response shapes (never the keys).
+# Run from the Actions tab ("API probe" -> Run workflow).
+name: API probe
 
 on:
   workflow_dispatch:
@@ -20,3 +20,6 @@ jobs:
       - run: python probe_sharpapi.py
         env:
           SHARPAPI_KEY: ${{ secrets.SHARPAPI_KEY }}
+      - run: python probe_oddsapi.py
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
