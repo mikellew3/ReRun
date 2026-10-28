@@ -29,6 +29,21 @@ function kickoffLabel(iso: string): string {
   });
 }
 
+/** "Week 8 · Updated Wed 10:29 AM": the newest of the snapshot's data timestamps. */
+function dataLine(snapshot: SlateSnapshot): string {
+  const times = Object.values(snapshot.dataAsOf)
+    .filter((t): t is string => typeof t === 'string')
+    .map((t) => Date.parse(t))
+    .filter((t) => Number.isFinite(t));
+  const newest = times.length ? Math.max(...times) : Date.parse(snapshot.createdAt);
+  const when = new Date(newest).toLocaleString(undefined, {
+    weekday: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+  return `Week ${snapshot.week} · Updated ${when}`;
+}
+
 function makeRequest(
   snapshot: SlateSnapshot,
   game: SnapshotGame,
@@ -208,7 +223,6 @@ export function App() {
   const [agg, setAgg] = useState<Aggregate | null>(null);
   const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
-  const [seed, setSeed] = useState<number | null>(null);
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
@@ -238,7 +252,6 @@ export function App() {
     workerRef.current = worker;
     const s = randomSeed();
     const request = makeRequest(snapshot, game, nSims, s);
-    setSeed(s);
     setAgg(null);
     setRunError(null);
     setRunning(true);
@@ -361,10 +374,7 @@ export function App() {
                   )}
                 </span>
               </button>
-              <span className="caption muted meta">
-                Slate {snapshot.id} · engine {ENGINE_VERSION}
-                {seed !== null && ` · seed ${seed}`}
-              </span>
+              <span className="caption muted meta">{dataLine(snapshot)}</span>
             </section>
             {game && <GameCard snapshot={snapshot} game={game} />}
           </aside>
