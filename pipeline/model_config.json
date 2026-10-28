@@ -1,6 +1,6 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "80ff2ecfb24be9a1",
+  "configHash": "4bfd6d58936de9fc",
   "engineVersion": "0.3.0",
   "model": {
     "configVersion": 1,
@@ -470,6 +470,7 @@
           "minEdge": 0.08
         }
       ],
+      "showEdges": false,
       "kellyFraction": 0.25,
       "maxStakeFraction": 0.03,
       "preferredSharpBook": "pinnacle",
@@ -498,7 +499,8 @@
         14
       ],
       "bookGapPts": 0.5,
-      "sharpGapPts": 0.5,
+      "sharpGapWinProb": 0.02,
+      "sharpGapTotalPts": 1,
       "minMovePts": 0.5
     },
     "oddsApi": {

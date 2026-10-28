@@ -43,8 +43,9 @@ export type Signal =
     }
   | {
       kind: 'sharpGap';
-      market: 'spreads' | 'totals';
-      sharp: { book: string; line: number };
+      /** h2h: values are home no-vig win probabilities; totals: lines. */
+      market: 'h2h' | 'totals';
+      sharp: { book: string; value: number };
       recAvg: number;
       /** The side the sharp book rates higher than the recreational books do. */
       lean: Lean;
@@ -188,18 +189,36 @@ export function summarizeLines(
       }
     }
     const sharp = current.find((b) => b.book === cfg.sharpBook);
-    if (sharp && rec.length > 0) {
+    if (market === 'totals' && sharp && rec.length > 0) {
       const recAvg = rec.reduce((acc, b) => acc + b.current.line!, 0) / rec.length;
       const gap = sharp.current.line! - recAvg;
-      if (Math.abs(gap) >= cfg.sharpGapPts) {
+      if (Math.abs(gap) >= cfg.sharpGapTotalPts) {
         signals.push({
           kind: 'sharpGap',
           market,
-          sharp: { book: sharp.book, line: sharp.current.line! },
+          sharp: { book: sharp.book, value: sharp.current.line! },
           recAvg,
           lean: leanOf(market, gap),
         });
       }
+    }
+  }
+
+  // Sides: compare moneyline no-vig home win probability (no line/price mixing).
+  const h2h = books.filter((b) => b.market === 'h2h');
+  const sharpMl = h2h.find((b) => b.book === cfg.sharpBook);
+  const recMl = h2h.filter((b) => recBooks.includes(b.book));
+  if (sharpMl && recMl.length > 0) {
+    const recAvg = recMl.reduce((acc, b) => acc + noVigA(b.current), 0) / recMl.length;
+    const gap = noVigA(sharpMl.current) - recAvg;
+    if (Math.abs(gap) >= cfg.sharpGapWinProb) {
+      signals.push({
+        kind: 'sharpGap',
+        market: 'h2h',
+        sharp: { book: sharpMl.book, value: noVigA(sharpMl.current) },
+        recAvg,
+        lean: gap > 0 ? 'home' : 'away',
+      });
     }
   }
   return { books, signals };

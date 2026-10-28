@@ -474,6 +474,11 @@ export const MODEL_CONFIG = {
       { id: 'play', minEdge: 0.05 },
       { id: 'strong', minEdge: 0.08 },
     ],
+    /**
+     * Show edges, tiers and stakes on the site. Off until the backtest supports the model's
+     * numbers: live 2026 sims run 2.7 points under market totals (calibration games: +0.9).
+     */
+    showEdges: false,
     kellyFraction: 0.25,
     /** Max suggested stake as a fraction of bankroll. */
     maxStakeFraction: 0.03,
@@ -506,8 +511,13 @@ export const MODEL_CONFIG = {
     keyNumbers: [3, 7, 10, 14],
     /** Two books' current lines this far apart (points) = a book gap. */
     bookGapPts: 0.5,
-    /** Sharp book's line this far from the recreational average (points) = sharp gap. */
-    sharpGapPts: 0.5,
+    /**
+     * Sharp gap. Lines alone mislead (Pinnacle -4 at +101 is about the same bet as DK -3.5 at
+     * -120), so sides compare the moneyline no-vig win probability: the sharp book this far
+     * from the recreational average. Totals need a real line difference.
+     */
+    sharpGapWinProb: 0.02,
+    sharpGapTotalPts: 1,
     /** A move this big since open (points) counts as "the line moved". */
     minMovePts: 0.5,
   },

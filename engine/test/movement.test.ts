@@ -61,19 +61,50 @@ describe('line movement', () => {
     expect(signals.some((s) => s.kind === 'steam')).toBe(false);
   });
 
-  it('flags a book gap and a sharp gap', () => {
-    const cfg = MODEL_CONFIG.lineMovement;
+  it('flags a book gap', () => {
     const { signals } = summarizeLines([
       series('draftkings', 'spreads', [tick('10:00', -3.5)]),
       series('fanduel', 'spreads', [tick('10:00', -3)]),
-      series(cfg.sharpBook, 'spreads', [tick('10:00', -4)]),
     ]);
     expect(signals.find((s) => s.kind === 'bookGap')).toMatchObject({
       low: { book: 'draftkings', line: -3.5 },
       high: { book: 'fanduel', line: -3 },
     });
-    // Pinnacle -4 vs rec average -3.25: the sharp book rates the home team higher.
-    expect(signals.find((s) => s.kind === 'sharpGap')).toMatchObject({ lean: 'home' });
+  });
+
+  it('sharp gap on sides uses moneyline win probability, not lines', () => {
+    const sharp = MODEL_CONFIG.lineMovement.sharpBook;
+    // Pinnacle -4 +101 vs DK -3.5 -120: different lines, same bet. No sharp gap.
+    const same = summarizeLines([
+      series('draftkings', 'spreads', [tick('10:00', -3.5, -120, 100)]),
+      series(sharp, 'spreads', [tick('10:00', -4, 101, -113)]),
+      series('draftkings', 'h2h', [tick('10:00', null, -190, 160)]),
+      series(sharp, 'h2h', [tick('10:00', null, -185, 165)]),
+    ]);
+    expect(same.signals.some((s) => s.kind === 'sharpGap')).toBe(false);
+    // Pinnacle rates the home team clearly higher on the moneyline.
+    const gap = summarizeLines([
+      series('draftkings', 'h2h', [tick('10:00', null, -150, 130)]),
+      series(sharp, 'h2h', [tick('10:00', null, -185, 165)]),
+    ]);
+    expect(gap.signals.find((s) => s.kind === 'sharpGap')).toMatchObject({
+      market: 'h2h',
+      lean: 'home',
+    });
+  });
+
+  it('sharp gap on totals needs a full point', () => {
+    const sharp = MODEL_CONFIG.lineMovement.sharpBook;
+    const small = summarizeLines([
+      series('draftkings', 'totals', [tick('10:00', 44.5)]),
+      series(sharp, 'totals', [tick('10:00', 44)]),
+    ]);
+    expect(small.signals.some((s) => s.kind === 'sharpGap')).toBe(false);
+    const big = summarizeLines([
+      series('draftkings', 'totals', [tick('10:00', 44.5)]),
+      series(sharp, 'totals', [tick('10:00', 46)]),
+    ]);
+    expect(big.signals.find((s) => s.kind === 'sharpGap')).toMatchObject({ lean: 'over' });
   });
 
   it('is empty without history', () => {

@@ -48,9 +48,9 @@ function signalText(s: Signal, game: SnapshotGame): string {
         ? `Book gap: ${game.home} ${signed(s.low.line)} at ${bookName(s.low.book)}, ${signed(s.high.line)} at ${bookName(s.high.book)}`
         : `Book gap: total ${s.low.line} at ${bookName(s.low.book)}, ${s.high.line} at ${bookName(s.high.book)}`;
     case 'sharpGap':
-      return s.market === 'spreads'
-        ? `${bookName(s.sharp.book)} has ${game.home} ${signed(s.sharp.line)} vs ${signed(s.recAvg, 2)} at DK/FD: sharp side ${side(s.lean)}`
-        : `${bookName(s.sharp.book)} total ${s.sharp.line} vs ${s.recAvg.toFixed(2)} at DK/FD: sharp side ${side(s.lean)}`;
+      return s.market === 'h2h'
+        ? `${bookName(s.sharp.book)} gives ${side(s.lean)} a better win chance (${game.home} ${pct(s.sharp.value)} vs ${pct(s.recAvg)} at DK/FD): sharp side ${side(s.lean)}`
+        : `${bookName(s.sharp.book)} total ${s.sharp.value} vs ${s.recAvg.toFixed(1)} at DK/FD: sharp side ${side(s.lean)}`;
   }
 }
 
@@ -286,6 +286,7 @@ export function EdgesCard(props: {
   totals: Counts;
   n: number;
 }) {
+  if (!MODEL_CONFIG.markets.showEdges) return null;
   const rows = edges(props.game, props.margins, props.totals, props.n);
   if (rows.length === 0) return null;
   const source = props.game.market[0]?.noVigSource;
