@@ -22,6 +22,7 @@ const outdoors = (c: Partial<ResolvedConditions>): ResolvedConditions => ({
   windMph: 0,
   tempF: 60,
   precip: 'none',
+  precipChance: 1,
   ...c,
 });
 
@@ -48,6 +49,8 @@ describe('weather', () => {
     );
     const double = weatherEffects(outdoors({ windMph: 30, precip: 'light_rain' }), 2);
     expect(double.completionLogit).toBeCloseTo(2 * full.completionLogit);
+    const maybe = weatherEffects(outdoors({ precip: 'light_rain', precipChance: 0.6 }), 1);
+    expect(maybe.yardsPerCarry).toBeCloseTo(0.6 * W.precip.light_rain.yardsPerCarry);
     const cold = weatherEffects(outdoors({ tempF: W.coldThresholdF - 1 }), 1);
     expect(cold.yardsPerCompletion).toBeCloseTo(W.cold.yardsPerCompletion);
   });

@@ -20,6 +20,8 @@ Props are void when a player doesn't play, so sims where a questionable player s
 
 ## Results (engine 0.3.0, seed 2026)
 
+Engine `0.4.0` (red-zone and fourth-down retune) changes these little: see `props-check.json`. Anytime-TD probabilities rose slightly (sim mean 0.26 vs 0.24 actual).
+
 | Market | n | Real avg | Sim avg | PIT | cov50 | cov80 | Over at p30 line, sim / real | p50 line | p70 line |
 |---|---|---|---|---|---|---|---|---|---|
 | Pass yards | 368 | 212.2 | 230.9 | 0.46 | 0.38 | 0.67 | 0.70 / 0.61 | 0.50 / 0.48 | 0.30 / 0.32 |

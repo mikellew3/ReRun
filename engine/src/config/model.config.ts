@@ -189,11 +189,13 @@ export const MODEL_CONFIG = {
     },
   },
 
-  /** Inside the opponent's 20 the field is compressed: shorter gains, lower completion odds. */
+  /** Inside the opponent's 20 the field is compressed: shorter gains, lower completion odds.
+   *  Retuned on 2025-2026 games (jobs/seasonStats.ts vs pipeline/season_stats.py) to the real
+   *  red-zone TD rate per trip (58.7%); the earlier values gave 56%. */
   redZone: {
-    passYdsTiltShift: -0.035,
-    runYdsTiltShift: -0.04,
-    completionLogitShift: -0.12,
+    passYdsTiltShift: -0.0245,
+    runYdsTiltShift: -0.028,
+    completionLogitShift: -0.084,
   },
 
   /**
@@ -255,15 +257,17 @@ export const MODEL_CONFIG = {
   },
 
   /** Fourth down. Rows by field zone (offense yardline upper bound), columns by yards to go
-   *  bucket (upper bounds). Values = probability of going for it. start */
+   *  bucket (upper bounds). Values = probability of going for it. */
   fourthDown: {
     zoneUpperYardline: [39, 59, 79, 99],
     ydsToGoUpper: [1, 2, 4, 7, 99],
+    /** Real go rates 2024-2026 outside the last 5 minutes and end-of-half kicks
+     *  (teams now go for it much more on 4th-and-short, at midfield and at the goal line). */
     goProb: [
-      [0.15, 0.05, 0.03, 0.01, 0.0],
-      [0.78, 0.48, 0.28, 0.1, 0.03],
-      [0.9, 0.62, 0.38, 0.19, 0.06],
-      [0.72, 0.44, 0.25, 0.1, 0.04],
+      [0.37, 0.06, 0.05, 0.03, 0.01],
+      [0.85, 0.49, 0.31, 0.11, 0.04],
+      [0.9, 0.55, 0.4, 0.15, 0.05],
+      [0.92, 0.59, 0.28, 0.07, 0.04],
     ],
     /** Longest FG a team normally attempts (yards). */
     maxFgDistance: 57,

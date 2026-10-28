@@ -26,6 +26,7 @@ export interface Targets {
     overtimeRate: number;
     tieRate: number;
     teamPoints: Summary;
+    totalMinusLine: Summary;
   };
   plays: {
     playsPerGame: Summary;
@@ -321,10 +322,20 @@ export function measure(sims: GameSims[], targets: Targets): Metric[] {
     tolerance: 0,
     pass: r >= 0.8,
   });
+  // Closing totals ran under real scoring in these seasons, so the target is the real
+  // full-season gap, not 0. The same games' actual scores are checked separately below.
   add(
     'market',
     'sim total - total line: mean',
     mean(simTotal.map((x, i) => x - totalLine[i]!)),
+    targets.game.totalMinusLine.mean,
+    1.5,
+  );
+  const actual = sims.map((gs) => byId.get(gs.gameId)!.total);
+  add(
+    'scores',
+    'sim total - actual total, same games: mean',
+    mean(simTotal.map((x, i) => x - actual[i]!)),
     0,
     1.5,
   );

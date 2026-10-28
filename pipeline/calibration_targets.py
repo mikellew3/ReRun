@@ -46,6 +46,9 @@ def game_targets(sched: pd.DataFrame) -> dict:
         "overtimeRate": float(sched["overtime"].mean()),
         "tieRate": float((sched["result"] == 0).mean()),
         "teamPoints": summary(pd.concat([sched["home_score"], sched["away_score"]])),
+        # Real total minus closing total over all games: closing totals ran under real
+        # scoring in 2023-2025, so a sim that matches real scoring sits above the line.
+        "totalMinusLine": summary(total - sched["total_line"].astype(float)),
     }
 
 

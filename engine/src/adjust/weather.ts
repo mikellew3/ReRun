@@ -15,6 +15,9 @@ export interface ResolvedConditions {
   windMph: number;
   tempF: number;
   precip: Precip;
+  /** Share of the precipitation effect applied: the forecast's chance of it during the game
+   *  (an expected-value blend), or 1 when the user sets precipitation or it was observed. */
+  precipChance: number;
 }
 
 export interface WeatherEffects {
@@ -46,6 +49,7 @@ export function resolveConditions(game: SnapshotGame, o: GameOverrides): Resolve
     windMph: o.conditions.windMph ?? game.weather?.windMph ?? 0,
     tempF: o.conditions.tempF ?? game.weather?.tempF ?? 60,
     precip: o.conditions.precip ?? game.weather?.precip ?? 'none',
+    precipChance: o.conditions.precip !== null ? 1 : (game.weather?.precipChance ?? 1),
   };
 }
 
@@ -59,7 +63,13 @@ export function weatherEffects(c: ResolvedConditions, weight: number): WeatherEf
   if (c.indoor || weight === 0) return NO_WEATHER;
   const w = MODEL_CONFIG.weather;
   const wind = windStrength(c.windMph);
-  const precip = w.precip[c.precip];
+  const p = w.precip[c.precip];
+  const chance = Math.min(1, Math.max(0, c.precipChance));
+  const precip = {
+    completionLogit: chance * p.completionLogit,
+    yardsPerCompletion: chance * p.yardsPerCompletion,
+    yardsPerCarry: chance * p.yardsPerCarry,
+  };
   const cold = c.tempF < w.coldThresholdF;
   return {
     completionLogit:

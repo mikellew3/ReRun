@@ -119,7 +119,9 @@ function GameCard({ snapshot, game }: { snapshot: SlateSnapshot; game: SnapshotG
   if (!c.indoor && game.weather && c.precip !== 'none') {
     chips.push({
       icon: 'rain',
-      text: c.precip.replace('_', ' ').replace(/^./, (s) => s.toUpperCase()),
+      text:
+        c.precip.replace('_', ' ').replace(/^./, (s) => s.toUpperCase()) +
+        (c.precipChance < 1 ? ` ${Math.round(100 * c.precipChance)}%` : ''),
     });
   }
   if (pts.away.altitude < 0) chips.push({ icon: 'mountain', text: 'Altitude' });

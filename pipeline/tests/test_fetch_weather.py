@@ -38,6 +38,7 @@ def test_nws_game_window_average():
     assert w["windMph"] == round((18 + 22 + 20) / 3, 1)
     assert w["tempF"] == 28.0
     assert w["precip"] == "light_rain"
+    assert w["precipChance"] == 0.7
     assert w["roofExpected"] is None
 
 

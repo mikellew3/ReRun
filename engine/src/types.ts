@@ -302,6 +302,9 @@ export interface WeatherForecast {
   gustMph: number | null;
   tempF: number;
   precip: Precip;
+  /** Forecast chance (0-1) that the precipitation happens during the game. Absent = certain
+   *  (observed weather, or a forecast of amounts). */
+  precipChance?: number;
   /** Retractable roofs only. */
   roofExpected: 'open' | 'closed' | null;
 }

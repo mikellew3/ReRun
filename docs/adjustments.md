@@ -1,6 +1,6 @@
 # Situational adjustments (Phase 1, step 5)
 
-Status: **in the engine from `0.3.0`**. Injuries, weather, venue and rest are on by default. Defense-vs-position matchups and streaks are lenses, off by default. Calibration still passes 55/55 (see [calibration.md](calibration.md)).
+Status: **in the engine from `0.3.0`**. Injuries, weather, venue and rest are on by default. Defense-vs-position matchups and streaks are lenses, off by default. Calibration passes 56/56 on engine `0.4.0` (see [calibration.md](calibration.md)).
 
 The brief (§9.4–9.7) lists the adjustments and says each must be toggleable and backtested on its own. Every adjustment here is a pure function in `engine/src/adjust/`, and every number it uses lives in `model.config.ts`. Each number was measured from 2022–2025 data rather than guessed.
 

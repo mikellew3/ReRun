@@ -1,6 +1,6 @@
 # Engine calibration (Phase 1, step 4)
 
-Status: **all 55 checks pass** with default settings (engine `0.3.0`, CI seed 2026), and on three other seeds. Engine `0.3.0` adds the step-5 adjustments (injuries, weather, venue, rest), which are on by default; see [adjustments.md](adjustments.md).
+Status: **all 56 checks pass** with default settings (engine `0.4.0`, CI seed 2026). Engine `0.3.0` added the step-5 adjustments (injuries, weather, venue, rest), which are on by default; see [adjustments.md](adjustments.md). Engine `0.4.0` fixed the sim scoring about 2 points a game under real NFL scoring since 2024; see [Scoring level](#scoring-level-engine-040).
 
 The brief (§10.2) asks that, with default settings, the engine reproduce league reality on historical games. This page covers how that's checked, what had to change to get there, and the gaps that remain.
 
@@ -17,30 +17,31 @@ The brief (§10.2) asks that, with default settings, the engine reproduce league
 
 | Group | Check | Sim | Real | Tolerance |
 |---|---|---|---|---|
-| Scores | Total points, mean | 45.0 | 45.1 | ±1.5 |
-| | Total points, sd | 13.4 | 13.6 | ±1.5 |
-| | Home margin vs closing spreads | 1.07 | 1.27 | ±1.0 |
-| | Margin sd | 13.9 | 14.3 | ±1.5 |
-| | Overtime rate | 4.9% | 5.3% | ±2 pts |
-| Key numbers | Margin of 3 | 12.9% | 14.2% | ±2.5 pts |
+| Scores | Total points, mean | 46.2 | 45.1 | ±1.5 |
+| | Sim total minus actual total, same games | −0.3 | 0 | ±1.5 |
+| | Total points, sd | 13.6 | 13.6 | ±1.5 |
+| | Home margin vs closing spreads | 1.06 | 1.27 | ±1.0 |
+| | Margin sd | 14.1 | 14.3 | ±1.5 |
+| | Overtime rate | 4.7% | 5.3% | ±2 pts |
+| Key numbers | Margin of 3 | 12.8% | 14.2% | ±2.5 pts |
 | | Margin of 7 | 8.4% | 8.3% | ±2 pts |
-| | Margin of 6 | 7.7% | 6.6% | ±1.5 pts |
+| | Margin of 6 | 7.6% | 6.6% | ±1.5 pts |
 | | Margin of 10 | 4.8% | 4.2% | ±1.5 pts |
-| | Margin of 14 | 3.5% | 4.4% | ±1.5 pts |
-| Plays | Plays per game | 126.6 | 124.4 | ±3 |
-| | Yards per play | 5.27 | 5.34 | ±0.15 |
+| | Margin of 14 | 3.6% | 4.4% | ±1.5 pts |
+| Plays | Plays per game | 126.7 | 124.4 | ±3 |
+| | Yards per play | 5.29 | 5.34 | ±0.15 |
 | | Pass attempt share | 55.6% | 55.0% | ±2 pts |
-| | Completion rate | 63.7% | 65.0% | ±1.5 pts |
-| | Turnovers per team-game | 1.24 | 1.17 | ±0.15 |
+| | Completion rate | 63.8% | 65.0% | ±1.5 pts |
+| | Turnovers per team-game | 1.23 | 1.17 | ±0.15 |
 | Starters | QB pass yards (mean / sd) | 231 / 68 | 226 / 74 | ±7% / ±15% |
-| | QB pass TDs | 1.44 | 1.43 | ±0.1 |
-| | RB1 carries / rush yards | 14.6 / 63.6 | 15.2 / 65.9 | ±7% |
+| | QB pass TDs | 1.50 | 1.43 | ±0.1 |
+| | RB1 carries / rush yards | 14.6 / 64.1 | 15.2 / 65.9 | ±7% |
 | | Top target: targets / rec / yards | 9.5 / 6.0 / 70 | 9.2 / 6.1 / 75 | ±7% |
-| Market | Sim margin vs closing spread: slope | 0.91 | 1.00 | ±0.15 |
-| | Correlation with closing spread | 0.841 | — | ≥ 0.8 |
-| | Sim total minus closing total | +0.9 | 0 | ±1.5 |
-| Events | Touchdowns / FG attempts / punts per game | 5.02 / 3.81 / 8.17 | 5.01 / 4.00 / 7.65 | ±0.3 / ±0.35 / ±0.6 |
-| | FG rate / 4th-down go rate | 84.8% / 19.7% | 85.2% / 20.9% | |
+| Market | Sim margin vs closing spread: slope | 0.94 | 1.00 | ±0.15 |
+| | Correlation with closing spread | 0.842 | — | ≥ 0.8 |
+| | Sim total minus closing total | +2.1 | +1.1 | ±1.5 |
+| Events | Touchdowns / FG attempts / punts per game | 5.19 / 3.68 / 7.99 | 5.01 / 4.00 / 7.65 | ±0.3 / ±0.35 / ±0.6 |
+| | FG rate / 4th-down go rate | 83.7% / 21.1% | 85.2% / 20.9% | |
 | | 3rd-down distance | 7.40 | 6.97 | ±0.5 |
 | | Penalties per game (off / def) | 6.6 / 4.4 | 6.4 / 4.5 | ±0.5 |
 | Late drives | Points per drive, last 7 min, by score state | see report | | 2.5 standard errors |
@@ -69,11 +70,34 @@ Each change is backed by a measurement from 2023–2025 play-by-play, and every 
 
 - **Punts** run about 0.5 per game high. Sim drives are slightly shorter (5.5 vs 5.9 snaps), so there are about 1 more possession per game.
 - **6-point margins** run about 1.1 points high.
-- **Market slope is 0.91** (0.86 before the step-5 adjustments). The sim's margins vary a little less than the closing spreads. Total margin spread is right (13.9 vs 14.3), so the remaining gap is in how far apart the sim rates teams. This should be revisited with the step-8 backtest, which has far more games.
-- **Totals sit 0.9 points above the closing totals** for these games (1.4 before weather), while matching the real final scores (45.0 vs 45.1). These games simply went over their closing totals on average.
+- **Market slope is 0.94** (0.86 before the step-5 adjustments). The sim's margins vary a little less than the closing spreads. Total margin spread is right (13.9 vs 14.3), so the remaining gap is in how far apart the sim rates teams. This should be revisited with the step-8 backtest, which has far more games.
+- **Totals sit 2.1 points above the closing totals** for these games, and 0.3 under their actual scores (46.2 vs 46.5). These games went over their closing totals by 2.4 on average, and all 2023–2025 games by 1.1, which is the target for this check.
+- **Touchdowns vs field goals:** the sim now scores slightly more touchdowns (5.19 vs 5.01) and tries fewer field goals (3.7 vs 4.0) than real games. Real drives stall at the opponent's 25–35 and kick 40–49-yard field goals more often.
 - **3rd-down distance** is 7.4 vs 7.0.
 
-## Re-running after changes
+## Scoring level (engine 0.4.0)
+
+Live 2026 sims ran about 2.5 points a game under the market totals. Checking against real results (`jobs/totalsGap.ts --finals`) showed the sim's scoring barely moved between seasons (about 44–46 a game) while real scoring rose from 44.5 in 2023 to about 47.5 in 2024–2025. On walk-forward snapshots for weeks 4–16, the sim was 0.3 over real scores in 2023 but 3.1 under in 2024, 1.7 under in 2025 and 2.2 under in 2026 weeks 4–7.
+
+`jobs/seasonStats.ts` and `pipeline/season_stats.py` compare scoring components on the same games. Field position, first downs, third-down conversions and first-down gains all matched. Two things did not:
+
+| 2025–2026 games | Real | Sim 0.3.0 | Sim 0.4.0 |
+|---|---|---|---|
+| Points per game | 47.0 | 44.7 | 46.3 |
+| Red-zone TD rate (per trip) | 58.7% | 56.3% | 59.5% |
+| 4th-down go rate | 22.6% | 19.4% | 21.4% |
+| Punts per game | 7.1 | 7.8 | 7.6 |
+
+Changes, both in `model.config.ts`:
+
+1. **Red zone.** The red-zone penalties (shorter gains, lower completion odds inside the 20) were cut to 70% of their old size, which brings the red-zone TD rate to the real level.
+2. **Fourth down.** The go-for-it table is now the real 2024–2026 go rates. Teams go for it far more on 4th-and-1 in their own territory (37% vs 15%) and at the goal line (92% vs 72%).
+
+Also in 0.4.0: a forecast chance of rain now applies that share of the rain effect (a 60% chance applies 60% of it), instead of the full effect whenever the chance reached 50%. If the user sets precipitation, the full effect applies.
+
+Result on 2026: weeks 4–7 went from 1.0 under the closing totals to 0.25 over, and from 2.2 under the real scores to 0.9 under. On the week 8 slate, sim totals went from 2.55 under the market to about 1.4 under, before the rain change.
+
+
 
 - **Engine constants:** edit `model.config.ts`, run `npx tsx jobs/calibrate.ts`, then run the engine tests. Bump `ENGINE_VERSION` if sim output changes.
 - **Pipeline changes** (fits or histograms):

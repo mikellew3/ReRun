@@ -129,12 +129,15 @@ def nws_game_weather(periods: list[dict], kickoff: datetime) -> dict | None:
         return t * 9 / 5 + 32 if p.get("temperatureUnit") == "C" else t
 
     probs = [float((p.get("probabilityOfPrecipitation") or {}).get("value") or 0) for p in inside]
+    precip = precip_from_forecast([p.get("shortForecast", "") for p in inside], max(probs))
     return {
         "source": "nws",
         "windMph": round(sum(parse_wind_mph(p.get("windSpeed")) for p in inside) / len(inside), 1),
         "gustMph": None,
         "tempF": round(sum(temp_f(p) for p in inside) / len(inside), 1),
-        "precip": precip_from_forecast([p.get("shortForecast", "") for p in inside], max(probs)),
+        "precip": precip,
+        # The engine applies this share of the precipitation effect (CLAUDE.md §9.7).
+        "precipChance": round(max(probs) / 100, 2) if precip != "none" else 0.0,
         "roofExpected": None,
     }
 
