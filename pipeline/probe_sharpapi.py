@@ -14,10 +14,9 @@ import urllib.request
 
 BASE = "https://api.sharpapi.io/api/v1"
 PATHS = [
-    "/books",
-    "/sportsbooks",
-    "/odds?league=nfl",
-    "/events?league=nfl",
+    "/odds?league=nfl&limit=1",
+    "/odds?league=nfl&sportsbook=pinnacle&limit=2",
+    "/odds?league=nfl&market_type=point_spread&limit=4",
 ]
 
 
@@ -58,6 +57,10 @@ def get(path: str, key: str) -> None:
             if isinstance(data.get(k), list):
                 sample = data[k]
                 break
+    if isinstance(data, dict) and "meta" in data:
+        print("meta:", json.dumps(data["meta"], indent=1))
+    if isinstance(data, dict) and "pagination" in data:
+        print("pagination:", json.dumps(data["pagination"]))
     if isinstance(sample, list):
         print("samples:", json.dumps(sample[:2], indent=1)[:5000])
     else:
