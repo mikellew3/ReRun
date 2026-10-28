@@ -1,0 +1,22 @@
+# One-off: prints what SharpAPI returns for NFL splits (shape and samples, never the key).
+# Run from the Actions tab ("SharpAPI probe" -> Run workflow).
+name: SharpAPI probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    name: Probe splits endpoints
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python probe_sharpapi.py
+        env:
+          SHARPAPI_KEY: ${{ secrets.SHARPAPI_KEY }}
