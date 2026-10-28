@@ -1,0 +1,60 @@
+# Polls game lines every 30 minutes: DraftKings + FanDuel via SharpAPI (free tier), and
+# Pinnacle via The Odds API at the UTC hours in config oddsApi.sharpPullHoursUtc (3 credits
+# each). The line history lives in the Actions cache between runs, so polling never commits
+# or triggers a Vercel build; the snapshot publisher reads the same cache.
+name: Lines
+
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+    inputs:
+      pinnacle:
+        description: Also pull Pinnacle now (3 Odds API credits)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lines
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    name: Fetch lines
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: pipeline/pyproject.toml
+      - run: pip install -e .
+      - name: Restore line history
+        uses: actions/cache/restore@v4
+        with:
+          path: pipeline/data/lines/history.json
+          key: lines-history-${{ github.run_id }}
+          restore-keys: lines-history-
+      - name: Fetch
+        env:
+          SHARPAPI_KEY: ${{ secrets.SHARPAPI_KEY }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          PINNACLE_NOW: ${{ inputs.pinnacle }}
+        run: |
+          if [ "$PINNACLE_NOW" = "true" ]; then
+            python fetch_lines.py --pinnacle
+          else
+            python fetch_lines.py --auto-pinnacle
+          fi
+      - name: Save line history
+        uses: actions/cache/save@v4
+        with:
+          path: pipeline/data/lines/history.json
+          key: lines-history-${{ github.run_id }}-${{ github.run_attempt }}

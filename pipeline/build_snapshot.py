@@ -35,6 +35,8 @@ from common.io import (
     round_floats,
     write_json,
 )
+from fetch_lines import HISTORY_PATH as LINES_HISTORY
+from market_lines import attach_lines
 
 SKILL_POSITIONS = ["QB", "RB", "FB", "WR", "TE", "K", "P"]
 DEPTH_POS_MAP = {"QB": "QB", "RB": "RB", "FB": "FB", "WR": "WR", "TE": "TE", "PK": "K", "P": "P"}
@@ -476,6 +478,11 @@ def build_snapshot(
 
         forecast = forecast_for
     games = build_games(slate, as_of, Stadiums(), forecast=forecast)
+    lines_at = None
+    if LINES_HISTORY.exists():
+        history = json.loads(LINES_HISTORY.read_text())
+        print(f"Lines: {attach_lines(games, history)} of {len(games)} games matched")
+        lines_at = history.get("updatedAt")
     manifest = read_manifest()
     nflverse_as_of = manifest.get(f"pbp_{season}", iso(as_of))
 
@@ -491,7 +498,7 @@ def build_snapshot(
         "dataAsOf": {
             "nflverse": nflverse_as_of,
             "injuries": manifest.get(f"injuries_{season}", nflverse_as_of),
-            "odds": None,
+            "odds": lines_at,
             "weather": iso(now) if live else None,
         },
         "league": league_block(base, teams_fit),

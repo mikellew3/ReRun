@@ -1,6 +1,7 @@
 # Builds the current slate's snapshot (fresh nflverse data, fits, injuries, weather forecasts)
 # and commits it to web/public/snapshots on main, which redeploys the site on Vercel.
-# CLAUDE.md §11: twice daily (morning and evening Eastern). Odds join in step 6.
+# CLAUDE.md §11: twice daily (morning and evening Eastern). Market lines and their movement
+# come from the line history the Lines workflow keeps in the Actions cache.
 name: Publish snapshot
 
 on:
@@ -41,7 +42,13 @@ jobs:
       - run: pip install -e .
       - name: Fetch nflverse data
         run: python fetch_nflverse.py
-      - name: Build snapshot with forecasts
+      - name: Restore line history
+        uses: actions/cache/restore@v4
+        with:
+          path: pipeline/data/lines/history.json
+          key: lines-history-${{ github.run_id }}
+          restore-keys: lines-history-
+      - name: Build snapshot with forecasts and lines
         run: python publish_web.py ${WEEK:+--week "$WEEK"}
       - name: Commit to main
         run: |

@@ -103,8 +103,14 @@ export function MarginHistogram(props: {
   n: number;
   favorite: string;
   underdog: string;
+  /** The favorite's market spread (e.g. −4), when the snapshot has market lines. */
+  market?: number;
 }) {
-  const { margins, n, favorite, underdog } = props;
+  const { margins, n, favorite, underdog, market } = props;
+  // The favorite covers when it wins by more than this.
+  const cover = market === undefined ? 0 : -market;
+  const coverLabel =
+    market === undefined ? `${favorite} wins` : `${favorite} covers ${signed(market)}`;
   const from = -35;
   const to = 35;
   const ticks = [-21, -14, -7, 0, 3, 7, 10, 14, 21, 28];
@@ -118,11 +124,7 @@ export function MarginHistogram(props: {
           </span>
         </div>
         <div className="stats-row">
-          <Stat
-            value={pct(shareWhere(margins, n, (m) => m > 0))}
-            label={`${favorite} wins`}
-            copper
-          />
+          <Stat value={pct(shareWhere(margins, n, (m) => m > cover))} label={coverLabel} copper />
           <Stat value={pct(shareWhere(margins, n, (m) => Math.abs(m) === 3))} label="Lands on 3" />
           <Stat value={pct(shareWhere(margins, n, (m) => Math.abs(m) <= 7))} label="One score" />
         </div>
@@ -134,10 +136,15 @@ export function MarginHistogram(props: {
           from={from}
           to={to}
           n={n}
-          highlight={(m) => m > 0}
+          highlight={(m) => m > cover}
           label={(m) => (m === 0 ? 'Tie' : m > 0 ? `${favorite} by ${m}` : `${underdog} by ${-m}`)}
         />
-        <RefLine x={0} from={from} to={to} label="Even" />
+        <RefLine
+          x={cover}
+          from={from}
+          to={to}
+          label={market === undefined ? 'Even' : `Market ${favorite} ${signed(market)}`}
+        />
       </div>
       <div className="ticks num" aria-hidden="true">
         {ticks.map((t) => (
@@ -160,12 +167,18 @@ export function MarginHistogram(props: {
       <div className="legend caption">
         <span>
           <i className="swatch on" />
-          {favorite} wins
+          {coverLabel}
         </span>
         <span>
           <i className="swatch" />
-          {underdog} wins or tie
+          {market === undefined ? `${underdog} wins or tie` : 'Doesn’t cover'}
         </span>
+        {market !== undefined && (
+          <span>
+            <i className="swatch dashed" />
+            Market line
+          </span>
+        )}
         <span>
           <b className="key">3 · 7 · 10 · 14</b>Key numbers
         </span>
@@ -174,13 +187,13 @@ export function MarginHistogram(props: {
   );
 }
 
-/** Totals with the sim's middle line: copper bars go over it. */
-export function TotalHistogram(props: { totals: Counts; n: number }) {
-  const { totals, n } = props;
+/** Totals against the market total (else the sim's middle line): copper bars go over it. */
+export function TotalHistogram(props: { totals: Counts; n: number; market?: number }) {
+  const { totals, n, market } = props;
   const from = 10;
   const to = 80;
   const median = quantile(totals, n, 0.5);
-  const line = Math.floor(median) + 0.5;
+  const line = market ?? Math.floor(median) + 0.5;
   return (
     <section className="card chart-card">
       <div className="card-head">
@@ -203,7 +216,12 @@ export function TotalHistogram(props: { totals: Counts; n: number }) {
           highlight={(t) => t > line}
           label={(t) => `${t} points`}
         />
-        <RefLine x={line} from={from} to={to} label={`Middle ${line}`} />
+        <RefLine
+          x={line}
+          from={from}
+          to={to}
+          label={market === undefined ? `Middle ${line}` : `Market ${line}`}
+        />
       </div>
       <div className="ticks num" aria-hidden="true">
         {[20, 30, 40, 50, 60, 70].map((t) => (
@@ -217,8 +235,14 @@ export function TotalHistogram(props: { totals: Counts; n: number }) {
 }
 
 /** Cover probability and fair price for the favorite at each half-point spread. */
-export function AltLadder(props: { margins: Counts; n: number; favorite: string }) {
-  const { margins, n, favorite } = props;
+export function AltLadder(props: {
+  margins: Counts;
+  n: number;
+  favorite: string;
+  /** The favorite's market spread, marked MKT when it is on the ladder. */
+  market?: number;
+}) {
+  const { margins, n, favorite, market } = props;
   const rows = Array.from({ length: 11 }, (_, i) => {
     const line = i + 0.5;
     const p = shareWhere(margins, n, (m) => m > line);
@@ -244,6 +268,7 @@ export function AltLadder(props: { margins: Counts; n: number; favorite: string 
             <span className="ladder-label">
               {favorite} −{r.line}
               {i === fairIdx && <span className="pill-dark">FAIR</span>}
+              {market !== undefined && -market === r.line && <span className="pill-dark">MKT</span>}
             </span>
             <div className="meter">
               <div className={r.p >= 0.5 ? 'fill on' : 'fill'} style={{ width: `${100 * r.p}%` }} />

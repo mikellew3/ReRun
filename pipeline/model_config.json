@@ -1,6 +1,6 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "c2a5850cad263a83",
+  "configHash": "80ff2ecfb24be9a1",
   "engineVersion": "0.3.0",
   "model": {
     "configVersion": 1,
@@ -482,13 +482,46 @@
         "player_rush_attempts"
       ]
     },
+    "lineMovement": {
+      "recBooks": [
+        "draftkings",
+        "fanduel"
+      ],
+      "sharpBook": "pinnacle",
+      "steamWindowMinutes": 60,
+      "steamMinMovePts": 0.5,
+      "steamMinBooks": 2,
+      "keyNumbers": [
+        3,
+        7,
+        10,
+        14
+      ],
+      "bookGapPts": 0.5,
+      "sharpGapPts": 0.5,
+      "minMovePts": 0.5
+    },
     "oddsApi": {
       "regions": [
         "us",
         "eu"
       ],
       "creditFloor": 100,
-      "monthlyCreditTarget": 1500
+      "monthlyCreditTarget": 1500,
+      "sharpPullHoursUtc": [
+        12,
+        18,
+        23
+      ]
+    },
+    "sharpApi": {
+      "requestsPerMinute": 12,
+      "marketTypes": {
+        "point_spread": "spreads",
+        "total_points": "totals",
+        "moneyline": "h2h"
+      },
+      "pageLimit": 200
     },
     "locks": {
       "maxPerUserPerSlate": 25,

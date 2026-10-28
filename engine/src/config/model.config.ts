@@ -490,12 +490,44 @@ export const MODEL_CONFIG = {
     ],
   },
 
+  /**
+   * Line movement signals (engine/src/market/movement.ts). Shown next to the sim's numbers as
+   * information only; none of them feed the model until a backtest supports it. start
+   */
+  lineMovement: {
+    /** Recreational books (SharpAPI free tier) and the sharp reference (The Odds API). */
+    recBooks: ['draftkings', 'fanduel'],
+    sharpBook: 'pinnacle',
+    /** Steam: at least this many books move the same way by this much within the window. */
+    steamWindowMinutes: 60,
+    steamMinMovePts: 0.5,
+    steamMinBooks: 2,
+    /** Spread key numbers a move can cross. */
+    keyNumbers: [3, 7, 10, 14],
+    /** Two books' current lines this far apart (points) = a book gap. */
+    bookGapPts: 0.5,
+    /** Sharp book's line this far from the recreational average (points) = sharp gap. */
+    sharpGapPts: 0.5,
+    /** A move this big since open (points) counts as "the line moved". */
+    minMovePts: 0.5,
+  },
+
   /** The Odds API budget. */
   oddsApi: {
     regions: ['us', 'eu'],
     /** Jobs abort if remaining credits fall below this. */
     creditFloor: 100,
     monthlyCreditTarget: 1500,
+    /** Pinnacle pulls (h2h, spreads, totals = 3 credits each) run at these UTC hours. */
+    sharpPullHoursUtc: [12, 18, 23],
+  },
+
+  /** SharpAPI (free tier: DraftKings + FanDuel, 60s delayed, 12 requests/minute). */
+  sharpApi: {
+    requestsPerMinute: 12,
+    /** Main-line market types and the snapshot market each maps to. */
+    marketTypes: { point_spread: 'spreads', total_points: 'totals', moneyline: 'h2h' },
+    pageLimit: 200,
   },
 
   /** Locks and leaderboard. */

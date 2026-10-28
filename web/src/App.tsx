@@ -18,6 +18,7 @@ import type {
 import { AltLadder, MarginHistogram, TotalHistogram, WinProbability, pct, signed } from './charts';
 import type { Counts } from './charts';
 import { Icon } from './icons';
+import { EdgesCard, MarketCard, marketSpread, marketTotal } from './market';
 import type { Aggregate, WorkerOut } from './sim.worker';
 
 function kickoffLabel(iso: string): string {
@@ -184,6 +185,13 @@ function GameCard({ snapshot, game }: { snapshot: SlateSnapshot; game: SnapshotG
 // Results
 // ---------------------------------------------------------------------------
 
+/** The market spread from the sim favorite's side (e.g. −4), if the snapshot has lines. */
+function favSpread(game: SnapshotGame, favoriteIsHome: boolean): number | undefined {
+  const home = marketSpread(game)?.line;
+  if (home === undefined || home === null) return undefined;
+  return favoriteIsHome ? home : -home;
+}
+
 /** Margins re-expressed from the favorite's side (positive = favorite wins). */
 function fromSide(margins: Counts, favoriteIsHome: boolean): Counts {
   if (favoriteIsHome) return margins;
@@ -280,6 +288,8 @@ export function App() {
       favWin: favoriteIsHome ? homeWin : awayWin,
       dogWin: favoriteIsHome ? awayWin : homeWin,
       margins: fromSide(shown.margins, favoriteIsHome),
+      favSpread: favSpread(game, favoriteIsHome),
+      marketTotal: marketTotal(game)?.line ?? undefined,
       players,
     };
   }, [shown, snapshot, game]);
@@ -360,6 +370,8 @@ export function App() {
           </aside>
 
           <main className="results">
+            {game && <MarketCard game={game} />}
+
             {runError && <p className="error">{runError}</p>}
 
             {!summary && !runError && (
@@ -408,16 +420,33 @@ export function App() {
                   dogWin={summary.dogWin}
                 />
 
+                <EdgesCard
+                  game={game}
+                  margins={shown!.margins}
+                  totals={shown!.totals}
+                  n={summary.n}
+                />
+
                 <MarginHistogram
                   margins={summary.margins}
                   n={summary.n}
                   favorite={summary.favorite}
                   underdog={summary.underdog}
+                  market={summary.favSpread}
                 />
 
                 <div className="pair">
-                  <TotalHistogram totals={shown!.totals} n={summary.n} />
-                  <AltLadder margins={summary.margins} n={summary.n} favorite={summary.favorite} />
+                  <TotalHistogram
+                    totals={shown!.totals}
+                    n={summary.n}
+                    market={summary.marketTotal}
+                  />
+                  <AltLadder
+                    margins={summary.margins}
+                    n={summary.n}
+                    favorite={summary.favorite}
+                    market={summary.favSpread}
+                  />
                 </div>
 
                 <section className="card">
@@ -459,8 +488,8 @@ export function App() {
 
             <section className="card note small">
               Early preview with default model settings. Injuries, weather, altitude and rest are in
-              the model, and weather forecasts are live. Market lines, edges and the full Sim Lab
-              controls are coming.
+              the model; weather forecasts and market lines are live. Edges are research from an
+              early model, not picks. The full Sim Lab controls are coming.
             </section>
           </main>
         </div>

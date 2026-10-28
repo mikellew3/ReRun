@@ -338,6 +338,29 @@ export interface MarketUsage {
   roleChange: boolean;
 }
 
+/** Game-line markets whose movement is tracked. */
+export const TRACKED_MARKETS = ['spreads', 'totals', 'h2h'] as const;
+export type TrackedMarket = (typeof TRACKED_MARKETS)[number];
+
+/**
+ * One price change at one book. `line` is the home spread (spreads), the total (totals) or
+ * null (h2h). `a` is the home / over price, `b` the away / under price.
+ */
+export interface LineTick {
+  /** ISO timestamp the book's price was seen. */
+  t: string;
+  line: number | null;
+  a: AmericanOdds;
+  b: AmericanOdds;
+}
+
+/** Main-line price history at one book for one market; a tick is stored only on change. */
+export interface LineHistory {
+  book: string;
+  market: TrackedMarket;
+  ticks: LineTick[];
+}
+
 export interface SnapshotGame {
   gameId: GameId;
   /** ISO timestamp. */
@@ -358,6 +381,9 @@ export interface SnapshotGame {
   };
   market: MarketLine[];
   marketUsage: Record<PlayerId, MarketUsage>;
+  /** Line movement since the market opened (pipeline/fetch_lines.py). Absent in older
+   *  snapshots and in backtests. */
+  lineHistory?: LineHistory[];
 }
 
 // ---------------------------------------------------------------------------

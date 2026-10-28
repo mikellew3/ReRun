@@ -701,6 +701,133 @@ tbody tr:last-child td {
   border-bottom: none;
 }
 
+/* ---------------------------------------------------------------- Market */
+
+.market-table td strong {
+  font-weight: 600;
+}
+
+.signals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rr-space-2);
+}
+
+.chip.signal {
+  height: auto;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: var(--rr-radius-input);
+  background: var(--rr-copper-50);
+  color: var(--rr-copper-700);
+  box-shadow: inset 0 0 0 1px var(--rr-copper-100);
+  line-height: 16px;
+}
+
+.movement svg {
+  width: 100%;
+  height: 120px;
+  display: block;
+  border-bottom: 1px solid var(--rr-border);
+}
+
+.mv-grid {
+  stroke: var(--rr-chart-grid);
+  stroke-width: 1;
+}
+
+.mv-line {
+  fill: none;
+  stroke-width: 2;
+  stroke: var(--rr-text-muted);
+}
+
+.mv-line.draftkings {
+  stroke: var(--rr-text-secondary);
+}
+
+.mv-line.sharp {
+  stroke: var(--rr-copper-500);
+}
+
+.mv-axis {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rr-space-2);
+  margin: 4px 0 var(--rr-space-2);
+}
+
+.mv-swatch {
+  width: 16px;
+  height: 0;
+  border-top: 2px solid var(--rr-text-muted);
+}
+
+.mv-swatch.draftkings {
+  border-color: var(--rr-text-secondary);
+}
+
+.mv-swatch.sharp {
+  border-color: var(--rr-copper-500);
+}
+
+.swatch.dashed {
+  width: 16px;
+  height: 0;
+  border-radius: 0;
+  background: none;
+  border-top: 1.5px dashed var(--rr-chart-line);
+}
+
+/* Tier badges and edge chips (design: Lean / Play / Strong). */
+.tier {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: var(--rr-radius-pill);
+  font: var(--rr-text-caption);
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.tier.lean {
+  background: var(--rr-copper-50);
+  color: var(--rr-copper-600);
+  box-shadow: inset 0 0 0 1px var(--rr-copper-100);
+}
+
+.tier.play {
+  background: var(--rr-copper-100);
+  color: var(--rr-copper-700);
+}
+
+.tier.strong {
+  background: var(--rr-copper-500);
+  color: #fff;
+  font-weight: 700;
+}
+
+.edge {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: var(--rr-radius-pill);
+  font-weight: 600;
+}
+
+.edge.pos {
+  background: var(--rr-positive-tint);
+  color: var(--rr-positive);
+}
+
+.edge.neg {
+  background: var(--rr-negative-tint);
+  color: var(--rr-negative);
+}
+
 /* ---------------------------------------------------------------- Phone */
 
 @media (max-width: 960px) {

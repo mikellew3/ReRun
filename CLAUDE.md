@@ -92,6 +92,7 @@ See §7 for the full list.
 | Play-by-play, rosters, weekly rosters, depth charts, injuries, snap counts, player stats, schedules | nflverse via `nflreadpy` | free; updated nightly in season |
 | Historical closing spreads/totals/moneylines | nflverse schedules (`spread_line`, `total_line`, moneylines) | free; used for backtests — do NOT buy historical odds |
 | Current game lines + player props | The Odds API | key `ODDS_API_KEY`, server-side only; regions `us,eu` (eu gives Pinnacle); props via per-event endpoint |
+| DraftKings + FanDuel line movement | SharpAPI free tier (`api.sharpapi.io`) | key `SHARPAPI_KEY`, server-side only; 2 books, 60s delayed, 12 requests/min; polled every 30 min by `.github/workflows/lines.yml`. Betting splits need its paid Pro tier (not used). Pinnacle comes from The Odds API at config `oddsApi.sharpPullHoursUtc` |
 | Weather | National Weather Service API (`api.weather.gov`) | free; forecast by stadium lat/lon; international games fall back to Open-Meteo |
 | Stadium facts | `pipeline/stadiums.csv` | maintained by hand |
 
@@ -99,7 +100,7 @@ See §7 for the full list.
 
 **Odds API budget:** credits = markets × regions per call. Log `x-requests-remaining` and `x-requests-last` on every call to `api_usage`; abort a job if remaining credits fall below a config floor. Target well under 1,500 credits/month in season.
 
-Env vars: `ODDS_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (jobs only); `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (web).
+Env vars: `ODDS_API_KEY`, `SHARPAPI_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (jobs only); `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (web).
 
 ## 6. Data snapshots
 
