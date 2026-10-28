@@ -385,13 +385,6 @@ export function App() {
 
           <main className="results">
             {game && <MarketCard game={game} />}
-            {game && (
-              <PropsCard
-                game={game}
-                snapshot={snapshot}
-                sims={shown ? { players: shown.players, n: shown.done } : undefined}
-              />
-            )}
 
             {runError && <p className="error">{runError}</p>}
 
@@ -404,6 +397,9 @@ export function App() {
                 </p>
               </section>
             )}
+
+            {/* Before a run, props sit at the bottom; after, just above player projections. */}
+            {!summary && game && <PropsCard game={game} snapshot={snapshot} />}
 
             {summary && game && (
               <>
@@ -470,6 +466,12 @@ export function App() {
                   homePts={shown!.homePts}
                   awayPts={shown!.awayPts}
                   n={summary.n}
+                />
+
+                <PropsCard
+                  game={game}
+                  snapshot={snapshot}
+                  sims={{ players: shown!.players, n: shown!.done }}
                 />
 
                 <section className="card">
