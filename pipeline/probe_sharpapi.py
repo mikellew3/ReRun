@@ -1,6 +1,6 @@
-"""One-off: print what SharpAPI returns for NFL splits, so fetch_splits.py can be written
-against the real response. Prints status codes, rate-limit headers, the top-level shape and a
-couple of sample records. Never prints the key.
+"""One-off: print what SharpAPI returns for NFL odds, books and events, so the odds job can
+be written against the real response. Prints status codes, rate-limit headers, the top-level
+shape and a couple of sample records. Never prints the key.
 
     SHARPAPI_KEY=... python probe_sharpapi.py
 """
@@ -14,11 +14,10 @@ import urllib.request
 
 BASE = "https://api.sharpapi.io/api/v1"
 PATHS = [
-    "/splits?league=nfl",
-    "/splits?sport=football",
-    "/splits/history?league=nfl",
-    "/account",
-    "/sports",
+    "/books",
+    "/sportsbooks",
+    "/odds?league=nfl",
+    "/events?league=nfl",
 ]
 
 

@@ -1,4 +1,4 @@
-# One-off: prints what SharpAPI returns for NFL splits (shape and samples, never the key).
+# One-off: prints what SharpAPI returns for NFL odds, books and events (never the key).
 # Run from the Actions tab ("SharpAPI probe" -> Run workflow).
 name: SharpAPI probe
 
@@ -7,7 +7,7 @@ on:
 
 jobs:
   probe:
-    name: Probe splits endpoints
+    name: Probe endpoints
     runs-on: ubuntu-latest
     defaults:
       run:
