@@ -1,7 +1,9 @@
 # Builds the current slate's snapshot (fresh nflverse data, fits, injuries, weather forecasts)
 # and commits it to web/public/snapshots on main, which redeploys the site on Vercel.
 # CLAUDE.md §11: twice daily (morning and evening Eastern). Market lines and their movement
-# come from the line history the Lines workflow keeps in the Actions cache.
+# come from the line history the Lines workflow keeps in the Actions cache, topped up with a
+# fresh DraftKings/FanDuel pull here (free tier, no Odds API credits). The cache is per
+# branch, so without that pull a run that can't see the history would publish no lines.
 name: Publish snapshot
 
 on:
@@ -48,6 +50,15 @@ jobs:
           path: pipeline/data/lines/history.json
           key: lines-history-${{ github.run_id }}
           restore-keys: lines-history-
+      - name: Pull current lines
+        env:
+          SHARPAPI_KEY: ${{ secrets.SHARPAPI_KEY }}
+        run: python fetch_lines.py
+      - name: Save line history
+        uses: actions/cache/save@v4
+        with:
+          path: pipeline/data/lines/history.json
+          key: lines-history-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Build snapshot with forecasts and lines
         run: python publish_web.py ${WEEK:+--week "$WEEK"}
       - name: Commit to main
