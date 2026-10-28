@@ -257,6 +257,19 @@ def test_name_key_and_prop_player_matching():
     assert props["Nobody Known"]["playerId"] is None
 
 
+def test_nickname_and_defense_props():
+    players = {"00-9": {"name": "Cam Ward", "team": "TEN"}}
+    quote = {"t": "1", "line": 220.5, "over": -110, "under": -110}
+    entry = {
+        "props": {
+            "draftkings|player_pass_yds|Cameron Ward": {"open": quote, "current": quote},
+            "draftkings|player_anytime_td|Tennessee Defense": {"open": quote, "current": quote},
+        }
+    }
+    props = ml.game_props(entry, {"home": "CIN", "away": "TEN"}, players)
+    assert [(p["player"], p["playerId"]) for p in props] == [("Cameron Ward", "00-9")]
+
+
 def test_market_lines_team_totals_and_first_half():
     e = entry(
         {

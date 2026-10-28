@@ -135,13 +135,25 @@ def name_key(name: str) -> str:
     return " ".join(SUFFIX.sub(" ", s).split())
 
 
+def initial_key(name: str) -> str:
+    """'Cameron Ward' -> 'c ward', so nicknames ('Cam Ward') still match."""
+    parts = name_key(name).split()
+    return f"{parts[0][0]} {parts[-1]}" if len(parts) >= 2 else ""
+
+
 def roster_index(players: dict, teams: set[str]) -> dict[str, str]:
-    """name key -> playerId for the two teams' players (ambiguous names left out)."""
+    """name key -> playerId for the two teams' players, plus first-initial + last-name keys
+    as a fallback. Ambiguous keys are left out."""
     seen: dict[str, list[str]] = {}
     for pid, p in players.items():
         if p.get("team") in teams:
             seen.setdefault(name_key(p["name"]), []).append(pid)
+            seen.setdefault("~" + initial_key(p["name"]), []).append(pid)
     return {k: ids[0] for k, ids in seen.items() if len(ids) == 1}
+
+
+def match_player(name: str, index: dict[str, str]) -> str | None:
+    return index.get(name_key(name)) or index.get("~" + initial_key(name))
 
 
 def game_props(entry: dict, game: dict, players: dict) -> list[dict]:
@@ -149,8 +161,8 @@ def game_props(entry: dict, game: dict, players: dict) -> list[dict]:
     grouped: dict[tuple[str, str], list[dict]] = {}
     for key, slot in entry.get("props", {}).items():
         book, market, player = key.split("|", 2)
-        if "current" not in slot:
-            continue
+        if "current" not in slot or player.endswith(" Defense"):
+            continue  # team defense / special teams TD props are not players
         grouped.setdefault((market, player), []).append(
             {"book": book, "open": slot["open"], "current": slot["current"]}
         )
@@ -158,7 +170,7 @@ def game_props(entry: dict, game: dict, players: dict) -> list[dict]:
     for (market, player), books in sorted(grouped.items()):
         out.append(
             {
-                "playerId": index.get(name_key(player)),
+                "playerId": match_player(player, index),
                 "player": player,
                 "market": market,
                 "books": sorted(books, key=lambda b: b["book"]),

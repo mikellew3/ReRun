@@ -65,7 +65,15 @@ function signalText(s: Signal, game: SnapshotGame): string {
 
 /** Spread over time, one stepped line per book; the sharp book in copper. */
 function MovementChart({ history, home }: { history: LineHistory[]; home: string }) {
-  const series = history.filter((h) => h.market === 'spreads' && h.ticks.length > 0);
+  // Only the books tracked every 30 minutes (and the sharp book); the others are pulled a few
+  // times a day and would just add flat lines.
+  const tracked: readonly string[] = [
+    MODEL_CONFIG.lineMovement.sharpBook,
+    ...MODEL_CONFIG.lineMovement.recBooks,
+  ];
+  const series = history.filter(
+    (h) => h.market === 'spreads' && h.ticks.length > 0 && tracked.includes(h.book),
+  );
   if (series.length === 0) return null;
   const sharp = MODEL_CONFIG.lineMovement.sharpBook;
   const all = series.flatMap((h) => h.ticks);
