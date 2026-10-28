@@ -384,7 +384,7 @@ export function App() {
           </aside>
 
           <main className="results">
-            {game && <MarketCard game={game} />}
+            {game && <MarketCard game={game} sims={shown && shown.done > 0 ? shown : null} />}
 
             {runError && <p className="error">{runError}</p>}
 

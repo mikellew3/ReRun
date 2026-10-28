@@ -1,6 +1,6 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "20a2693831d16ccd",
+  "configHash": "26a35b19f444f595",
   "engineVersion": "0.4.0",
   "model": {
     "configVersion": 1,
@@ -471,6 +471,11 @@
         }
       ],
       "showEdges": false,
+      "valueShading": {
+        "enabled": true,
+        "minEv": 0.03,
+        "propMarkets": []
+      },
       "kellyFraction": 0.25,
       "maxStakeFraction": 0.03,
       "preferredSharpBook": "pinnacle",

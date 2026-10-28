@@ -20,7 +20,25 @@ export interface PlayerAgg {
   recYds: number;
   rec: number;
   anyTd: number; // sims with a rushing or receiving TD
+  /** Sims the player sat out (questionable players drawn out): props on him are void there. */
+  sitOut: number;
+  /** Per stat: value -> sims, for sims where the value was above 0 (zeros are implied). */
+  dist: Record<PropStat, Record<number, number>>;
 }
+
+/** Stats with a full distribution, for pricing props at any line. */
+export const PROP_STATS = [
+  'passYds',
+  'passAtt',
+  'passCmp',
+  'passTd',
+  'passInt',
+  'rushYds',
+  'rushAtt',
+  'rec',
+  'recYds',
+] as const;
+export type PropStat = (typeof PROP_STATS)[number];
 
 export interface Aggregate {
   gameId: string;
@@ -37,6 +55,9 @@ export interface Aggregate {
   /** each team's points -> count */
   homePts: Record<number, number>;
   awayPts: Record<number, number>;
+  /** First half: margin (home - away) and total points -> count */
+  h1Margins: Record<number, number>;
+  h1Totals: Record<number, number>;
   players: PlayerAgg[];
   elapsedMs: number;
 }
@@ -64,10 +85,35 @@ self.onmessage = (event: MessageEvent<WorkerIn>) => {
     totals: {},
     homePts: {},
     awayPts: {},
+    h1Margins: {},
+    h1Totals: {},
     players: [],
     elapsedMs: 0,
   };
   const players = new Map<string, PlayerAgg>();
+  const player = (id: string): PlayerAgg => {
+    let p = players.get(id);
+    if (!p) {
+      p = {
+        id,
+        passAtt: 0,
+        passCmp: 0,
+        passYds: 0,
+        passTd: 0,
+        passInt: 0,
+        rushAtt: 0,
+        targets: 0,
+        rushYds: 0,
+        recYds: 0,
+        rec: 0,
+        anyTd: 0,
+        sitOut: 0,
+        dist: Object.fromEntries(PROP_STATS.map((k) => [k, {}])) as PlayerAgg['dist'],
+      };
+      players.set(id, p);
+    }
+    return p;
+  };
 
   const absorb = (batch: SimGameResult[]) => {
     for (const r of batch) {
@@ -77,28 +123,20 @@ self.onmessage = (event: MessageEvent<WorkerIn>) => {
       agg.totals[t] = (agg.totals[t] ?? 0) + 1;
       agg.homePts[r.final.home] = (agg.homePts[r.final.home] ?? 0) + 1;
       agg.awayPts[r.final.away] = (agg.awayPts[r.final.away] ?? 0) + 1;
+      const hm = r.firstHalf.home - r.firstHalf.away;
+      const ht = r.firstHalf.home + r.firstHalf.away;
+      agg.h1Margins[hm] = (agg.h1Margins[hm] ?? 0) + 1;
+      agg.h1Totals[ht] = (agg.h1Totals[ht] ?? 0) + 1;
+      for (const id of r.sittingOut) player(id).sitOut++;
       if (m > 0) agg.homeWins++;
       if (m === 0) agg.ties++;
       agg.sumHome += r.final.home;
       agg.sumAway += r.final.away;
       for (const l of r.players) {
-        let p = players.get(l.playerId);
-        if (!p) {
-          p = {
-            id: l.playerId,
-            passAtt: 0,
-            passCmp: 0,
-            passYds: 0,
-            passTd: 0,
-            passInt: 0,
-            rushAtt: 0,
-            targets: 0,
-            rushYds: 0,
-            recYds: 0,
-            rec: 0,
-            anyTd: 0,
-          };
-          players.set(l.playerId, p);
+        const p = player(l.playerId);
+        for (const k of PROP_STATS) {
+          const v = l[k];
+          if (v > 0) p.dist[k][v] = (p.dist[k][v] ?? 0) + 1;
         }
         p.passAtt += l.passAtt;
         p.passCmp += l.passCmp;

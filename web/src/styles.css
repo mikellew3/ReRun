@@ -924,3 +924,20 @@ tbody tr:last-child td {
     transition: none !important;
   }
 }
+
+/* ---------------------------------------------------------- Value shading */
+
+/* A price with value at the sim's odds (see value.tsx). */
+.price.value {
+  display: inline-block;
+  padding: 0 var(--rr-space-1);
+  border-radius: 4px;
+  background: var(--rr-positive-tint);
+  color: var(--rr-positive);
+  font-weight: 600;
+  font-style: normal;
+}
+
+.value-note {
+  display: block;
+}

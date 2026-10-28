@@ -17,7 +17,16 @@ import {
   shareWhere,
   type Counts,
 } from './charts';
-import { bookName, odds } from './market';
+import { bookName } from './market';
+import { Price, ValueNote } from './value';
+
+/** Over/under chances for a team total line. */
+function ttChances(counts: Counts, n: number, line: number, over: boolean) {
+  return {
+    win: shareWhere(counts, n, (x) => (over ? x > line : x < line)),
+    push: shareWhere(counts, n, (x) => x === line),
+  };
+}
 
 const FROM = 0;
 const TO = 56;
@@ -144,8 +153,18 @@ function TeamTotalCard(props: {
                         <span className="muted"> (opened {q.open.line})</span>
                       )}
                     </td>
-                    <td>{odds(q.current.a)}</td>
-                    <td>{odds(q.current.b)}</td>
+                    <td>
+                      <Price
+                        american={q.current.a}
+                        chances={l === null ? null : ttChances(counts, n, l, true)}
+                      />
+                    </td>
+                    <td>
+                      <Price
+                        american={q.current.b}
+                        chances={l === null ? null : ttChances(counts, n, l, false)}
+                      />
+                    </td>
                     <td>{l === null ? '–' : pct(shareWhere(counts, n, (x) => x > l))}</td>
                   </tr>
                 );
@@ -154,6 +173,7 @@ function TeamTotalCard(props: {
           </table>
         </div>
       )}
+      {quotes.length > 0 && <ValueNote />}
       <span className="caption muted">
         Copper bars = sims where {team} scores over {line}. Ladder: how often {team} clears each
         line, with the fair no-vig price.

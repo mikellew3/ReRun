@@ -479,10 +479,23 @@ export const MODEL_CONFIG = {
       { id: 'strong', minEdge: 0.08 },
     ],
     /**
-     * Show edges, tiers and stakes on the site. Off until the backtest supports the model's
-     * numbers: live 2026 sims run 2.7 points under market totals (calibration games: +0.9).
+     * Show edges, tiers and stakes on the site. Off until the walk-forward backtest (CLAUDE.md
+     * step 8) supports the model's numbers.
      */
     showEdges: false,
+    /**
+     * After a run, shade a book's price green when its expected value at the sim's probability
+     * is at least minEv (pushes refund the stake). Research only: no stakes or tiers.
+     * Props are shaded only for the markets listed. None yet: on the 2026-W08 slate the sim's
+     * chance of the over averaged 41% for receptions (books 48.5%), 44% for receiving yards
+     * (50%) and 44% for carries (50%), so shading would flag nearly every under. Add markets
+     * back once the prop distributions are fixed (docs/props.md).
+     */
+    valueShading: {
+      enabled: true,
+      minEv: 0.03,
+      propMarkets: [] as string[],
+    },
     kellyFraction: 0.25,
     /** Max suggested stake as a fraction of bankroll. */
     maxStakeFraction: 0.03,

@@ -7,7 +7,8 @@
 import { useState } from 'react';
 import type { MarketKey, PropLine, PropQuote, SlateSnapshot, SnapshotGame } from '@rerun/engine';
 import { pct } from './charts';
-import { bookName, odds } from './market';
+import { bookName } from './market';
+import { Price, propChances, shadeProps } from './value';
 import type { PlayerAgg } from './sim.worker';
 
 type Group = 'all' | 'passing' | 'rushing' | 'receiving' | 'tds';
@@ -47,9 +48,31 @@ function marketOver(q: PropQuote): number {
   return o / (o + u);
 }
 
-function quoteText(q: PropQuote, showLine: boolean): string {
-  const prices = q.under === null ? odds(q.over) : `${odds(q.over)} / ${odds(q.under)}`;
-  return showLine && q.line !== null ? `${q.line}: ${prices}` : prices;
+/** One book's quote: optional line, then over / under prices, shaded when they have value. */
+function Quote(props: {
+  q: PropQuote;
+  showLine: boolean;
+  market: MarketKey;
+  sim?: PlayerAgg;
+  n?: number;
+}) {
+  const { q, showLine, market, sim, n } = props;
+  const chances = (over: boolean) =>
+    sim && n && q.line !== null && shadeProps(market)
+      ? propChances(sim, n, market, q.line, over)
+      : null;
+  return (
+    <>
+      {showLine && q.line !== null && `${q.line}: `}
+      <Price american={q.over} chances={chances(true)} />
+      {q.under !== null && (
+        <>
+          {' / '}
+          <Price american={q.under} chances={chances(false)} />
+        </>
+      )}
+    </>
+  );
 }
 
 export function PropsCard(props: {
@@ -136,7 +159,21 @@ export function PropsCard(props: {
                   </td>
                   {books.map((b) => {
                     const q = p.books.find((x) => x.book === b)?.current;
-                    return <td key={b}>{q ? quoteText(q, !sameLine) : '–'}</td>;
+                    return (
+                      <td key={b}>
+                        {q ? (
+                          <Quote
+                            q={q}
+                            showLine={!sameLine}
+                            market={p.market}
+                            sim={sim}
+                            n={sims?.n}
+                          />
+                        ) : (
+                          '–'
+                        )}
+                      </td>
+                    );
                   })}
                   <td>{pct(over)}</td>
                   <td>
@@ -154,8 +191,9 @@ export function PropsCard(props: {
       </div>
       <span className="caption muted">
         Market over = the books&apos; no-vig chance of the over (anytime TD: the implied price). Sim
-        avg fills in after you run the game. The sim&apos;s QB volume runs high and its stat ranges
-        are too narrow (see the prop check), so prop edges are not shown yet.
+        avg fills in after you run the game. Prop prices aren&apos;t shaded yet: against the
+        books&apos; lines the sim still leans under on receptions, receiving yards and carries, so
+        it would flag nearly every under. That gets fixed before props light up.
       </span>
     </section>
   );

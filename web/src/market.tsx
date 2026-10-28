@@ -9,6 +9,8 @@ import type { LineHistory, MarketLine, Signal, SnapshotGame, TrackedMarket } fro
 import { pct, shareWhere, signed } from './charts';
 import type { Counts } from './charts';
 import { Icon } from './icons';
+import type { Aggregate } from './sim.worker';
+import { Price, ValueNote, lineChances } from './value';
 
 const BOOK_NAMES: Record<string, string> = {
   pinnacle: 'Pinnacle',
@@ -146,7 +148,7 @@ function views(
     full: {
       label: 'Full game',
       cols: [
-        { market: 'spreads', head: `${game.home} spread` },
+        { market: 'spreads', head: `${game.home} spread (${game.home} / ${game.away})` },
         { market: 'totals', head: 'Total' },
         { market: 'h2h', head: `ML ${game.home} / ${game.away}` },
       ],
@@ -154,7 +156,7 @@ function views(
     h1: {
       label: '1st half',
       cols: [
-        { market: 'spreads_h1', head: `${game.home} spread` },
+        { market: 'spreads_h1', head: `${game.home} spread (${game.home} / ${game.away})` },
         { market: 'totals_h1', head: 'Total' },
         { market: 'h2h_h1', head: `ML ${game.home} / ${game.away}` },
       ],
@@ -178,7 +180,7 @@ function bookSort(a: string, b: string): number {
   return bookName(a).localeCompare(bookName(b));
 }
 
-export function MarketCard({ game }: { game: SnapshotGame }) {
+export function MarketCard({ game, sims }: { game: SnapshotGame; sims?: Aggregate | null }) {
   const [view, setView] = useState<ViewId>('full');
   const history = game.lineHistory ?? [];
   if (history.length === 0) {
@@ -206,21 +208,30 @@ export function MarketCard({ game }: { game: SnapshotGame }) {
   const cell = (book: string, market: TrackedMarket) => {
     const b = books.find((x) => x.book === book && x.market === market);
     if (!b) return <td key={market}>–</td>;
+    const t = b.current;
+    const price = (side: 'a' | 'b') => (
+      <Price
+        american={side === 'a' ? t.a : t.b}
+        chances={sims ? lineChances(sims, market, side, t.line) : null}
+      />
+    );
     if (market.startsWith('h2h')) {
       return (
         <td key={market}>
-          {odds(b.current.a)} / {odds(b.current.b)}
+          {price('a')} / {price('b')}
         </td>
       );
     }
     const spread = market.startsWith('spreads');
     const fmt = (v: number | null) => (spread ? signed(v ?? 0) : String(v));
-    const moved = b.current.line !== b.open.line;
+    const moved = t.line !== b.open.line;
     return (
       <td key={market}>
-        <strong>{fmt(b.current.line)}</strong>{' '}
+        <strong>{fmt(t.line)}</strong>{' '}
         <span className="muted">
-          {spread ? odds(b.current.a) : `o ${odds(b.current.a)}`}
+          {spread ? '' : 'o '}
+          {price('a')} / {spread ? '' : 'u '}
+          {price('b')}
           {moved && ` · open ${fmt(b.open.line)}`}
         </span>
       </td>
@@ -270,6 +281,7 @@ export function MarketCard({ game }: { game: SnapshotGame }) {
           </tbody>
         </table>
       </div>
+      {sims && <ValueNote />}
       {signals.length > 0 && (
         <ul className="signals">
           {signals.map((s, i) => (
