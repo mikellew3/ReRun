@@ -481,7 +481,7 @@ def build_snapshot(
     lines_at = None
     if LINES_HISTORY.exists():
         history = json.loads(LINES_HISTORY.read_text())
-        print(f"Lines: {attach_lines(games, history)} of {len(games)} games matched")
+        print(f"Lines: {attach_lines(games, history, players)} of {len(games)} games matched")
         lines_at = history.get("updatedAt")
     manifest = read_manifest()
     nflverse_as_of = manifest.get(f"pbp_{season}", iso(as_of))

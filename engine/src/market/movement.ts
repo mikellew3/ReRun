@@ -81,7 +81,7 @@ export function bookLines(history: readonly LineHistory[]): BookLine[] {
       const open = h.ticks[0]!;
       const current = h.ticks[h.ticks.length - 1]!;
       const move =
-        h.market === 'h2h'
+        h.market.startsWith('h2h')
           ? noVigA(current) - noVigA(open)
           : (current.line ?? 0) - (open.line ?? 0);
       return { book: h.book, market: h.market, open, current, move, ticks: h.ticks.length };

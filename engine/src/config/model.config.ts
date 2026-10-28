@@ -552,7 +552,30 @@ export const MODEL_CONFIG = {
   sharpApi: {
     requestsPerMinute: 12,
     /** Main-line market types and the snapshot market each maps to. */
-    marketTypes: { point_spread: 'spreads', total_points: 'totals', moneyline: 'h2h' },
+    marketTypes: {
+      point_spread: 'spreads',
+      total_points: 'totals',
+      moneyline: 'h2h',
+      '1st_half_point_spread': 'spreads_h1',
+      '1st_half_total_points': 'totals_h1',
+      '1st_half_moneyline': 'h2h_h1',
+      team_total: 'team_totals',
+    },
+    /** Player-prop market types and the snapshot market (The Odds API key) each maps to. */
+    propMarketTypes: {
+      player_passing_yards: 'player_pass_yds',
+      player_passing_touchdowns: 'player_pass_tds',
+      player_passing_attempts: 'player_pass_attempts',
+      player_passing_completions: 'player_pass_completions',
+      player_interceptions: 'player_pass_interceptions',
+      player_rushing_yards: 'player_rush_yds',
+      player_rushing_attempts: 'player_rush_attempts',
+      player_receptions: 'player_receptions',
+      player_receiving_yards: 'player_reception_yds',
+      anytime_touchdown_scorer: 'player_anytime_td',
+    },
+    /** Props change slowly and take many requests: pulled at most this often. */
+    propsEveryMinutes: 120,
     pageLimit: 200,
   },
 

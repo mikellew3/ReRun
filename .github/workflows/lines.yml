@@ -1,4 +1,5 @@
-# Polls game lines every 30 minutes: DraftKings + FanDuel via SharpAPI (free tier), and
+# Polls game lines every 30 minutes and player props every 2 hours: DraftKings + FanDuel via
+# SharpAPI (free tier), and
 # Pinnacle via The Odds API at the UTC hours in config oddsApi.sharpPullHoursUtc (3 credits
 # each). The line history lives in the Actions cache between runs, so polling never commits
 # or triggers a Vercel build; the snapshot publisher reads the same cache.
@@ -10,7 +11,11 @@ on:
   workflow_dispatch:
     inputs:
       pinnacle:
-        description: Also pull Pinnacle now (3 Odds API credits)
+        description: Also pull Pinnacle and other books now (3 Odds API credits)
+        type: boolean
+        default: false
+      props:
+        description: Pull DraftKings/FanDuel player props now
         type: boolean
         default: false
 
@@ -47,12 +52,12 @@ jobs:
           SHARPAPI_KEY: ${{ secrets.SHARPAPI_KEY }}
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
           PINNACLE_NOW: ${{ inputs.pinnacle }}
+          PROPS_NOW: ${{ inputs.props }}
         run: |
-          if [ "$PINNACLE_NOW" = "true" ]; then
-            python fetch_lines.py --pinnacle
-          else
-            python fetch_lines.py --auto-pinnacle
-          fi
+          args="--auto-pinnacle"
+          if [ "$PINNACLE_NOW" = "true" ]; then args="--pinnacle"; fi
+          if [ "$PROPS_NOW" = "true" ]; then args="$args --props"; fi
+          python fetch_lines.py $args
       - name: Save line history
         uses: actions/cache/save@v4
         with:

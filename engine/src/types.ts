@@ -339,12 +339,21 @@ export interface MarketUsage {
 }
 
 /** Game-line markets whose movement is tracked. */
-export const TRACKED_MARKETS = ['spreads', 'totals', 'h2h'] as const;
+export const TRACKED_MARKETS = [
+  'spreads',
+  'totals',
+  'h2h',
+  'spreads_h1',
+  'totals_h1',
+  'h2h_h1',
+  'team_totals_home',
+  'team_totals_away',
+] as const;
 export type TrackedMarket = (typeof TRACKED_MARKETS)[number];
 
 /**
- * One price change at one book. `line` is the home spread (spreads), the total (totals) or
- * null (h2h). `a` is the home / over price, `b` the away / under price.
+ * One price change at one book. `line` is the home spread (spreads*), the total (totals*,
+ * team_totals_*) or null (h2h*). `a` is the home / over price, `b` the away / under price.
  */
 export interface LineTick {
   /** ISO timestamp the book's price was seen. */
@@ -359,6 +368,24 @@ export interface LineHistory {
   book: string;
   market: TrackedMarket;
   ticks: LineTick[];
+}
+
+/** One book's price on a player prop. Anytime TD has no line and no under. */
+export interface PropQuote {
+  t: string;
+  line: number | null;
+  over: AmericanOdds;
+  under: AmericanOdds | null;
+}
+
+/** A player prop at the books that list it: the first price seen and the latest. */
+export interface PropLine {
+  /** null when the book's player name did not match the snapshot roster. */
+  playerId: PlayerId | null;
+  /** As the book spells it. */
+  player: string;
+  market: MarketKey;
+  books: { book: string; open: PropQuote; current: PropQuote }[];
 }
 
 export interface SnapshotGame {
@@ -384,6 +411,8 @@ export interface SnapshotGame {
   /** Line movement since the market opened (pipeline/fetch_lines.py). Absent in older
    *  snapshots and in backtests. */
   lineHistory?: LineHistory[];
+  /** DraftKings/FanDuel player props (pipeline/fetch_lines.py). Absent in older snapshots. */
+  props?: PropLine[];
 }
 
 // ---------------------------------------------------------------------------

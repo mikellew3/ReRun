@@ -3,8 +3,9 @@
  * against the market's no-vig prices (CLAUDE.md §10.4). Tiers and stakes come from config.
  */
 
+import { useState } from 'react';
 import { MODEL_CONFIG, summarizeLines } from '@rerun/engine';
-import type { LineHistory, MarketLine, Signal, SnapshotGame } from '@rerun/engine';
+import type { LineHistory, MarketLine, Signal, SnapshotGame, TrackedMarket } from '@rerun/engine';
 import { pct, shareWhere, signed } from './charts';
 import type { Counts } from './charts';
 import { Icon } from './icons';
@@ -13,8 +14,16 @@ const BOOK_NAMES: Record<string, string> = {
   pinnacle: 'Pinnacle',
   draftkings: 'DraftKings',
   fanduel: 'FanDuel',
+  betmgm: 'BetMGM',
+  williamhill_us: 'Caesars',
+  espnbet: 'ESPN BET',
+  fanatics: 'Fanatics',
+  betrivers: 'BetRivers',
+  bovada: 'Bovada',
+  betonlineag: 'BetOnline',
+  lowvig: 'LowVig',
 };
-const bookName = (b: string) => BOOK_NAMES[b] ?? b;
+export const bookName = (b: string) => BOOK_NAMES[b] ?? b;
 
 /** American odds with a real minus sign. */
 export const odds = (a: number) => (a > 0 ? `+${a}` : `−${Math.abs(a)}`);
@@ -120,7 +129,49 @@ function MovementChart({ history, home }: { history: LineHistory[]; home: string
   );
 }
 
+type ViewId = 'full' | 'h1' | 'tt';
+
+function views(
+  game: SnapshotGame,
+): Record<ViewId, { label: string; cols: { market: TrackedMarket; head: string }[] }> {
+  return {
+    full: {
+      label: 'Full game',
+      cols: [
+        { market: 'spreads', head: `${game.home} spread` },
+        { market: 'totals', head: 'Total' },
+        { market: 'h2h', head: `ML ${game.home} / ${game.away}` },
+      ],
+    },
+    h1: {
+      label: '1st half',
+      cols: [
+        { market: 'spreads_h1', head: `${game.home} spread` },
+        { market: 'totals_h1', head: 'Total' },
+        { market: 'h2h_h1', head: `ML ${game.home} / ${game.away}` },
+      ],
+    },
+    tt: {
+      label: 'Team totals',
+      cols: [
+        { market: 'team_totals_home', head: `${game.home} total` },
+        { market: 'team_totals_away', head: `${game.away} total` },
+      ],
+    },
+  };
+}
+
+const BOOK_ORDER = [MODEL_CONFIG.lineMovement.sharpBook, 'draftkings', 'fanduel'];
+
+function bookSort(a: string, b: string): number {
+  const ia = BOOK_ORDER.indexOf(a);
+  const ib = BOOK_ORDER.indexOf(b);
+  if (ia >= 0 || ib >= 0) return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  return bookName(a).localeCompare(bookName(b));
+}
+
 export function MarketCard({ game }: { game: SnapshotGame }) {
+  const [view, setView] = useState<ViewId>('full');
   const history = game.lineHistory ?? [];
   if (history.length === 0) {
     return (
@@ -134,30 +185,36 @@ export function MarketCard({ game }: { game: SnapshotGame }) {
     );
   }
   const { books, signals } = summarizeLines(history);
-  const bookIds = [...new Set(books.map((b) => b.book))].sort((a, b) =>
-    a === MODEL_CONFIG.lineMovement.sharpBook
-      ? -1
-      : b === MODEL_CONFIG.lineMovement.sharpBook
-        ? 1
-        : a.localeCompare(b),
+  const all = views(game);
+  const available = (Object.keys(all) as ViewId[]).filter((v) =>
+    all[v].cols.some((c) => books.some((b) => b.market === c.market)),
   );
-  const cell = (book: string, market: 'spreads' | 'totals' | 'h2h') => {
+  const shown = available.includes(view) ? view : 'full';
+  const cols = all[shown].cols;
+  const bookIds = [
+    ...new Set(books.filter((b) => cols.some((c) => c.market === b.market)).map((b) => b.book)),
+  ].sort(bookSort);
+
+  const cell = (book: string, market: TrackedMarket) => {
     const b = books.find((x) => x.book === book && x.market === market);
-    if (!b) return <td>–</td>;
-    if (market === 'h2h') {
+    if (!b) return <td key={market}>–</td>;
+    if (market.startsWith('h2h')) {
       return (
-        <td>
+        <td key={market}>
           {odds(b.current.a)} / {odds(b.current.b)}
         </td>
       );
     }
-    const cur = market === 'spreads' ? signed(b.current.line ?? 0) : String(b.current.line);
-    const open = market === 'spreads' ? signed(b.open.line ?? 0) : String(b.open.line);
+    const spread = market.startsWith('spreads');
+    const fmt = (v: number | null) => (spread ? signed(v ?? 0) : String(v));
     const moved = b.current.line !== b.open.line;
     return (
-      <td>
-        <strong>{cur}</strong>
-        {moved && <span className="muted"> (open {open})</span>}
+      <td key={market}>
+        <strong>{fmt(b.current.line)}</strong>{' '}
+        <span className="muted">
+          {spread ? odds(b.current.a) : `o ${odds(b.current.a)}`}
+          {moved && ` · open ${fmt(b.open.line)}`}
+        </span>
       </td>
     );
   };
@@ -167,25 +224,39 @@ export function MarketCard({ game }: { game: SnapshotGame }) {
         <h2>Market</h2>
         <span className="caption muted">Information only, not used by the model</span>
       </div>
+      {available.length > 1 && (
+        <div className="segmented" role="tablist" aria-label="Market view">
+          {available.map((v) => (
+            <button
+              key={v}
+              type="button"
+              role="tab"
+              aria-selected={v === shown}
+              className={v === shown ? 'on' : ''}
+              onClick={() => setView(v)}
+            >
+              {all[v].label}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="table-wrap">
         <table className="num market-table">
           <thead>
             <tr>
               <th scope="col">Book</th>
-              <th scope="col">{game.home} spread</th>
-              <th scope="col">Total</th>
-              <th scope="col">
-                ML {game.home} / {game.away}
-              </th>
+              {cols.map((c) => (
+                <th key={c.market} scope="col">
+                  {c.head}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {bookIds.map((book) => (
               <tr key={book}>
                 <th scope="row">{bookName(book)}</th>
-                {cell(book, 'spreads')}
-                {cell(book, 'totals')}
-                {cell(book, 'h2h')}
+                {cols.map((c) => cell(book, c.market))}
               </tr>
             ))}
           </tbody>

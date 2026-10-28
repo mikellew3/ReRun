@@ -9,8 +9,13 @@ import type { RunRequest, SimGameResult, SlateSnapshot } from '@rerun/engine';
 
 export interface PlayerAgg {
   id: string;
+  passAtt: number;
+  passCmp: number;
   passYds: number;
   passTd: number;
+  passInt: number;
+  rushAtt: number;
+  targets: number;
   rushYds: number;
   recYds: number;
   rec: number;
@@ -72,9 +77,27 @@ self.onmessage = (event: MessageEvent<WorkerIn>) => {
       for (const l of r.players) {
         let p = players.get(l.playerId);
         if (!p) {
-          p = { id: l.playerId, passYds: 0, passTd: 0, rushYds: 0, recYds: 0, rec: 0, anyTd: 0 };
+          p = {
+            id: l.playerId,
+            passAtt: 0,
+            passCmp: 0,
+            passYds: 0,
+            passTd: 0,
+            passInt: 0,
+            rushAtt: 0,
+            targets: 0,
+            rushYds: 0,
+            recYds: 0,
+            rec: 0,
+            anyTd: 0,
+          };
           players.set(l.playerId, p);
         }
+        p.passAtt += l.passAtt;
+        p.passCmp += l.passCmp;
+        p.passInt += l.passInt;
+        p.rushAtt += l.rushAtt;
+        p.targets += l.targets;
         p.passYds += l.passYds;
         p.passTd += l.passTd;
         p.rushYds += l.rushYds;

@@ -828,6 +828,52 @@ tbody tr:last-child td {
   color: var(--rr-negative);
 }
 
+/* Segmented control (design: toggle / segmented). */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--rr-radius-btn);
+  background: var(--rr-surface);
+  align-self: flex-start;
+}
+
+.segmented button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--rr-radius-input);
+  background: transparent;
+  color: var(--rr-text-secondary);
+  font: var(--rr-text-small);
+  font-weight: 600;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.segmented button.on {
+  background: var(--rr-bg);
+  color: var(--rr-text);
+  box-shadow: var(--rr-shadow-card);
+}
+
+.props-table {
+  max-height: 560px;
+  overflow-y: auto;
+}
+
+.props-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--rr-bg);
+}
+
+.prop-name {
+  text-align: left;
+  color: var(--rr-text-secondary);
+}
+
 /* ---------------------------------------------------------------- Phone */
 
 @media (max-width: 960px) {

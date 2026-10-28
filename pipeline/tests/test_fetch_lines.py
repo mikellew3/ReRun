@@ -176,3 +176,96 @@ def test_attach_lines_matches_by_teams_and_kickoff():
     assert ml.attach_lines(games, history) == 1
     assert games[0]["lineHistory"][0]["book"] == "draftkings"
     assert {m["selection"] for m in games[0]["market"]} == {"home", "away"}
+
+
+def test_team_totals_split_by_team():
+    rows = []
+    for team, line in (("home", 27.5), ("away", 23.5)):
+        for ou, price in (("over", -110), ("under", -110)):
+            r = sharp_row("draftkings", f"{team}_{ou}", line, price)
+            r["team_side"] = team
+            rows.append(r)
+    quotes = {q["market"]: q for q in fl.sharpapi_rows_to_quotes(rows, "team_totals")}
+    assert quotes["team_totals_home"]["line"] == 27.5
+    assert quotes["team_totals_away"]["line"] == 23.5
+
+
+def prop_row(book: str, player: str, side: str, line: float | None, price: int) -> dict:
+    r = sharp_row(book, side, line, price)
+    r.update({"player_name": player, "is_player_prop": True, "selection": side.title()})
+    return r
+
+
+def test_props_pair_over_under_and_anytime_td_is_one_sided():
+    rows = [
+        prop_row("draftkings", "Tucker Kraft", "over", 46.5, -107),
+        prop_row("draftkings", "Tucker Kraft", "under", 46.5, -113),
+    ]
+    (p,) = fl.sharpapi_rows_to_props(rows, "player_reception_yds")
+    assert (p["player"], p["line"], p["over"], p["under"]) == ("Tucker Kraft", 46.5, -107, -113)
+    td = prop_row("fanduel", "Pierre Strong Jr.", "other", None, 1100)
+    (t,) = fl.sharpapi_rows_to_props([td], "player_anytime_td")
+    assert (t["line"], t["over"], t["under"]) == (None, 1100, None)
+
+
+def test_merge_props_keeps_open_and_current():
+    now = datetime(2026, 10, 28, 15, tzinfo=UTC)
+    base = {
+        "game": "2026-10-30_CAR_GB",
+        "home": "GB",
+        "away": "CAR",
+        "kickoff": "2026-10-30T00:15:00Z",
+        "book": "draftkings",
+        "market": "player_reception_yds",
+        "player": "Tucker Kraft",
+        "under": -110,
+    }
+    h: dict = {"games": {}}
+    fl.merge_props(h, [{**base, "line": 44.5, "over": -110, "t": "t1"}], now)
+    fl.merge_props(h, [{**base, "line": 46.5, "over": -105, "t": "t2"}], now)
+    slot = h["games"]["2026-10-30_CAR_GB"]["props"]["draftkings|player_reception_yds|Tucker Kraft"]
+    assert slot["open"]["line"] == 44.5
+    assert slot["current"]["line"] == 46.5
+    assert h["propsAt"] == fl.iso(now)
+    assert not fl.props_due(h, now + timedelta(minutes=10))
+
+
+def test_name_key_and_prop_player_matching():
+    assert ml.name_key("Pierre Strong Jr.") == "pierre strong"
+    assert ml.name_key("Amon-Ra St. Brown") == ml.name_key("Amon-Ra St Brown")
+    players = {
+        "00-1": {"name": "Pierre Strong", "team": "GB"},
+        "00-2": {"name": "Tucker Kraft", "team": "GB"},
+        "00-3": {"name": "Tucker Kraft", "team": "KC"},  # other game: ignored
+    }
+    entry = {
+        "props": {
+            "draftkings|player_anytime_td|Pierre Strong Jr.": {
+                "open": {"t": "1", "line": None, "over": 1100, "under": None},
+                "current": {"t": "2", "line": None, "over": 1000, "under": None},
+            },
+            "draftkings|player_reception_yds|Nobody Known": {
+                "open": {"t": "1", "line": 9.5, "over": -110, "under": -110},
+                "current": {"t": "1", "line": 9.5, "over": -110, "under": -110},
+            },
+        }
+    }
+    game = {"home": "GB", "away": "CAR"}
+    props = {p["player"]: p for p in ml.game_props(entry, game, players)}
+    assert props["Pierre Strong Jr."]["playerId"] == "00-1"
+    assert props["Pierre Strong Jr."]["books"][0]["current"]["over"] == 1000
+    assert props["Nobody Known"]["playerId"] is None
+
+
+def test_market_lines_team_totals_and_first_half():
+    e = entry(
+        {
+            "draftkings|team_totals_home": [{"t": "1", "line": 27.5, "a": -110, "b": -110}],
+            "draftkings|spreads_h1": [{"t": "1", "line": -2.5, "a": -110, "b": -110}],
+        }
+    )
+    lines = ml.market_lines(e)
+    tt = [m for m in lines if m["market"] == "team_totals"]
+    assert {(m["selection"], m["side"]) for m in tt} == {("over", "home"), ("under", "home")}
+    h1 = {m["selection"]: m for m in lines if m["market"] == "spreads_h1"}
+    assert (h1["home"]["line"], h1["away"]["line"]) == (-2.5, 2.5)

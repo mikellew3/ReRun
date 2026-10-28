@@ -2,7 +2,8 @@
 
 Two sources, both server-side only:
 - SharpAPI (free tier, env SHARPAPI_KEY): DraftKings and FanDuel main lines for spreads,
-  totals and moneylines, 60s delayed. Polled often; costs no credits.
+  totals, moneylines, first-half lines and team totals (every run), and main-line player
+  props (every config sharpApi.propsEveryMinutes). 60s delayed; costs no credits.
 - The Odds API (env ODDS_API_KEY): Pinnacle (the sharp reference) plus other US books
   (config oddsApi.bookmakers), a few times a day (config oddsApi.sharpPullHoursUtc). 3
   credits per pull for up to 10 books. Credits left are logged on every
@@ -83,29 +84,55 @@ def http_json(url: str, headers: dict[str, str] | None = None) -> tuple[Any, dic
 # ---------------------------------------------------------------------------
 
 
+def _usable(r: dict) -> bool:
+    return bool(
+        r.get("is_main_line")
+        and not r.get("is_live")
+        and r.get("is_active", True)
+        and not r.get("is_stale_pregame_price")
+    )
+
+
+def _teams(r: dict) -> tuple[str | None, str | None]:
+    home = abbr((r.get("home") or {}).get("name") or r.get("home_team", ""))
+    away = abbr((r.get("away") or {}).get("name") or r.get("away_team", ""))
+    return home, away
+
+
+def _side(r: dict) -> str:
+    """home / away / over / under, from selection_type (team totals: home_over -> over)."""
+    side = (r.get("selection_type") or "").lower().split("_")[-1]
+    if side in ("home", "away", "over", "under"):
+        return side
+    sel = (r.get("selection") or "").lower()
+    return "over" if sel.startswith("over") else "under" if sel.startswith("under") else ""
+
+
 def sharpapi_rows_to_quotes(rows: list[dict], market: str) -> list[Quote]:
-    """Main-line rows (one per selection) -> one quote per (game, book): line + both prices."""
-    groups: dict[tuple[str, str], dict[str, dict]] = {}
+    """Main-line game rows (one per selection) -> one quote per (game, book): line + both
+    prices. Team totals become team_totals_home / team_totals_away."""
+    groups: dict[tuple[str, str, str], dict[str, dict]] = {}
     for r in rows:
-        if not r.get("is_main_line") or r.get("is_live") or not r.get("is_active", True):
+        if not _usable(r) or r.get("is_player_prop"):
             continue
-        if r.get("is_stale_pregame_price") or r.get("is_player_prop"):
-            continue
-        side = (r.get("selection_type") or "").lower()
-        if side not in ("home", "away", "over", "under"):
-            sel = (r.get("selection") or "").lower()
-            side = "over" if sel.startswith("over") else "under" if sel.startswith("under") else ""
+        side = _side(r)
         if not side:
             continue
-        groups.setdefault((r["event_id"], r["sportsbook"]), {})[side] = r
+        name = market
+        if market == "team_totals":
+            team = (r.get("team_side") or (r.get("selection_type") or "").split("_")[0]).lower()
+            if team not in ("home", "away"):
+                continue
+            name = f"team_totals_{team}"
+        groups.setdefault((r["event_id"], r["sportsbook"], name), {})[side] = r
     quotes = []
-    for (_, book), sides in groups.items():
-        first, second = ("over", "under") if market == "totals" else ("home", "away")
+    for (_, book, name), sides in groups.items():
+        over_under = name.startswith(("totals", "team_totals"))
+        first, second = ("over", "under") if over_under else ("home", "away")
         if first not in sides or second not in sides:
             continue
         a, b = sides[first], sides[second]
-        home = abbr((a.get("home") or {}).get("name") or a.get("home_team", ""))
-        away = abbr((a.get("away") or {}).get("name") or a.get("away_team", ""))
+        home, away = _teams(a)
         if not home or not away:
             continue
         kickoff = parse_time(a["event_start_time"])
@@ -116,8 +143,8 @@ def sharpapi_rows_to_quotes(rows: list[dict], market: str) -> list[Quote]:
                 "away": away,
                 "kickoff": iso(kickoff),
                 "book": book,
-                "market": market,
-                "line": None if market == "h2h" else float(a["line"]),
+                "market": name,
+                "line": None if name.startswith("h2h") else float(a["line"]),
                 "a": int(a["odds_american"]),
                 "b": int(b["odds_american"]),
                 "t": a.get("timestamp") or iso(datetime.now(UTC)),
@@ -126,26 +153,91 @@ def sharpapi_rows_to_quotes(rows: list[dict], market: str) -> list[Quote]:
     return quotes
 
 
-def fetch_sharpapi(key: str) -> list[Quote]:
+def sharpapi_rows_to_props(rows: list[dict], market: str) -> list[dict]:
+    """Main-line prop rows -> one quote per (game, book, player): line, over and under prices.
+    Anytime TD rows are single-sided (no line, no under)."""
+    groups: dict[tuple[str, str, str], dict[str, dict]] = {}
+    for r in rows:
+        if not _usable(r) or not r.get("player_name"):
+            continue
+        side = "over" if market == "player_anytime_td" else _side(r)
+        if side not in ("over", "under"):
+            continue
+        groups.setdefault((r["event_id"], r["sportsbook"], r["player_name"]), {})[side] = r
+    out = []
+    for (_, book, player), sides in groups.items():
+        over = sides.get("over")
+        if over is None:
+            continue
+        under = sides.get("under")
+        home, away = _teams(over)
+        if not home or not away:
+            continue
+        kickoff = parse_time(over["event_start_time"])
+        line = over.get("line")
+        out.append(
+            {
+                "game": game_key(away, home, kickoff),
+                "home": home,
+                "away": away,
+                "kickoff": iso(kickoff),
+                "book": book,
+                "market": market,
+                "player": player,
+                "line": None if line is None else float(line),
+                "over": int(over["odds_american"]),
+                "under": None if under is None else int(under["odds_american"]),
+                "t": over.get("timestamp") or iso(datetime.now(UTC)),
+            }
+        )
+    return out
+
+
+def sharpapi_rows(key: str, market_type: str):
+    """Every main-line row of one market type, page by page, paced to the rate limit."""
     cfg = model_config()["sharpApi"]
     pause = 60 / cfg["requestsPerMinute"] + 0.2
+    cursor = None
+    while True:
+        params = {
+            "league": "nfl",
+            "market_type": market_type,
+            "is_main_line": "true",
+            "limit": cfg["pageLimit"],
+        }
+        if cursor:
+            params["cursor"] = cursor
+        data, _ = http_json(
+            f"{SHARPAPI_BASE}/odds?{urllib.parse.urlencode(params)}", {"X-API-Key": key}
+        )
+        yield from data.get("data", [])
+        page = data.get("pagination") or {}
+        time.sleep(pause)
+        cursor = page.get("next_cursor") if page.get("has_more") else None
+        if not cursor:
+            return
+
+
+def fetch_sharpapi(key: str) -> list[Quote]:
     quotes: list[Quote] = []
-    for market_type, market in cfg["marketTypes"].items():
-        cursor = None
-        while True:
-            params = {"league": "nfl", "market_type": market_type, "limit": cfg["pageLimit"]}
-            if cursor:
-                params["cursor"] = cursor
-            url = f"{SHARPAPI_BASE}/odds?{urllib.parse.urlencode(params)}"
-            data, _ = http_json(url, {"X-API-Key": key})
-            quotes += sharpapi_rows_to_quotes(data.get("data", []), market)
-            page = data.get("pagination") or {}
-            time.sleep(pause)
-            cursor = page.get("next_cursor") if page.get("has_more") else None
-            if not cursor:
-                break
-    print(f"SharpAPI: {len(quotes)} main-line quotes")
+    for market_type, market in model_config()["sharpApi"]["marketTypes"].items():
+        quotes += sharpapi_rows_to_quotes(list(sharpapi_rows(key, market_type)), market)
+    print(f"SharpAPI: {len(quotes)} game-line quotes")
     return quotes
+
+
+def fetch_props(key: str) -> list[dict]:
+    props: list[dict] = []
+    for market_type, market in model_config()["sharpApi"]["propMarketTypes"].items():
+        props += sharpapi_rows_to_props(list(sharpapi_rows(key, market_type)), market)
+    print(f"SharpAPI: {len(props)} player-prop quotes")
+    return props
+
+
+def props_due(history: dict, now: datetime) -> bool:
+    last = history.get("propsAt")
+    every = timedelta(minutes=model_config()["sharpApi"]["propsEveryMinutes"])
+    return last is None or now - parse_time(last) >= every
 
 
 # ---------------------------------------------------------------------------
@@ -258,6 +350,22 @@ def merge(history: dict, quotes: list[Quote], now: datetime) -> int:
     return added
 
 
+def merge_props(history: dict, props: list[dict], now: datetime) -> int:
+    """Keeps each prop's first price (open) and latest price (current). Returns props seen."""
+    games = history.setdefault("games", {})
+    for p in props:
+        g = games.setdefault(
+            p["game"], {"home": p["home"], "away": p["away"], "kickoff": p["kickoff"], "series": {}}
+        )
+        quote = {"t": p["t"], "line": p["line"], "over": p["over"], "under": p["under"]}
+        slot = g.setdefault("props", {}).setdefault(
+            f"{p['book']}|{p['market']}|{p['player']}", {"open": quote}
+        )
+        slot["current"] = quote
+    history["propsAt"] = iso(now)
+    return len(props)
+
+
 def pinnacle_due(history: dict, now: datetime) -> bool:
     """At a configured UTC hour, and not already pulled in the last 2 hours (the poller runs
     every 30 minutes)."""
@@ -275,6 +383,7 @@ def main() -> None:
         action="store_true",
         help="pull Pinnacle only at the configured UTC hours",
     )
+    parser.add_argument("--props", action="store_true", help="pull player props now")
     parser.add_argument("--history", type=Path, default=HISTORY_PATH)
     args = parser.parse_args()
 
@@ -282,10 +391,13 @@ def main() -> None:
     history = load_history(args.history)
     quotes: list[Quote] = []
 
+    props: list[dict] = []
     sharp_key = os.environ.get("SHARPAPI_KEY", "").strip()
     if sharp_key:
         try:
             quotes += fetch_sharpapi(sharp_key)
+            if args.props or props_due(history, now):
+                props = fetch_props(sharp_key)
         except RuntimeError as err:
             print(f"SharpAPI failed: {err}")
     else:
@@ -302,6 +414,8 @@ def main() -> None:
         print("ODDS_API_KEY not set; skipping Pinnacle")
 
     added = merge(history, quotes, now)
+    if props:
+        merge_props(history, props, now)
     args.history.parent.mkdir(parents=True, exist_ok=True)
     args.history.write_text(json.dumps(history, separators=(",", ":")))
     print(f"History: {len(history['games'])} games, {added} new ticks -> {args.history}")

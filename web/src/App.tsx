@@ -19,6 +19,7 @@ import { AltLadder, MarginHistogram, TotalHistogram, WinProbability, pct, signed
 import type { Counts } from './charts';
 import { Icon } from './icons';
 import { EdgesCard, MarketCard, marketSpread, marketTotal } from './market';
+import { PropsCard } from './props';
 import type { Aggregate, WorkerOut } from './sim.worker';
 
 function kickoffLabel(iso: string): string {
@@ -381,6 +382,13 @@ export function App() {
 
           <main className="results">
             {game && <MarketCard game={game} />}
+            {game && (
+              <PropsCard
+                game={game}
+                snapshot={snapshot}
+                sims={shown ? { players: shown.players, n: shown.done } : undefined}
+              />
+            )}
 
             {runError && <p className="error">{runError}</p>}
 
