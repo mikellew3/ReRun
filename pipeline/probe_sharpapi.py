@@ -67,12 +67,36 @@ def get(path: str, key: str) -> None:
         print("body:", json.dumps(data, indent=1)[:3000])
 
 
+def market_census(key: str) -> None:
+    """Pages through NFL odds and counts market types (main lines vs alternates)."""
+    from collections import Counter
+
+    counts: Counter = Counter()
+    url = f"{BASE}/odds?league=nfl&limit=500"
+    pages = 0
+    while url and pages < 8:
+        req = urllib.request.Request(url, headers={"X-API-Key": key})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        for r in data.get("data", []):
+            counts[(r["market_type"], r["is_main_line"], r["is_player_prop"], r["sportsbook"])] += 1
+        pages += 1
+        cursor = (data.get("pagination") or {}).get("next_cursor")
+        has_more = (data.get("pagination") or {}).get("has_more")
+        url = f"{BASE}/odds?league=nfl&limit=500&cursor={cursor}" if has_more and cursor else None
+        print("page", pages, "rows", len(data.get("data", [])), "limit", data.get("pagination"))
+    print("\nmarket_type | main | prop | book | rows")
+    for k, v in sorted(counts.items()):
+        if not k[2]:
+            print(*k, v, sep=" | ")
+    print("player-prop rows:", sum(v for k, v in counts.items() if k[2]))
+
+
 def main() -> None:
     key = os.environ.get("SHARPAPI_KEY", "").strip()
     if not key:
         raise SystemExit("SHARPAPI_KEY is not set")
-    for path in PATHS:
-        get(path, key)
+    market_census(key)
 
 
 if __name__ == "__main__":
