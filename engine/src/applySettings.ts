@@ -255,6 +255,18 @@ function availabilityOf(
   }
 }
 
+/**
+ * Historical shares, or an even split when no available player has one (e.g. a team resting
+ * its starters behind backups with too few games to fit): even among `preferred` players
+ * (RBs for carries), else among everyone. Keeps the engine from having no one to give the
+ * ball to.
+ */
+function withFallback(hist: number[], preferred: boolean[]): number[] {
+  if (hist.some((h) => h > 0)) return hist;
+  const anyPreferred = preferred.some(Boolean);
+  return hist.map((_, i) => (!anyPreferred || preferred[i] ? 1 : 0));
+}
+
 export function picker(shares: Float64Array): WeightedPicker | null {
   return shares.length > 0 && shares.some((s) => s > 0) ? new WeightedPicker(shares) : null;
 }
@@ -381,7 +393,10 @@ function buildOffense(inputs: BaseInputs, side: Side, available: Set<number>): O
       )
     : receivers.map(targetBase);
   const dvpOf = (p: PlayerRef) => (p.entry.dvpBucket ? dvp[p.entry.dvpBucket] : undefined);
-  const targetHist = receivers.map((p, i) => targetPooled[i]! * (dvpOf(p)?.targets ?? 1));
+  const targetHist = withFallback(
+    receivers.map((p, i) => targetPooled[i]! * (dvpOf(p)?.targets ?? 1)),
+    receivers.map((p) => p.entry.position !== 'QB'),
+  );
   const targetShares = allocateShares(
     receivers.map((p, i) => ({
       hist: targetHist[i]!,
@@ -440,15 +455,19 @@ function buildOffense(inputs: BaseInputs, side: Side, available: Set<number>): O
         keep.carries,
       )
     : rushers.map(carryBase);
+  const carryHistSafe = withFallback(
+    carryHist,
+    rushers.map((p) => p.entry.position === 'RB'),
+  );
   const carryShares = allocateShares(
     rushers.map((p, i) => ({
-      hist: carryHist[i]!,
+      hist: carryHistSafe[i]!,
       market: marketUsage[p.entry.playerId]?.impliedCarryShare,
       nudge: overrides.usage[p.entry.playerId]?.carryShare ?? 0,
     })),
     settings.lenses.marketBlend,
   );
-  const carryBefore = normalizedHistory(carryHist);
+  const carryBefore = normalizedHistory(carryHistSafe);
   const rzCarryShares = followShares(
     rushers.map((p) => p.params?.rzCarryShare ?? 0),
     carryBefore,

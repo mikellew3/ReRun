@@ -1,6 +1,6 @@
 {
   "_generated": "by jobs/exportConfig.ts from engine/src/config/model.config.ts. Do not edit.",
-  "configHash": "26a35b19f444f595",
+  "configHash": "88961ee59efa9381",
   "engineVersion": "0.4.0",
   "model": {
     "configVersion": 1,
@@ -472,7 +472,7 @@
       ],
       "showEdges": false,
       "valueShading": {
-        "enabled": true,
+        "enabled": false,
         "minEv": 0.03,
         "propMarkets": []
       },
@@ -487,6 +487,10 @@
         "player_pass_completions",
         "player_rush_attempts"
       ]
+    },
+    "forwardTest": {
+      "recordWithinHours": 36,
+      "sims": 2000
     },
     "lineMovement": {
       "recBooks": [

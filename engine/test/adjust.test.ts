@@ -99,6 +99,21 @@ describe('injuries: usage of out players', () => {
     expect(shares[0]).toBeCloseTo(0.75);
     expect(shares[1]).toBeCloseTo(0.25);
   });
+
+  it('never divides by zero when the other positions have no share (2022 W18 BAL)', () => {
+    const shares = redistributeOutShares(
+      [
+        { position: 'RB', share: 0.45, available: false },
+        { position: 'RB', share: 0.3, available: true },
+        { position: 'WR', share: 0, available: true },
+        { position: 'QB', share: 0, available: true },
+      ],
+      { RB: 0.99 },
+    );
+    expect(shares.every(Number.isFinite)).toBe(true);
+    expect(shares[0]).toBeCloseTo(0.75);
+    expect(shares[1]).toBe(0);
+  });
 });
 
 describe('injuries: QB swaps', () => {

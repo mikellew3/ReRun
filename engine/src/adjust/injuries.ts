@@ -112,8 +112,12 @@ export function redistributeOutShares(
     let kept = same.length > 0 ? (keep[out.position] ?? 0) : 0;
     if (othersTotal <= 0) kept = same.length > 0 ? 1 : 0;
     for (const i of same) shares[i]! += (out.share * kept) / same.length;
-    for (const i of others)
-      shares[i]! += (out.share * (1 - kept) * players[i]!.share) / othersTotal;
+    // othersTotal is 0 exactly when kept is 1 (or no one is left): nothing to hand on.
+    if (othersTotal > 0) {
+      for (const i of others) {
+        shares[i]! += (out.share * (1 - kept) * players[i]!.share) / othersTotal;
+      }
+    }
   }
   return players.flatMap((p, i) => (p.available ? [shares[i]!] : []));
 }

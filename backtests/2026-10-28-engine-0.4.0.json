@@ -1,0 +1,4122 @@
+{
+  "createdAt": "2026-10-28T19:09:32.797Z",
+  "engine": "0.4.0",
+  "note": "Walk-forward: each week fit only on data before it. Bets at the closing price.",
+  "presets": {
+    "default": {
+      "games": 895,
+      "sims": 2000,
+      "moneyline": {
+        "accuracy": {
+          "games": 893,
+          "logLoss": {
+            "sim": 0.64,
+            "market": 0.597,
+            "blend": 0.612
+          },
+          "brier": {
+            "sim": 0.225,
+            "market": 0.206
+          },
+          "meanLean": -0.008
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 31,
+            "sim": 0.153,
+            "market": 0.226,
+            "actual": 0.355
+          },
+          {
+            "bin": "20-35%",
+            "n": 125,
+            "sim": 0.29,
+            "market": 0.342,
+            "actual": 0.376
+          },
+          {
+            "bin": "35-45%",
+            "n": 141,
+            "sim": 0.405,
+            "market": 0.432,
+            "actual": 0.397
+          },
+          {
+            "bin": "45-55%",
+            "n": 174,
+            "sim": 0.499,
+            "market": 0.518,
+            "actual": 0.506
+          },
+          {
+            "bin": "55-65%",
+            "n": 147,
+            "sim": 0.6,
+            "market": 0.599,
+            "actual": 0.592
+          },
+          {
+            "bin": "65-80%",
+            "n": 185,
+            "sim": 0.718,
+            "market": 0.699,
+            "actual": 0.714
+          },
+          {
+            "bin": "80-100%",
+            "n": 90,
+            "sim": 0.853,
+            "market": 0.794,
+            "actual": 0.811
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 664,
+            "record": "279-383-2",
+            "winRate": 0.421,
+            "units": -85.1,
+            "roi": -0.128
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 541,
+            "record": "219-321-1",
+            "winRate": 0.406,
+            "units": -77.1,
+            "roi": -0.142
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 381,
+            "record": "147-234-0",
+            "winRate": 0.386,
+            "units": -70.6,
+            "roi": -0.185
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.643,
+                "market": 0.595,
+                "blend": 0.614
+              },
+              "brier": {
+                "sim": 0.226,
+                "market": 0.205
+              },
+              "meanLean": -0.014
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 161,
+                "record": "59-101-1",
+                "winRate": 0.369,
+                "units": -33,
+                "roi": -0.205
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 129,
+                "record": "48-81-0",
+                "winRate": 0.372,
+                "units": -28.6,
+                "roi": -0.221
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 85,
+                "record": "27-58-0",
+                "winRate": 0.318,
+                "units": -26.8,
+                "roi": -0.315
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.669,
+                "market": 0.621,
+                "blend": 0.637
+              },
+              "brier": {
+                "sim": 0.239,
+                "market": 0.216
+              },
+              "meanLean": -0.01
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 170,
+                "record": "75-95-0",
+                "winRate": 0.441,
+                "units": -10.8,
+                "roi": -0.063
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 143,
+                "record": "58-85-0",
+                "winRate": 0.406,
+                "units": -15,
+                "roi": -0.105
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 102,
+                "record": "41-61-0",
+                "winRate": 0.402,
+                "units": -11.3,
+                "roi": -0.111
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.593,
+                "market": 0.556,
+                "blend": 0.569
+              },
+              "brier": {
+                "sim": 0.203,
+                "market": 0.186
+              },
+              "meanLean": 0.002
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 167,
+                "record": "74-93-0",
+                "winRate": 0.443,
+                "units": -35.5,
+                "roi": -0.213
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 134,
+                "record": "58-76-0",
+                "winRate": 0.433,
+                "units": -30.3,
+                "roi": -0.226
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 94,
+                "record": "37-57-0",
+                "winRate": 0.394,
+                "units": -28.6,
+                "roi": -0.304
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.654,
+                "market": 0.616,
+                "blend": 0.628
+              },
+              "brier": {
+                "sim": 0.23,
+                "market": 0.216
+              },
+              "meanLean": -0.009
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 166,
+                "record": "71-94-1",
+                "winRate": 0.43,
+                "units": -5.8,
+                "roi": -0.035
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 135,
+                "record": "55-79-1",
+                "winRate": 0.41,
+                "units": -3.3,
+                "roi": -0.024
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 100,
+                "record": "42-58-0",
+                "winRate": 0.42,
+                "units": -3.9,
+                "roi": -0.039
+              }
+            ]
+          }
+        }
+      },
+      "spread": {
+        "accuracy": {
+          "games": 872,
+          "logLoss": {
+            "sim": 0.73,
+            "market": 0.692,
+            "blend": 0.703
+          },
+          "brier": {
+            "sim": 0.267,
+            "market": 0.25
+          },
+          "meanLean": -0.011
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 5,
+            "sim": 0.16,
+            "market": 0.497,
+            "actual": 0.8
+          },
+          {
+            "bin": "20-35%",
+            "n": 92,
+            "sim": 0.291,
+            "market": 0.5,
+            "actual": 0.576
+          },
+          {
+            "bin": "35-45%",
+            "n": 228,
+            "sim": 0.406,
+            "market": 0.5,
+            "actual": 0.5
+          },
+          {
+            "bin": "45-55%",
+            "n": 292,
+            "sim": 0.499,
+            "market": 0.499,
+            "actual": 0.493
+          },
+          {
+            "bin": "55-65%",
+            "n": 178,
+            "sim": 0.598,
+            "market": 0.502,
+            "actual": 0.494
+          },
+          {
+            "bin": "65-80%",
+            "n": 76,
+            "sim": 0.699,
+            "market": 0.5,
+            "actual": 0.513
+          },
+          {
+            "bin": "80-100%",
+            "n": 1,
+            "sim": 0.894,
+            "market": 0.5,
+            "actual": 1
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 709,
+            "record": "334-360-15",
+            "winRate": 0.481,
+            "units": -51.2,
+            "roi": -0.072
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 585,
+            "record": "276-295-14",
+            "winRate": 0.483,
+            "units": -39.9,
+            "roi": -0.068
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 450,
+            "record": "213-223-14",
+            "winRate": 0.489,
+            "units": -26.4,
+            "roi": -0.059
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 215,
+              "logLoss": {
+                "sim": 0.722,
+                "market": 0.69,
+                "blend": 0.698
+              },
+              "brier": {
+                "sim": 0.263,
+                "market": 0.248
+              },
+              "meanLean": -0.017
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 175,
+                "record": "85-84-6",
+                "winRate": 0.503,
+                "units": -3.6,
+                "roi": -0.02
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 140,
+                "record": "67-67-6",
+                "winRate": 0.5,
+                "units": -3.7,
+                "roi": -0.026
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 102,
+                "record": "47-49-6",
+                "winRate": 0.49,
+                "units": -5,
+                "roi": -0.049
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 213,
+              "logLoss": {
+                "sim": 0.743,
+                "market": 0.693,
+                "blend": 0.709
+              },
+              "brier": {
+                "sim": 0.273,
+                "market": 0.25
+              },
+              "meanLean": -0.013
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 179,
+                "record": "81-91-7",
+                "winRate": 0.471,
+                "units": -16.2,
+                "roi": -0.09
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 152,
+                "record": "68-77-7",
+                "winRate": 0.469,
+                "units": -14.3,
+                "roi": -0.094
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 122,
+                "record": "53-62-7",
+                "winRate": 0.461,
+                "units": -13.1,
+                "roi": -0.108
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.714,
+                "market": 0.695,
+                "blend": 0.697
+              },
+              "brier": {
+                "sim": 0.26,
+                "market": 0.251
+              },
+              "meanLean": -0.002
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 181,
+                "record": "88-92-1",
+                "winRate": 0.489,
+                "units": -11.2,
+                "roi": -0.062
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 145,
+                "record": "72-72-1",
+                "winRate": 0.5,
+                "units": -5.7,
+                "roi": -0.04
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 110,
+                "record": "56-53-1",
+                "winRate": 0.514,
+                "units": -1.6,
+                "roi": -0.014
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.74,
+                "market": 0.691,
+                "blend": 0.706
+              },
+              "brier": {
+                "sim": 0.271,
+                "market": 0.249
+              },
+              "meanLean": -0.014
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 174,
+                "record": "80-93-1",
+                "winRate": 0.462,
+                "units": -20.2,
+                "roi": -0.116
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 148,
+                "record": "69-79-0",
+                "winRate": 0.466,
+                "units": -16.1,
+                "roi": -0.109
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 116,
+                "record": "57-59-0",
+                "winRate": 0.491,
+                "units": -6.6,
+                "roi": -0.057
+              }
+            ]
+          }
+        }
+      },
+      "total": {
+        "accuracy": {
+          "games": 888,
+          "logLoss": {
+            "sim": 0.715,
+            "market": 0.693,
+            "blend": 0.698
+          },
+          "brier": {
+            "sim": 0.26,
+            "market": 0.25
+          },
+          "meanLean": 0.055
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 0,
+            "sim": 0,
+            "market": 0,
+            "actual": 0
+          },
+          {
+            "bin": "20-35%",
+            "n": 15,
+            "sim": 0.315,
+            "market": 0.503,
+            "actual": 0.4
+          },
+          {
+            "bin": "35-45%",
+            "n": 76,
+            "sim": 0.414,
+            "market": 0.499,
+            "actual": 0.539
+          },
+          {
+            "bin": "45-55%",
+            "n": 337,
+            "sim": 0.507,
+            "market": 0.5,
+            "actual": 0.496
+          },
+          {
+            "bin": "55-65%",
+            "n": 337,
+            "sim": 0.596,
+            "market": 0.501,
+            "actual": 0.504
+          },
+          {
+            "bin": "65-80%",
+            "n": 122,
+            "sim": 0.694,
+            "market": 0.501,
+            "actual": 0.516
+          },
+          {
+            "bin": "80-100%",
+            "n": 1,
+            "sim": 0.832,
+            "market": 0.511,
+            "actual": 1
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 697,
+            "record": "353-339-5",
+            "winRate": 0.51,
+            "units": -15.3,
+            "roi": -0.022
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 550,
+            "record": "274-271-5",
+            "winRate": 0.503,
+            "units": -19.2,
+            "roi": -0.035
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 400,
+            "record": "191-206-3",
+            "winRate": 0.481,
+            "units": -30.4,
+            "roi": -0.076
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.72,
+                "market": 0.693,
+                "blend": 0.7
+              },
+              "brier": {
+                "sim": 0.263,
+                "market": 0.25
+              },
+              "meanLean": 0.062
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 179,
+                "record": "87-90-2",
+                "winRate": 0.492,
+                "units": -7.5,
+                "roi": -0.042
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 146,
+                "record": "70-74-2",
+                "winRate": 0.486,
+                "units": -7.4,
+                "roi": -0.05
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 110,
+                "record": "49-59-2",
+                "winRate": 0.454,
+                "units": -12.5,
+                "roi": -0.114
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.734,
+                "market": 0.693,
+                "blend": 0.705
+              },
+              "brier": {
+                "sim": 0.269,
+                "market": 0.25
+              },
+              "meanLean": 0.083
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 188,
+                "record": "90-96-2",
+                "winRate": 0.484,
+                "units": -14.3,
+                "roi": -0.076
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 162,
+                "record": "77-83-2",
+                "winRate": 0.481,
+                "units": -13.2,
+                "roi": -0.081
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 125,
+                "record": "58-66-1",
+                "winRate": 0.468,
+                "units": -13.3,
+                "roi": -0.106
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.703,
+                "market": 0.692,
+                "blend": 0.693
+              },
+              "brier": {
+                "sim": 0.254,
+                "market": 0.25
+              },
+              "meanLean": 0.03
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 160,
+                "record": "85-74-1",
+                "winRate": 0.535,
+                "units": 3.1,
+                "roi": 0.019
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 114,
+                "record": "60-53-1",
+                "winRate": 0.531,
+                "units": 1.5,
+                "roi": 0.013
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 77,
+                "record": "38-39-0",
+                "winRate": 0.494,
+                "units": -4.5,
+                "roi": -0.058
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.703,
+                "market": 0.694,
+                "blend": 0.694
+              },
+              "brier": {
+                "sim": 0.254,
+                "market": 0.25
+              },
+              "meanLean": 0.045
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 170,
+                "record": "91-79-0",
+                "winRate": 0.535,
+                "units": 3.5,
+                "roi": 0.021
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 128,
+                "record": "67-61-0",
+                "winRate": 0.523,
+                "units": -0.2,
+                "roi": -0.001
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 88,
+                "record": "46-42-0",
+                "winRate": 0.523,
+                "units": -0.1,
+                "roi": -0.001
+              }
+            ]
+          }
+        }
+      }
+    },
+    "hot-hand": {
+      "games": 895,
+      "sims": 2000,
+      "moneyline": {
+        "accuracy": {
+          "games": 893,
+          "logLoss": {
+            "sim": 0.707,
+            "market": 0.597,
+            "blend": 0.626
+          },
+          "brier": {
+            "sim": 0.248,
+            "market": 0.206
+          },
+          "meanLean": -0.015
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 90,
+            "sim": 0.129,
+            "market": 0.325,
+            "actual": 0.367
+          },
+          {
+            "bin": "20-35%",
+            "n": 140,
+            "sim": 0.276,
+            "market": 0.433,
+            "actual": 0.45
+          },
+          {
+            "bin": "35-45%",
+            "n": 131,
+            "sim": 0.402,
+            "market": 0.508,
+            "actual": 0.466
+          },
+          {
+            "bin": "45-55%",
+            "n": 91,
+            "sim": 0.497,
+            "market": 0.502,
+            "actual": 0.473
+          },
+          {
+            "bin": "55-65%",
+            "n": 125,
+            "sim": 0.597,
+            "market": 0.57,
+            "actual": 0.632
+          },
+          {
+            "bin": "65-80%",
+            "n": 162,
+            "sim": 0.723,
+            "market": 0.624,
+            "actual": 0.605
+          },
+          {
+            "bin": "80-100%",
+            "n": 154,
+            "sim": 0.887,
+            "market": 0.747,
+            "actual": 0.76
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 787,
+            "record": "388-398-1",
+            "winRate": 0.494,
+            "units": -65.6,
+            "roi": -0.083
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 706,
+            "record": "345-360-1",
+            "winRate": 0.489,
+            "units": -59.7,
+            "roi": -0.085
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 596,
+            "record": "279-316-1",
+            "winRate": 0.469,
+            "units": -65.2,
+            "roi": -0.109
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.711,
+                "market": 0.595,
+                "blend": 0.629
+              },
+              "brier": {
+                "sim": 0.253,
+                "market": 0.205
+              },
+              "meanLean": -0.035
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 193,
+                "record": "87-105-1",
+                "winRate": 0.453,
+                "units": -29.4,
+                "roi": -0.152
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 171,
+                "record": "77-93-1",
+                "winRate": 0.453,
+                "units": -25.5,
+                "roi": -0.149
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 144,
+                "record": "66-77-1",
+                "winRate": 0.462,
+                "units": -16.7,
+                "roi": -0.116
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.763,
+                "market": 0.621,
+                "blend": 0.664
+              },
+              "brier": {
+                "sim": 0.274,
+                "market": 0.216
+              },
+              "meanLean": -0.03
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 193,
+                "record": "85-108-0",
+                "winRate": 0.44,
+                "units": -26.7,
+                "roi": -0.138
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 181,
+                "record": "78-103-0",
+                "winRate": 0.431,
+                "units": -27.6,
+                "roi": -0.153
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 155,
+                "record": "63-92-0",
+                "winRate": 0.406,
+                "units": -25.7,
+                "roi": -0.166
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.668,
+                "market": 0.556,
+                "blend": 0.587
+              },
+              "brier": {
+                "sim": 0.231,
+                "market": 0.186
+              },
+              "meanLean": 0.007
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 207,
+                "record": "109-98-0",
+                "winRate": 0.527,
+                "units": -25.3,
+                "roi": -0.122
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 190,
+                "record": "97-93-0",
+                "winRate": 0.511,
+                "units": -28.2,
+                "roi": -0.149
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 164,
+                "record": "83-81-0",
+                "winRate": 0.506,
+                "units": -23.7,
+                "roi": -0.145
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.685,
+                "market": 0.616,
+                "blend": 0.624
+              },
+              "brier": {
+                "sim": 0.235,
+                "market": 0.216
+              },
+              "meanLean": -0.001
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 194,
+                "record": "107-87-0",
+                "winRate": 0.552,
+                "units": 15.8,
+                "roi": 0.081
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 164,
+                "record": "93-71-0",
+                "winRate": 0.567,
+                "units": 21.7,
+                "roi": 0.132
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 133,
+                "record": "67-66-0",
+                "winRate": 0.504,
+                "units": 0.9,
+                "roi": 0.007
+              }
+            ]
+          }
+        }
+      },
+      "spread": {
+        "accuracy": {
+          "games": 872,
+          "logLoss": {
+            "sim": 0.791,
+            "market": 0.692,
+            "blend": 0.713
+          },
+          "brier": {
+            "sim": 0.288,
+            "market": 0.25
+          },
+          "meanLean": -0.012
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 58,
+            "sim": 0.142,
+            "market": 0.498,
+            "actual": 0.517
+          },
+          {
+            "bin": "20-35%",
+            "n": 167,
+            "sim": 0.279,
+            "market": 0.501,
+            "actual": 0.509
+          },
+          {
+            "bin": "35-45%",
+            "n": 148,
+            "sim": 0.396,
+            "market": 0.5,
+            "actual": 0.466
+          },
+          {
+            "bin": "45-55%",
+            "n": 155,
+            "sim": 0.501,
+            "market": 0.499,
+            "actual": 0.568
+          },
+          {
+            "bin": "55-65%",
+            "n": 155,
+            "sim": 0.599,
+            "market": 0.5,
+            "actual": 0.49
+          },
+          {
+            "bin": "65-80%",
+            "n": 143,
+            "sim": 0.713,
+            "market": 0.5,
+            "actual": 0.51
+          },
+          {
+            "bin": "80-100%",
+            "n": 46,
+            "sim": 0.854,
+            "market": 0.501,
+            "actual": 0.478
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 782,
+            "record": "384-378-20",
+            "winRate": 0.504,
+            "units": -24.3,
+            "roi": -0.031
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 730,
+            "record": "356-357-17",
+            "winRate": 0.499,
+            "units": -28.8,
+            "roi": -0.039
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 646,
+            "record": "316-316-14",
+            "winRate": 0.5,
+            "units": -24.3,
+            "roi": -0.038
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 215,
+              "logLoss": {
+                "sim": 0.787,
+                "market": 0.69,
+                "blend": 0.712
+              },
+              "brier": {
+                "sim": 0.287,
+                "market": 0.248
+              },
+              "meanLean": -0.033
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 191,
+                "record": "93-92-6",
+                "winRate": 0.503,
+                "units": -3.9,
+                "roi": -0.02
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 177,
+                "record": "84-88-5",
+                "winRate": 0.488,
+                "units": -8,
+                "roi": -0.045
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 153,
+                "record": "71-77-5",
+                "winRate": 0.48,
+                "units": -9.2,
+                "roi": -0.06
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 213,
+              "logLoss": {
+                "sim": 0.833,
+                "market": 0.693,
+                "blend": 0.728
+              },
+              "brier": {
+                "sim": 0.303,
+                "market": 0.25
+              },
+              "meanLean": -0.03
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 201,
+                "record": "91-100-10",
+                "winRate": 0.476,
+                "units": -16.7,
+                "roi": -0.083
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 184,
+                "record": "86-90-8",
+                "winRate": 0.489,
+                "units": -11.4,
+                "roi": -0.062
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 164,
+                "record": "75-82-7",
+                "winRate": 0.478,
+                "units": -13.5,
+                "roi": -0.082
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.786,
+                "market": 0.695,
+                "blend": 0.713
+              },
+              "brier": {
+                "sim": 0.287,
+                "market": 0.251
+              },
+              "meanLean": 0.012
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 199,
+                "record": "100-96-3",
+                "winRate": 0.51,
+                "units": -4.7,
+                "roi": -0.024
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 190,
+                "record": "93-94-3",
+                "winRate": 0.497,
+                "units": -9,
+                "roi": -0.047
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 171,
+                "record": "86-84-1",
+                "winRate": 0.506,
+                "units": -5.3,
+                "roi": -0.031
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.761,
+                "market": 0.691,
+                "blend": 0.699
+              },
+              "brier": {
+                "sim": 0.273,
+                "market": 0.249
+              },
+              "meanLean": 0
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 191,
+                "record": "100-90-1",
+                "winRate": 0.526,
+                "units": 1,
+                "roi": 0.005
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 179,
+                "record": "93-85-1",
+                "winRate": 0.522,
+                "units": -0.4,
+                "roi": -0.002
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 158,
+                "record": "84-73-1",
+                "winRate": 0.535,
+                "units": 3.7,
+                "roi": 0.023
+              }
+            ]
+          }
+        }
+      },
+      "total": {
+        "accuracy": {
+          "games": 888,
+          "logLoss": {
+            "sim": 0.747,
+            "market": 0.693,
+            "blend": 0.707
+          },
+          "brier": {
+            "sim": 0.274,
+            "market": 0.25
+          },
+          "meanLean": 0.058
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 0,
+            "sim": 0,
+            "market": 0,
+            "actual": 0
+          },
+          {
+            "bin": "20-35%",
+            "n": 52,
+            "sim": 0.303,
+            "market": 0.501,
+            "actual": 0.558
+          },
+          {
+            "bin": "35-45%",
+            "n": 150,
+            "sim": 0.404,
+            "market": 0.499,
+            "actual": 0.507
+          },
+          {
+            "bin": "45-55%",
+            "n": 230,
+            "sim": 0.502,
+            "market": 0.501,
+            "actual": 0.526
+          },
+          {
+            "bin": "55-65%",
+            "n": 219,
+            "sim": 0.6,
+            "market": 0.5,
+            "actual": 0.479
+          },
+          {
+            "bin": "65-80%",
+            "n": 195,
+            "sim": 0.703,
+            "market": 0.501,
+            "actual": 0.472
+          },
+          {
+            "bin": "80-100%",
+            "n": 42,
+            "sim": 0.834,
+            "market": 0.5,
+            "actual": 0.595
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 753,
+            "record": "358-389-6",
+            "winRate": 0.479,
+            "units": -60.3,
+            "roi": -0.08
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 671,
+            "record": "324-343-4",
+            "winRate": 0.486,
+            "units": -45.6,
+            "roi": -0.068
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 537,
+            "record": "249-285-3",
+            "winRate": 0.466,
+            "units": -56.3,
+            "roi": -0.105
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.753,
+                "market": 0.693,
+                "blend": 0.71
+              },
+              "brier": {
+                "sim": 0.278,
+                "market": 0.25
+              },
+              "meanLean": 0.056
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 188,
+                "record": "87-99-2",
+                "winRate": 0.468,
+                "units": -16.3,
+                "roi": -0.087
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 167,
+                "record": "79-87-1",
+                "winRate": 0.476,
+                "units": -12,
+                "roi": -0.072
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 134,
+                "record": "57-76-1",
+                "winRate": 0.429,
+                "units": -21.5,
+                "roi": -0.161
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.758,
+                "market": 0.693,
+                "blend": 0.707
+              },
+              "brier": {
+                "sim": 0.278,
+                "market": 0.25
+              },
+              "meanLean": 0.079
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 191,
+                "record": "95-94-2",
+                "winRate": 0.503,
+                "units": -7.7,
+                "roi": -0.04
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 166,
+                "record": "85-80-1",
+                "winRate": 0.515,
+                "units": -2.8,
+                "roi": -0.017
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 141,
+                "record": "69-71-1",
+                "winRate": 0.493,
+                "units": -8.3,
+                "roi": -0.059
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.756,
+                "market": 0.692,
+                "blend": 0.712
+              },
+              "brier": {
+                "sim": 0.278,
+                "market": 0.25
+              },
+              "meanLean": 0.046
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 189,
+                "record": "85-102-2",
+                "winRate": 0.455,
+                "units": -24.9,
+                "roi": -0.132
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 172,
+                "record": "77-93-2",
+                "winRate": 0.453,
+                "units": -23.1,
+                "roi": -0.134
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 137,
+                "record": "60-76-1",
+                "winRate": 0.441,
+                "units": -21.6,
+                "roi": -0.157
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.722,
+                "market": 0.694,
+                "blend": 0.698
+              },
+              "brier": {
+                "sim": 0.263,
+                "market": 0.25
+              },
+              "meanLean": 0.051
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 185,
+                "record": "91-94-0",
+                "winRate": 0.492,
+                "units": -11.3,
+                "roi": -0.061
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 166,
+                "record": "83-83-0",
+                "winRate": 0.5,
+                "units": -7.7,
+                "roi": -0.046
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 125,
+                "record": "63-62-0",
+                "winRate": 0.504,
+                "units": -4.9,
+                "roi": -0.039
+              }
+            ]
+          }
+        }
+      }
+    },
+    "pure-model": {
+      "games": 895,
+      "sims": 2000,
+      "moneyline": {
+        "accuracy": {
+          "games": 893,
+          "logLoss": {
+            "sim": 0.64,
+            "market": 0.597,
+            "blend": 0.612
+          },
+          "brier": {
+            "sim": 0.225,
+            "market": 0.206
+          },
+          "meanLean": -0.008
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 31,
+            "sim": 0.153,
+            "market": 0.226,
+            "actual": 0.355
+          },
+          {
+            "bin": "20-35%",
+            "n": 125,
+            "sim": 0.29,
+            "market": 0.342,
+            "actual": 0.376
+          },
+          {
+            "bin": "35-45%",
+            "n": 141,
+            "sim": 0.405,
+            "market": 0.432,
+            "actual": 0.397
+          },
+          {
+            "bin": "45-55%",
+            "n": 174,
+            "sim": 0.499,
+            "market": 0.518,
+            "actual": 0.506
+          },
+          {
+            "bin": "55-65%",
+            "n": 147,
+            "sim": 0.6,
+            "market": 0.599,
+            "actual": 0.592
+          },
+          {
+            "bin": "65-80%",
+            "n": 185,
+            "sim": 0.718,
+            "market": 0.699,
+            "actual": 0.714
+          },
+          {
+            "bin": "80-100%",
+            "n": 90,
+            "sim": 0.853,
+            "market": 0.794,
+            "actual": 0.811
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 664,
+            "record": "279-383-2",
+            "winRate": 0.421,
+            "units": -85.1,
+            "roi": -0.128
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 541,
+            "record": "219-321-1",
+            "winRate": 0.406,
+            "units": -77.1,
+            "roi": -0.142
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 381,
+            "record": "147-234-0",
+            "winRate": 0.386,
+            "units": -70.6,
+            "roi": -0.185
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.643,
+                "market": 0.595,
+                "blend": 0.614
+              },
+              "brier": {
+                "sim": 0.226,
+                "market": 0.205
+              },
+              "meanLean": -0.014
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 161,
+                "record": "59-101-1",
+                "winRate": 0.369,
+                "units": -33,
+                "roi": -0.205
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 129,
+                "record": "48-81-0",
+                "winRate": 0.372,
+                "units": -28.6,
+                "roi": -0.221
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 85,
+                "record": "27-58-0",
+                "winRate": 0.318,
+                "units": -26.8,
+                "roi": -0.315
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.669,
+                "market": 0.621,
+                "blend": 0.637
+              },
+              "brier": {
+                "sim": 0.239,
+                "market": 0.216
+              },
+              "meanLean": -0.01
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 170,
+                "record": "75-95-0",
+                "winRate": 0.441,
+                "units": -10.8,
+                "roi": -0.063
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 143,
+                "record": "58-85-0",
+                "winRate": 0.406,
+                "units": -15,
+                "roi": -0.105
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 102,
+                "record": "41-61-0",
+                "winRate": 0.402,
+                "units": -11.3,
+                "roi": -0.111
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.593,
+                "market": 0.556,
+                "blend": 0.569
+              },
+              "brier": {
+                "sim": 0.203,
+                "market": 0.186
+              },
+              "meanLean": 0.002
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 167,
+                "record": "74-93-0",
+                "winRate": 0.443,
+                "units": -35.5,
+                "roi": -0.213
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 134,
+                "record": "58-76-0",
+                "winRate": 0.433,
+                "units": -30.3,
+                "roi": -0.226
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 94,
+                "record": "37-57-0",
+                "winRate": 0.394,
+                "units": -28.6,
+                "roi": -0.304
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.654,
+                "market": 0.616,
+                "blend": 0.628
+              },
+              "brier": {
+                "sim": 0.23,
+                "market": 0.216
+              },
+              "meanLean": -0.009
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 166,
+                "record": "71-94-1",
+                "winRate": 0.43,
+                "units": -5.8,
+                "roi": -0.035
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 135,
+                "record": "55-79-1",
+                "winRate": 0.41,
+                "units": -3.3,
+                "roi": -0.024
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 100,
+                "record": "42-58-0",
+                "winRate": 0.42,
+                "units": -3.9,
+                "roi": -0.039
+              }
+            ]
+          }
+        }
+      },
+      "spread": {
+        "accuracy": {
+          "games": 872,
+          "logLoss": {
+            "sim": 0.73,
+            "market": 0.692,
+            "blend": 0.703
+          },
+          "brier": {
+            "sim": 0.267,
+            "market": 0.25
+          },
+          "meanLean": -0.011
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 5,
+            "sim": 0.16,
+            "market": 0.497,
+            "actual": 0.8
+          },
+          {
+            "bin": "20-35%",
+            "n": 92,
+            "sim": 0.291,
+            "market": 0.5,
+            "actual": 0.576
+          },
+          {
+            "bin": "35-45%",
+            "n": 228,
+            "sim": 0.406,
+            "market": 0.5,
+            "actual": 0.5
+          },
+          {
+            "bin": "45-55%",
+            "n": 292,
+            "sim": 0.499,
+            "market": 0.499,
+            "actual": 0.493
+          },
+          {
+            "bin": "55-65%",
+            "n": 178,
+            "sim": 0.598,
+            "market": 0.502,
+            "actual": 0.494
+          },
+          {
+            "bin": "65-80%",
+            "n": 76,
+            "sim": 0.699,
+            "market": 0.5,
+            "actual": 0.513
+          },
+          {
+            "bin": "80-100%",
+            "n": 1,
+            "sim": 0.894,
+            "market": 0.5,
+            "actual": 1
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 709,
+            "record": "334-360-15",
+            "winRate": 0.481,
+            "units": -51.2,
+            "roi": -0.072
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 585,
+            "record": "276-295-14",
+            "winRate": 0.483,
+            "units": -39.9,
+            "roi": -0.068
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 450,
+            "record": "213-223-14",
+            "winRate": 0.489,
+            "units": -26.4,
+            "roi": -0.059
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 215,
+              "logLoss": {
+                "sim": 0.722,
+                "market": 0.69,
+                "blend": 0.698
+              },
+              "brier": {
+                "sim": 0.263,
+                "market": 0.248
+              },
+              "meanLean": -0.017
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 175,
+                "record": "85-84-6",
+                "winRate": 0.503,
+                "units": -3.6,
+                "roi": -0.02
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 140,
+                "record": "67-67-6",
+                "winRate": 0.5,
+                "units": -3.7,
+                "roi": -0.026
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 102,
+                "record": "47-49-6",
+                "winRate": 0.49,
+                "units": -5,
+                "roi": -0.049
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 213,
+              "logLoss": {
+                "sim": 0.743,
+                "market": 0.693,
+                "blend": 0.709
+              },
+              "brier": {
+                "sim": 0.273,
+                "market": 0.25
+              },
+              "meanLean": -0.013
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 179,
+                "record": "81-91-7",
+                "winRate": 0.471,
+                "units": -16.2,
+                "roi": -0.09
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 152,
+                "record": "68-77-7",
+                "winRate": 0.469,
+                "units": -14.3,
+                "roi": -0.094
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 122,
+                "record": "53-62-7",
+                "winRate": 0.461,
+                "units": -13.1,
+                "roi": -0.108
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.714,
+                "market": 0.695,
+                "blend": 0.697
+              },
+              "brier": {
+                "sim": 0.26,
+                "market": 0.251
+              },
+              "meanLean": -0.002
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 181,
+                "record": "88-92-1",
+                "winRate": 0.489,
+                "units": -11.2,
+                "roi": -0.062
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 145,
+                "record": "72-72-1",
+                "winRate": 0.5,
+                "units": -5.7,
+                "roi": -0.04
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 110,
+                "record": "56-53-1",
+                "winRate": 0.514,
+                "units": -1.6,
+                "roi": -0.014
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.74,
+                "market": 0.691,
+                "blend": 0.706
+              },
+              "brier": {
+                "sim": 0.271,
+                "market": 0.249
+              },
+              "meanLean": -0.014
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 174,
+                "record": "80-93-1",
+                "winRate": 0.462,
+                "units": -20.2,
+                "roi": -0.116
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 148,
+                "record": "69-79-0",
+                "winRate": 0.466,
+                "units": -16.1,
+                "roi": -0.109
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 116,
+                "record": "57-59-0",
+                "winRate": 0.491,
+                "units": -6.6,
+                "roi": -0.057
+              }
+            ]
+          }
+        }
+      },
+      "total": {
+        "accuracy": {
+          "games": 888,
+          "logLoss": {
+            "sim": 0.715,
+            "market": 0.693,
+            "blend": 0.698
+          },
+          "brier": {
+            "sim": 0.26,
+            "market": 0.25
+          },
+          "meanLean": 0.055
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 0,
+            "sim": 0,
+            "market": 0,
+            "actual": 0
+          },
+          {
+            "bin": "20-35%",
+            "n": 15,
+            "sim": 0.315,
+            "market": 0.503,
+            "actual": 0.4
+          },
+          {
+            "bin": "35-45%",
+            "n": 76,
+            "sim": 0.414,
+            "market": 0.499,
+            "actual": 0.539
+          },
+          {
+            "bin": "45-55%",
+            "n": 337,
+            "sim": 0.507,
+            "market": 0.5,
+            "actual": 0.496
+          },
+          {
+            "bin": "55-65%",
+            "n": 337,
+            "sim": 0.596,
+            "market": 0.501,
+            "actual": 0.504
+          },
+          {
+            "bin": "65-80%",
+            "n": 122,
+            "sim": 0.694,
+            "market": 0.501,
+            "actual": 0.516
+          },
+          {
+            "bin": "80-100%",
+            "n": 1,
+            "sim": 0.832,
+            "market": 0.511,
+            "actual": 1
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 697,
+            "record": "353-339-5",
+            "winRate": 0.51,
+            "units": -15.3,
+            "roi": -0.022
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 550,
+            "record": "274-271-5",
+            "winRate": 0.503,
+            "units": -19.2,
+            "roi": -0.035
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 400,
+            "record": "191-206-3",
+            "winRate": 0.481,
+            "units": -30.4,
+            "roi": -0.076
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.72,
+                "market": 0.693,
+                "blend": 0.7
+              },
+              "brier": {
+                "sim": 0.263,
+                "market": 0.25
+              },
+              "meanLean": 0.062
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 179,
+                "record": "87-90-2",
+                "winRate": 0.492,
+                "units": -7.5,
+                "roi": -0.042
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 146,
+                "record": "70-74-2",
+                "winRate": 0.486,
+                "units": -7.4,
+                "roi": -0.05
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 110,
+                "record": "49-59-2",
+                "winRate": 0.454,
+                "units": -12.5,
+                "roi": -0.114
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.734,
+                "market": 0.693,
+                "blend": 0.705
+              },
+              "brier": {
+                "sim": 0.269,
+                "market": 0.25
+              },
+              "meanLean": 0.083
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 188,
+                "record": "90-96-2",
+                "winRate": 0.484,
+                "units": -14.3,
+                "roi": -0.076
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 162,
+                "record": "77-83-2",
+                "winRate": 0.481,
+                "units": -13.2,
+                "roi": -0.081
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 125,
+                "record": "58-66-1",
+                "winRate": 0.468,
+                "units": -13.3,
+                "roi": -0.106
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.703,
+                "market": 0.692,
+                "blend": 0.693
+              },
+              "brier": {
+                "sim": 0.254,
+                "market": 0.25
+              },
+              "meanLean": 0.03
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 160,
+                "record": "85-74-1",
+                "winRate": 0.535,
+                "units": 3.1,
+                "roi": 0.019
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 114,
+                "record": "60-53-1",
+                "winRate": 0.531,
+                "units": 1.5,
+                "roi": 0.013
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 77,
+                "record": "38-39-0",
+                "winRate": 0.494,
+                "units": -4.5,
+                "roi": -0.058
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.703,
+                "market": 0.694,
+                "blend": 0.694
+              },
+              "brier": {
+                "sim": 0.254,
+                "market": 0.25
+              },
+              "meanLean": 0.045
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 170,
+                "record": "91-79-0",
+                "winRate": 0.535,
+                "units": 3.5,
+                "roi": 0.021
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 128,
+                "record": "67-61-0",
+                "winRate": 0.523,
+                "units": -0.2,
+                "roi": -0.001
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 88,
+                "record": "46-42-0",
+                "winRate": 0.523,
+                "units": -0.1,
+                "roi": -0.001
+              }
+            ]
+          }
+        }
+      }
+    },
+    "sharp": {
+      "games": 895,
+      "sims": 2000,
+      "moneyline": {
+        "accuracy": {
+          "games": 893,
+          "logLoss": {
+            "sim": 0.64,
+            "market": 0.597,
+            "blend": 0.612
+          },
+          "brier": {
+            "sim": 0.225,
+            "market": 0.206
+          },
+          "meanLean": -0.008
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 31,
+            "sim": 0.153,
+            "market": 0.226,
+            "actual": 0.355
+          },
+          {
+            "bin": "20-35%",
+            "n": 125,
+            "sim": 0.29,
+            "market": 0.342,
+            "actual": 0.376
+          },
+          {
+            "bin": "35-45%",
+            "n": 141,
+            "sim": 0.405,
+            "market": 0.432,
+            "actual": 0.397
+          },
+          {
+            "bin": "45-55%",
+            "n": 174,
+            "sim": 0.499,
+            "market": 0.518,
+            "actual": 0.506
+          },
+          {
+            "bin": "55-65%",
+            "n": 147,
+            "sim": 0.6,
+            "market": 0.599,
+            "actual": 0.592
+          },
+          {
+            "bin": "65-80%",
+            "n": 185,
+            "sim": 0.718,
+            "market": 0.699,
+            "actual": 0.714
+          },
+          {
+            "bin": "80-100%",
+            "n": 90,
+            "sim": 0.853,
+            "market": 0.794,
+            "actual": 0.811
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 664,
+            "record": "279-383-2",
+            "winRate": 0.421,
+            "units": -85.1,
+            "roi": -0.128
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 541,
+            "record": "219-321-1",
+            "winRate": 0.406,
+            "units": -77.1,
+            "roi": -0.142
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 381,
+            "record": "147-234-0",
+            "winRate": 0.386,
+            "units": -70.6,
+            "roi": -0.185
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.643,
+                "market": 0.595,
+                "blend": 0.614
+              },
+              "brier": {
+                "sim": 0.226,
+                "market": 0.205
+              },
+              "meanLean": -0.014
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 161,
+                "record": "59-101-1",
+                "winRate": 0.369,
+                "units": -33,
+                "roi": -0.205
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 129,
+                "record": "48-81-0",
+                "winRate": 0.372,
+                "units": -28.6,
+                "roi": -0.221
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 85,
+                "record": "27-58-0",
+                "winRate": 0.318,
+                "units": -26.8,
+                "roi": -0.315
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.669,
+                "market": 0.621,
+                "blend": 0.637
+              },
+              "brier": {
+                "sim": 0.239,
+                "market": 0.216
+              },
+              "meanLean": -0.01
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 170,
+                "record": "75-95-0",
+                "winRate": 0.441,
+                "units": -10.8,
+                "roi": -0.063
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 143,
+                "record": "58-85-0",
+                "winRate": 0.406,
+                "units": -15,
+                "roi": -0.105
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 102,
+                "record": "41-61-0",
+                "winRate": 0.402,
+                "units": -11.3,
+                "roi": -0.111
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.593,
+                "market": 0.556,
+                "blend": 0.569
+              },
+              "brier": {
+                "sim": 0.203,
+                "market": 0.186
+              },
+              "meanLean": 0.002
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 167,
+                "record": "74-93-0",
+                "winRate": 0.443,
+                "units": -35.5,
+                "roi": -0.213
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 134,
+                "record": "58-76-0",
+                "winRate": 0.433,
+                "units": -30.3,
+                "roi": -0.226
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 94,
+                "record": "37-57-0",
+                "winRate": 0.394,
+                "units": -28.6,
+                "roi": -0.304
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.654,
+                "market": 0.616,
+                "blend": 0.628
+              },
+              "brier": {
+                "sim": 0.23,
+                "market": 0.216
+              },
+              "meanLean": -0.009
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 166,
+                "record": "71-94-1",
+                "winRate": 0.43,
+                "units": -5.8,
+                "roi": -0.035
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 135,
+                "record": "55-79-1",
+                "winRate": 0.41,
+                "units": -3.3,
+                "roi": -0.024
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 100,
+                "record": "42-58-0",
+                "winRate": 0.42,
+                "units": -3.9,
+                "roi": -0.039
+              }
+            ]
+          }
+        }
+      },
+      "spread": {
+        "accuracy": {
+          "games": 872,
+          "logLoss": {
+            "sim": 0.73,
+            "market": 0.692,
+            "blend": 0.703
+          },
+          "brier": {
+            "sim": 0.267,
+            "market": 0.25
+          },
+          "meanLean": -0.011
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 5,
+            "sim": 0.16,
+            "market": 0.497,
+            "actual": 0.8
+          },
+          {
+            "bin": "20-35%",
+            "n": 92,
+            "sim": 0.291,
+            "market": 0.5,
+            "actual": 0.576
+          },
+          {
+            "bin": "35-45%",
+            "n": 228,
+            "sim": 0.406,
+            "market": 0.5,
+            "actual": 0.5
+          },
+          {
+            "bin": "45-55%",
+            "n": 292,
+            "sim": 0.499,
+            "market": 0.499,
+            "actual": 0.493
+          },
+          {
+            "bin": "55-65%",
+            "n": 178,
+            "sim": 0.598,
+            "market": 0.502,
+            "actual": 0.494
+          },
+          {
+            "bin": "65-80%",
+            "n": 76,
+            "sim": 0.699,
+            "market": 0.5,
+            "actual": 0.513
+          },
+          {
+            "bin": "80-100%",
+            "n": 1,
+            "sim": 0.894,
+            "market": 0.5,
+            "actual": 1
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 709,
+            "record": "334-360-15",
+            "winRate": 0.481,
+            "units": -51.2,
+            "roi": -0.072
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 585,
+            "record": "276-295-14",
+            "winRate": 0.483,
+            "units": -39.9,
+            "roi": -0.068
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 450,
+            "record": "213-223-14",
+            "winRate": 0.489,
+            "units": -26.4,
+            "roi": -0.059
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 215,
+              "logLoss": {
+                "sim": 0.722,
+                "market": 0.69,
+                "blend": 0.698
+              },
+              "brier": {
+                "sim": 0.263,
+                "market": 0.248
+              },
+              "meanLean": -0.017
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 175,
+                "record": "85-84-6",
+                "winRate": 0.503,
+                "units": -3.6,
+                "roi": -0.02
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 140,
+                "record": "67-67-6",
+                "winRate": 0.5,
+                "units": -3.7,
+                "roi": -0.026
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 102,
+                "record": "47-49-6",
+                "winRate": 0.49,
+                "units": -5,
+                "roi": -0.049
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 213,
+              "logLoss": {
+                "sim": 0.743,
+                "market": 0.693,
+                "blend": 0.709
+              },
+              "brier": {
+                "sim": 0.273,
+                "market": 0.25
+              },
+              "meanLean": -0.013
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 179,
+                "record": "81-91-7",
+                "winRate": 0.471,
+                "units": -16.2,
+                "roi": -0.09
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 152,
+                "record": "68-77-7",
+                "winRate": 0.469,
+                "units": -14.3,
+                "roi": -0.094
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 122,
+                "record": "53-62-7",
+                "winRate": 0.461,
+                "units": -13.1,
+                "roi": -0.108
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.714,
+                "market": 0.695,
+                "blend": 0.697
+              },
+              "brier": {
+                "sim": 0.26,
+                "market": 0.251
+              },
+              "meanLean": -0.002
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 181,
+                "record": "88-92-1",
+                "winRate": 0.489,
+                "units": -11.2,
+                "roi": -0.062
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 145,
+                "record": "72-72-1",
+                "winRate": 0.5,
+                "units": -5.7,
+                "roi": -0.04
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 110,
+                "record": "56-53-1",
+                "winRate": 0.514,
+                "units": -1.6,
+                "roi": -0.014
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.74,
+                "market": 0.691,
+                "blend": 0.706
+              },
+              "brier": {
+                "sim": 0.271,
+                "market": 0.249
+              },
+              "meanLean": -0.014
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 174,
+                "record": "80-93-1",
+                "winRate": 0.462,
+                "units": -20.2,
+                "roi": -0.116
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 148,
+                "record": "69-79-0",
+                "winRate": 0.466,
+                "units": -16.1,
+                "roi": -0.109
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 116,
+                "record": "57-59-0",
+                "winRate": 0.491,
+                "units": -6.6,
+                "roi": -0.057
+              }
+            ]
+          }
+        }
+      },
+      "total": {
+        "accuracy": {
+          "games": 888,
+          "logLoss": {
+            "sim": 0.715,
+            "market": 0.693,
+            "blend": 0.698
+          },
+          "brier": {
+            "sim": 0.26,
+            "market": 0.25
+          },
+          "meanLean": 0.055
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 0,
+            "sim": 0,
+            "market": 0,
+            "actual": 0
+          },
+          {
+            "bin": "20-35%",
+            "n": 15,
+            "sim": 0.315,
+            "market": 0.503,
+            "actual": 0.4
+          },
+          {
+            "bin": "35-45%",
+            "n": 76,
+            "sim": 0.414,
+            "market": 0.499,
+            "actual": 0.539
+          },
+          {
+            "bin": "45-55%",
+            "n": 337,
+            "sim": 0.507,
+            "market": 0.5,
+            "actual": 0.496
+          },
+          {
+            "bin": "55-65%",
+            "n": 337,
+            "sim": 0.596,
+            "market": 0.501,
+            "actual": 0.504
+          },
+          {
+            "bin": "65-80%",
+            "n": 122,
+            "sim": 0.694,
+            "market": 0.501,
+            "actual": 0.516
+          },
+          {
+            "bin": "80-100%",
+            "n": 1,
+            "sim": 0.832,
+            "market": 0.511,
+            "actual": 1
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 697,
+            "record": "353-339-5",
+            "winRate": 0.51,
+            "units": -15.3,
+            "roi": -0.022
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 550,
+            "record": "274-271-5",
+            "winRate": 0.503,
+            "units": -19.2,
+            "roi": -0.035
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 400,
+            "record": "191-206-3",
+            "winRate": 0.481,
+            "units": -30.4,
+            "roi": -0.076
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.72,
+                "market": 0.693,
+                "blend": 0.7
+              },
+              "brier": {
+                "sim": 0.263,
+                "market": 0.25
+              },
+              "meanLean": 0.062
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 179,
+                "record": "87-90-2",
+                "winRate": 0.492,
+                "units": -7.5,
+                "roi": -0.042
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 146,
+                "record": "70-74-2",
+                "winRate": 0.486,
+                "units": -7.4,
+                "roi": -0.05
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 110,
+                "record": "49-59-2",
+                "winRate": 0.454,
+                "units": -12.5,
+                "roi": -0.114
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.734,
+                "market": 0.693,
+                "blend": 0.705
+              },
+              "brier": {
+                "sim": 0.269,
+                "market": 0.25
+              },
+              "meanLean": 0.083
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 188,
+                "record": "90-96-2",
+                "winRate": 0.484,
+                "units": -14.3,
+                "roi": -0.076
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 162,
+                "record": "77-83-2",
+                "winRate": 0.481,
+                "units": -13.2,
+                "roi": -0.081
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 125,
+                "record": "58-66-1",
+                "winRate": 0.468,
+                "units": -13.3,
+                "roi": -0.106
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.703,
+                "market": 0.692,
+                "blend": 0.693
+              },
+              "brier": {
+                "sim": 0.254,
+                "market": 0.25
+              },
+              "meanLean": 0.03
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 160,
+                "record": "85-74-1",
+                "winRate": 0.535,
+                "units": 3.1,
+                "roi": 0.019
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 114,
+                "record": "60-53-1",
+                "winRate": 0.531,
+                "units": 1.5,
+                "roi": 0.013
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 77,
+                "record": "38-39-0",
+                "winRate": 0.494,
+                "units": -4.5,
+                "roi": -0.058
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.703,
+                "market": 0.694,
+                "blend": 0.694
+              },
+              "brier": {
+                "sim": 0.254,
+                "market": 0.25
+              },
+              "meanLean": 0.045
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 170,
+                "record": "91-79-0",
+                "winRate": 0.535,
+                "units": 3.5,
+                "roi": 0.021
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 128,
+                "record": "67-61-0",
+                "winRate": 0.523,
+                "units": -0.2,
+                "roi": -0.001
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 88,
+                "record": "46-42-0",
+                "winRate": 0.523,
+                "units": -0.1,
+                "roi": -0.001
+              }
+            ]
+          }
+        }
+      }
+    },
+    "weatherman": {
+      "games": 895,
+      "sims": 2000,
+      "moneyline": {
+        "accuracy": {
+          "games": 893,
+          "logLoss": {
+            "sim": 0.64,
+            "market": 0.597,
+            "blend": 0.612
+          },
+          "brier": {
+            "sim": 0.225,
+            "market": 0.206
+          },
+          "meanLean": -0.008
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 31,
+            "sim": 0.153,
+            "market": 0.226,
+            "actual": 0.355
+          },
+          {
+            "bin": "20-35%",
+            "n": 127,
+            "sim": 0.291,
+            "market": 0.342,
+            "actual": 0.378
+          },
+          {
+            "bin": "35-45%",
+            "n": 139,
+            "sim": 0.406,
+            "market": 0.432,
+            "actual": 0.388
+          },
+          {
+            "bin": "45-55%",
+            "n": 176,
+            "sim": 0.5,
+            "market": 0.518,
+            "actual": 0.517
+          },
+          {
+            "bin": "55-65%",
+            "n": 148,
+            "sim": 0.601,
+            "market": 0.6,
+            "actual": 0.595
+          },
+          {
+            "bin": "65-80%",
+            "n": 183,
+            "sim": 0.719,
+            "market": 0.701,
+            "actual": 0.71
+          },
+          {
+            "bin": "80-100%",
+            "n": 89,
+            "sim": 0.853,
+            "market": 0.794,
+            "actual": 0.809
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 666,
+            "record": "277-387-2",
+            "winRate": 0.417,
+            "units": -89.9,
+            "roi": -0.135
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 544,
+            "record": "221-322-1",
+            "winRate": 0.407,
+            "units": -76.7,
+            "roi": -0.141
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 383,
+            "record": "147-236-0",
+            "winRate": 0.384,
+            "units": -69.3,
+            "roi": -0.181
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.644,
+                "market": 0.595,
+                "blend": 0.614
+              },
+              "brier": {
+                "sim": 0.227,
+                "market": 0.205
+              },
+              "meanLean": -0.014
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 160,
+                "record": "58-101-1",
+                "winRate": 0.365,
+                "units": -33.6,
+                "roi": -0.21
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 131,
+                "record": "49-82-0",
+                "winRate": 0.374,
+                "units": -28.4,
+                "roi": -0.217
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 86,
+                "record": "27-59-0",
+                "winRate": 0.314,
+                "units": -24.5,
+                "roi": -0.285
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.668,
+                "market": 0.621,
+                "blend": 0.637
+              },
+              "brier": {
+                "sim": 0.238,
+                "market": 0.216
+              },
+              "meanLean": -0.009
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 170,
+                "record": "75-95-0",
+                "winRate": 0.441,
+                "units": -10.8,
+                "roi": -0.063
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 143,
+                "record": "58-85-0",
+                "winRate": 0.406,
+                "units": -15,
+                "roi": -0.105
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 103,
+                "record": "41-62-0",
+                "winRate": 0.398,
+                "units": -12.3,
+                "roi": -0.12
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.593,
+                "market": 0.556,
+                "blend": 0.569
+              },
+              "brier": {
+                "sim": 0.203,
+                "market": 0.186
+              },
+              "meanLean": 0.002
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 168,
+                "record": "74-94-0",
+                "winRate": 0.44,
+                "units": -36.5,
+                "roi": -0.217
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 133,
+                "record": "58-75-0",
+                "winRate": 0.436,
+                "units": -29.3,
+                "roi": -0.22
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 93,
+                "record": "37-56-0",
+                "winRate": 0.398,
+                "units": -27.6,
+                "roi": -0.296
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.655,
+                "market": 0.616,
+                "blend": 0.629
+              },
+              "brier": {
+                "sim": 0.23,
+                "market": 0.216
+              },
+              "meanLean": -0.01
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 168,
+                "record": "70-97-1",
+                "winRate": 0.419,
+                "units": -9,
+                "roi": -0.054
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 137,
+                "record": "56-80-1",
+                "winRate": 0.412,
+                "units": -4.1,
+                "roi": -0.03
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 101,
+                "record": "42-59-0",
+                "winRate": 0.416,
+                "units": -4.9,
+                "roi": -0.049
+              }
+            ]
+          }
+        }
+      },
+      "spread": {
+        "accuracy": {
+          "games": 872,
+          "logLoss": {
+            "sim": 0.73,
+            "market": 0.692,
+            "blend": 0.703
+          },
+          "brier": {
+            "sim": 0.267,
+            "market": 0.25
+          },
+          "meanLean": -0.012
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 5,
+            "sim": 0.16,
+            "market": 0.497,
+            "actual": 0.8
+          },
+          {
+            "bin": "20-35%",
+            "n": 91,
+            "sim": 0.29,
+            "market": 0.5,
+            "actual": 0.571
+          },
+          {
+            "bin": "35-45%",
+            "n": 231,
+            "sim": 0.406,
+            "market": 0.5,
+            "actual": 0.506
+          },
+          {
+            "bin": "45-55%",
+            "n": 290,
+            "sim": 0.499,
+            "market": 0.499,
+            "actual": 0.49
+          },
+          {
+            "bin": "55-65%",
+            "n": 179,
+            "sim": 0.598,
+            "market": 0.502,
+            "actual": 0.492
+          },
+          {
+            "bin": "65-80%",
+            "n": 75,
+            "sim": 0.699,
+            "market": 0.5,
+            "actual": 0.52
+          },
+          {
+            "bin": "80-100%",
+            "n": 1,
+            "sim": 0.887,
+            "market": 0.5,
+            "actual": 1
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 711,
+            "record": "336-360-15",
+            "winRate": 0.483,
+            "units": -49.7,
+            "roi": -0.07
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 587,
+            "record": "275-298-14",
+            "winRate": 0.48,
+            "units": -43.8,
+            "roi": -0.075
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 455,
+            "record": "213-228-14",
+            "winRate": 0.483,
+            "units": -31.4,
+            "roi": -0.069
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 215,
+              "logLoss": {
+                "sim": 0.724,
+                "market": 0.69,
+                "blend": 0.699
+              },
+              "brier": {
+                "sim": 0.264,
+                "market": 0.248
+              },
+              "meanLean": -0.017
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 176,
+                "record": "85-85-6",
+                "winRate": 0.5,
+                "units": -4.8,
+                "roi": -0.027
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 140,
+                "record": "66-68-6",
+                "winRate": 0.493,
+                "units": -5.6,
+                "roi": -0.04
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 104,
+                "record": "47-51-6",
+                "winRate": 0.48,
+                "units": -7,
+                "roi": -0.067
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 213,
+              "logLoss": {
+                "sim": 0.743,
+                "market": 0.693,
+                "blend": 0.709
+              },
+              "brier": {
+                "sim": 0.273,
+                "market": 0.25
+              },
+              "meanLean": -0.013
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 179,
+                "record": "81-91-7",
+                "winRate": 0.471,
+                "units": -16.2,
+                "roi": -0.09
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 152,
+                "record": "68-77-7",
+                "winRate": 0.469,
+                "units": -14.3,
+                "roi": -0.094
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 123,
+                "record": "53-63-7",
+                "winRate": 0.457,
+                "units": -14.1,
+                "roi": -0.115
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.714,
+                "market": 0.695,
+                "blend": 0.697
+              },
+              "brier": {
+                "sim": 0.26,
+                "market": 0.251
+              },
+              "meanLean": -0.002
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 182,
+                "record": "89-92-1",
+                "winRate": 0.492,
+                "units": -10.4,
+                "roi": -0.057
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 146,
+                "record": "72-73-1",
+                "winRate": 0.497,
+                "units": -6.7,
+                "roi": -0.046
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 111,
+                "record": "56-54-1",
+                "winRate": 0.509,
+                "units": -2.6,
+                "roi": -0.023
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 223,
+              "logLoss": {
+                "sim": 0.74,
+                "market": 0.691,
+                "blend": 0.706
+              },
+              "brier": {
+                "sim": 0.271,
+                "market": 0.249
+              },
+              "meanLean": -0.014
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 174,
+                "record": "81-92-1",
+                "winRate": 0.468,
+                "units": -18.4,
+                "roi": -0.106
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 149,
+                "record": "69-80-0",
+                "winRate": 0.463,
+                "units": -17.2,
+                "roi": -0.115
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 117,
+                "record": "57-60-0",
+                "winRate": 0.487,
+                "units": -7.6,
+                "roi": -0.065
+              }
+            ]
+          }
+        }
+      },
+      "total": {
+        "accuracy": {
+          "games": 888,
+          "logLoss": {
+            "sim": 0.712,
+            "market": 0.693,
+            "blend": 0.697
+          },
+          "brier": {
+            "sim": 0.259,
+            "market": 0.25
+          },
+          "meanLean": 0.05
+        },
+        "calibration": [
+          {
+            "bin": "0-20%",
+            "n": 0,
+            "sim": 0,
+            "market": 0,
+            "actual": 0
+          },
+          {
+            "bin": "20-35%",
+            "n": 19,
+            "sim": 0.313,
+            "market": 0.502,
+            "actual": 0.474
+          },
+          {
+            "bin": "35-45%",
+            "n": 83,
+            "sim": 0.413,
+            "market": 0.499,
+            "actual": 0.482
+          },
+          {
+            "bin": "45-55%",
+            "n": 344,
+            "sim": 0.506,
+            "market": 0.5,
+            "actual": 0.506
+          },
+          {
+            "bin": "55-65%",
+            "n": 325,
+            "sim": 0.596,
+            "market": 0.501,
+            "actual": 0.502
+          },
+          {
+            "bin": "65-80%",
+            "n": 116,
+            "sim": 0.693,
+            "market": 0.501,
+            "actual": 0.526
+          },
+          {
+            "bin": "80-100%",
+            "n": 1,
+            "sim": 0.832,
+            "market": 0.511,
+            "actual": 1
+          }
+        ],
+        "betting": [
+          {
+            "tier": "lean",
+            "minEdge": 0.03,
+            "bets": 691,
+            "record": "351-333-7",
+            "winRate": 0.513,
+            "units": -11,
+            "roi": -0.016
+          },
+          {
+            "tier": "play",
+            "minEdge": 0.05,
+            "bets": 550,
+            "record": "276-268-6",
+            "winRate": 0.507,
+            "units": -14.4,
+            "roi": -0.026
+          },
+          {
+            "tier": "strong",
+            "minEdge": 0.08,
+            "bets": 397,
+            "record": "194-199-4",
+            "winRate": 0.494,
+            "units": -20.6,
+            "roi": -0.052
+          }
+        ],
+        "bySeason": {
+          "2022": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.713,
+                "market": 0.693,
+                "blend": 0.697
+              },
+              "brier": {
+                "sim": 0.26,
+                "market": 0.25
+              },
+              "meanLean": 0.055
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 179,
+                "record": "88-89-2",
+                "winRate": 0.497,
+                "units": -5.7,
+                "roi": -0.032
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 143,
+                "record": "70-71-2",
+                "winRate": 0.496,
+                "units": -4.3,
+                "roi": -0.03
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 105,
+                "record": "49-54-2",
+                "winRate": 0.476,
+                "units": -7.4,
+                "roi": -0.071
+              }
+            ]
+          },
+          "2023": {
+            "accuracy": {
+              "games": 222,
+              "logLoss": {
+                "sim": 0.73,
+                "market": 0.693,
+                "blend": 0.703
+              },
+              "brier": {
+                "sim": 0.267,
+                "market": 0.25
+              },
+              "meanLean": 0.079
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 185,
+                "record": "90-93-2",
+                "winRate": 0.492,
+                "units": -11.3,
+                "roi": -0.061
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 164,
+                "record": "80-82-2",
+                "winRate": 0.494,
+                "units": -9.5,
+                "roi": -0.058
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 127,
+                "record": "59-67-1",
+                "winRate": 0.468,
+                "units": -13.3,
+                "roi": -0.105
+              }
+            ]
+          },
+          "2024": {
+            "accuracy": {
+              "games": 221,
+              "logLoss": {
+                "sim": 0.702,
+                "market": 0.692,
+                "blend": 0.692
+              },
+              "brier": {
+                "sim": 0.254,
+                "market": 0.25
+              },
+              "meanLean": 0.027
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 161,
+                "record": "84-74-3",
+                "winRate": 0.532,
+                "units": 2.2,
+                "roi": 0.014
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 116,
+                "record": "60-54-2",
+                "winRate": 0.526,
+                "units": 0.4,
+                "roi": 0.004
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 80,
+                "record": "40-39-1",
+                "winRate": 0.506,
+                "units": -2.7,
+                "roi": -0.034
+              }
+            ]
+          },
+          "2025": {
+            "accuracy": {
+              "games": 224,
+              "logLoss": {
+                "sim": 0.703,
+                "market": 0.694,
+                "blend": 0.694
+              },
+              "brier": {
+                "sim": 0.254,
+                "market": 0.25
+              },
+              "meanLean": 0.04
+            },
+            "betting": [
+              {
+                "tier": "lean",
+                "minEdge": 0.03,
+                "bets": 166,
+                "record": "89-77-0",
+                "winRate": 0.536,
+                "units": 3.8,
+                "roi": 0.023
+              },
+              {
+                "tier": "play",
+                "minEdge": 0.05,
+                "bets": 127,
+                "record": "66-61-0",
+                "winRate": 0.52,
+                "units": -1,
+                "roi": -0.008
+              },
+              {
+                "tier": "strong",
+                "minEdge": 0.08,
+                "bets": 85,
+                "record": "46-39-0",
+                "winRate": 0.541,
+                "units": 2.8,
+                "roi": 0.033
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

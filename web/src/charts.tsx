@@ -244,14 +244,21 @@ export function AltLadder(props: {
   market?: number;
 }) {
   const { margins, n, favorite, market } = props;
-  const rows = Array.from({ length: 11 }, (_, i) => {
-    const line = i + 0.5;
+  // Half-point lines, plus the market line when it is a whole number (it can push).
+  const lines = Array.from({ length: 11 }, (_, i) => i + 0.5);
+  if (market !== undefined && -market > 0 && Number.isInteger(-market) && -market < 11) {
+    lines.push(-market);
+    lines.sort((a, b) => a - b);
+  }
+  const rows = lines.map((line) => {
     const p = shareWhere(margins, n, (m) => m > line);
-    return { line, p };
+    const push = shareWhere(margins, n, (m) => m === line);
+    // Fair price on a whole number: pushes are refunded, so price the win given no push.
+    return { line, p, push, fairP: p / Math.max(1e-9, 1 - push) };
   });
   // The fair line: the spread closest to a coin flip.
   const fairIdx = rows.reduce(
-    (best, r, i) => (Math.abs(r.p - 0.5) < Math.abs(rows[best]!.p - 0.5) ? i : best),
+    (best, r, i) => (Math.abs(r.fairP - 0.5) < Math.abs(rows[best]!.fairP - 0.5) ? i : best),
     0,
   );
   return (
@@ -274,13 +281,16 @@ export function AltLadder(props: {
             <div className="meter">
               <div className={r.p >= 0.5 ? 'fill on' : 'fill'} style={{ width: `${100 * r.p}%` }} />
             </div>
-            <span className="ladder-pct">{pct(r.p)}</span>
-            <span className="ladder-fair muted">{fairAmerican(r.p)}</span>
+            <span className="ladder-pct" title={r.push > 0 ? `Push ${pct(r.push)}` : undefined}>
+              {pct(r.p)}
+            </span>
+            <span className="ladder-fair muted">{fairAmerican(r.fairP)}</span>
           </div>
         ))}
       </div>
       <span className="caption muted">
-        Cover = {favorite} wins by more than the line. Fair = no-vig American price.
+        Cover = {favorite} wins by more than the line. Fair = no-vig American price (on a
+        whole-number line, pushes are refunded).
       </span>
     </section>
   );

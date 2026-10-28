@@ -4,6 +4,8 @@
 # come from the line history the Lines workflow keeps in the Actions cache, topped up with a
 # fresh DraftKings/FanDuel pull here (free tier, no Odds API credits). The cache is per
 # branch, so without that pull a run that can't see the history would publish no lines.
+# Each run also records the forward test (jobs/recordForward.ts) and grades it
+# (pipeline/grade_forward.py), committed with the snapshot so it costs no extra deploy.
 name: Publish snapshot
 
 on:
@@ -61,11 +63,23 @@ jobs:
           key: lines-history-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Build snapshot with forecasts and lines
         run: python publish_web.py ${WEEK:+--week "$WEEK"}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install engine
+        working-directory: .
+        run: npm ci
+      - name: Forward test - record the sim's chances on upcoming games, grade finished ones
+        run: |
+          id=$(python -c "import json; print(json.load(open('../web/public/snapshots/latest.json'))['id'])")
+          (cd .. && npx tsx jobs/recordForward.ts "web/public/snapshots/$id.json" --dir forward-test)
+          python grade_forward.py
       - name: Commit to main
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add ../web/public/snapshots
+          git add ../web/public/snapshots ../forward-test ../docs/forward-test.json
           if git diff --cached --quiet; then
             echo 'No changes'
             exit 0

@@ -492,7 +492,10 @@ export const MODEL_CONFIG = {
      * back once the prop distributions are fixed (docs/props.md).
      */
     valueShading: {
-      enabled: true,
+      /** Off: the 2022-2025 walk-forward backtest (docs/backtest.md) lost money betting the
+       *  sim's disagreements with closing lines in every market, so green would point at
+       *  losing bets. Turn on once the forward test (forwardTest) shows value. */
+      enabled: false,
       minEv: 0.03,
       propMarkets: [] as string[],
     },
@@ -511,6 +514,13 @@ export const MODEL_CONFIG = {
       'player_rush_attempts',
     ],
   },
+
+  /**
+   * Forward test (jobs/recordForward.ts, pipeline/grade_forward.py): each snapshot publish
+   * records the sim's chances on every book's line for games kicking off within this many hours,
+   * replacing that game's earlier record, so the graded record is the last one before kickoff.
+   */
+  forwardTest: { recordWithinHours: 36, sims: 2000 },
 
   /**
    * Line movement signals (engine/src/market/movement.ts). Shown next to the sim's numbers as

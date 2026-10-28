@@ -66,3 +66,12 @@ Standard errors on the over rates are about 0.03 for QB markets and 0.01–0.02 
 cd pipeline && python calibration_targets.py --seasons 2023 2024 2025 --weeks 4 8 12 16
 cd .. && npx tsx jobs/checkProps.ts --n 1000 --out docs/props-check.json
 ```
+
+## Against the books' lines (2026 week 8)
+
+The sim's chance of the over averaged 41% on receptions (books' no-vig chance 48.5%), 44% on receiving yards (50%), 44% on carries (50%) and 48% on rushing yards (50%). Two causes:
+
+- **The sim is a little low on top receivers.** Comparing each team's top-ranked receiver in the sim (ranked by the sim, not by outcome) with what that player did on 2026 weeks 5–7: targets 8.0 vs 8.3, receptions 5.1 vs 5.4, yards 61 vs 64. Second and third receivers are on target. Target shares by depth slot are not the problem: fitted multipliers for WR1–WR5, TE1–TE3 and RB1–RB3 all came out near 1.
+- **The books' lines sit at players' medians, with the overs shaded up.** Without historical prop prices, how much of the gap is book shading can't be measured.
+
+So prop value shading stays off, and props are forward-tested (`forward-test/`, `docs/forward-test.json`): every snapshot publish records the sim's chances on each book's prop lines before kickoff, and the results are graded after the games.
