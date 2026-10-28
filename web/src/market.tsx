@@ -324,11 +324,20 @@ function edgeRow(label: string, m: MarketLine, sim: number): EdgeRow | null {
   };
 }
 
+/** The count tables a run produces (see sim.worker.ts). */
+export interface SimCounts {
+  margins: Counts;
+  totals: Counts;
+  homePts: Counts;
+  awayPts: Counts;
+}
+
 /**
  * Sim probability of each side at the market's line. Pushes are refunded, so they are taken
  * out: P(win | no push).
  */
-export function edges(game: SnapshotGame, margins: Counts, totals: Counts, n: number): EdgeRow[] {
+export function edges(game: SnapshotGame, sims: SimCounts, n: number): EdgeRow[] {
+  const { margins, totals } = sims;
   const rows: EdgeRow[] = [];
   const noPush = (win: number, push: number) => win / Math.max(1e-9, 1 - push);
   for (const m of game.market) {
@@ -348,6 +357,15 @@ export function edges(game: SnapshotGame, margins: Counts, totals: Counts, n: nu
       const push = shareWhere(totals, n, (t) => t === line);
       const r = edgeRow(`${over ? 'Over' : 'Under'} ${line}`, m, noPush(win, push));
       if (r) rows.push(r);
+    } else if (m.market === 'team_totals' && m.line !== null && m.side) {
+      const line = m.line;
+      const over = m.selection === 'over';
+      const pts = m.side === 'home' ? sims.homePts : sims.awayPts;
+      const team = m.side === 'home' ? game.home : game.away;
+      const win = shareWhere(pts, n, (x) => (over ? x > line : x < line));
+      const push = shareWhere(pts, n, (x) => x === line);
+      const r = edgeRow(`${team} ${over ? 'over' : 'under'} ${line}`, m, noPush(win, push));
+      if (r) rows.push(r);
     } else if (m.market === 'h2h') {
       const home = m.selection === 'home';
       const win = shareWhere(margins, n, (x) => (home ? x > 0 : x < 0));
@@ -359,14 +377,9 @@ export function edges(game: SnapshotGame, margins: Counts, totals: Counts, n: nu
   return rows.sort((a, b) => b.edge - a.edge);
 }
 
-export function EdgesCard(props: {
-  game: SnapshotGame;
-  margins: Counts;
-  totals: Counts;
-  n: number;
-}) {
+export function EdgesCard(props: { game: SnapshotGame; agg: SimCounts; n: number }) {
   if (!MODEL_CONFIG.markets.showEdges) return null;
-  const rows = edges(props.game, props.margins, props.totals, props.n);
+  const rows = edges(props.game, props.agg, props.n);
   if (rows.length === 0) return null;
   const source = props.game.market[0]?.noVigSource;
   return (

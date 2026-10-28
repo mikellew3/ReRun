@@ -43,7 +43,7 @@ export const signed = (x: number, digits = 1) =>
 
 const KEY_NUMBERS = new Set([3, 7, 10, 14]);
 
-function Bars(props: {
+export function Bars(props: {
   counts: Counts;
   from: number;
   to: number;
@@ -69,9 +69,10 @@ function Bars(props: {
 }
 
 /** Position (%) of the center of value x among bars from..to. */
-const at = (x: number, from: number, to: number) => ((x - from + 0.5) / (to - from + 1)) * 100;
+export const at = (x: number, from: number, to: number) =>
+  ((x - from + 0.5) / (to - from + 1)) * 100;
 
-function RefLine(props: { x: number; from: number; to: number; label: string }) {
+export function RefLine(props: { x: number; from: number; to: number; label: string }) {
   const left: CSSProperties = { left: `${at(props.x, props.from, props.to)}%` };
   return (
     <>
@@ -83,7 +84,7 @@ function RefLine(props: { x: number; from: number; to: number; label: string }) 
   );
 }
 
-function Stat(props: { value: string; label: string; copper?: boolean }) {
+export function Stat(props: { value: string; label: string; copper?: boolean }) {
   return (
     <div className="stat">
       <span className={props.copper ? 'stat-value num copper' : 'stat-value num'}>

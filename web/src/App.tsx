@@ -20,6 +20,7 @@ import type { Counts } from './charts';
 import { Icon } from './icons';
 import { EdgesCard, MarketCard, marketSpread, marketTotal } from './market';
 import { PropsCard } from './props';
+import { TeamTotals } from './teamTotals';
 import type { Aggregate, WorkerOut } from './sim.worker';
 
 function kickoffLabel(iso: string): string {
@@ -438,12 +439,7 @@ export function App() {
                   dogWin={summary.dogWin}
                 />
 
-                <EdgesCard
-                  game={game}
-                  margins={shown!.margins}
-                  totals={shown!.totals}
-                  n={summary.n}
-                />
+                <EdgesCard game={game} agg={shown!} n={summary.n} />
 
                 <MarginHistogram
                   margins={summary.margins}
@@ -466,6 +462,13 @@ export function App() {
                     market={summary.favSpread}
                   />
                 </div>
+
+                <TeamTotals
+                  game={game}
+                  homePts={shown!.homePts}
+                  awayPts={shown!.awayPts}
+                  n={summary.n}
+                />
 
                 <section className="card">
                   <div className="card-head baseline">

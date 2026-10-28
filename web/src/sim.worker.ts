@@ -34,6 +34,9 @@ export interface Aggregate {
   margins: Record<number, number>;
   /** total points -> count */
   totals: Record<number, number>;
+  /** each team's points -> count */
+  homePts: Record<number, number>;
+  awayPts: Record<number, number>;
   players: PlayerAgg[];
   elapsedMs: number;
 }
@@ -59,6 +62,8 @@ self.onmessage = (event: MessageEvent<WorkerIn>) => {
     sumAway: 0,
     margins: {},
     totals: {},
+    homePts: {},
+    awayPts: {},
     players: [],
     elapsedMs: 0,
   };
@@ -70,6 +75,8 @@ self.onmessage = (event: MessageEvent<WorkerIn>) => {
       const t = r.final.home + r.final.away;
       agg.margins[m] = (agg.margins[m] ?? 0) + 1;
       agg.totals[t] = (agg.totals[t] ?? 0) + 1;
+      agg.homePts[r.final.home] = (agg.homePts[r.final.home] ?? 0) + 1;
+      agg.awayPts[r.final.away] = (agg.awayPts[r.final.away] ?? 0) + 1;
       if (m > 0) agg.homeWins++;
       if (m === 0) agg.ties++;
       agg.sumHome += r.final.home;
