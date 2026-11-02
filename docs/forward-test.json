@@ -1,148 +1,148 @@
 {
-  "quotesRecorded": 2475,
-  "quotesGraded": 171,
+  "quotesRecorded": 2476,
+  "quotesGraded": 578,
   "markets": {
     "line:h2h": {
-      "quotes": 9,
-      "decided": 9,
-      "simA": 0.562,
-      "marketA": 0.64,
-      "actualA": 1.0,
+      "quotes": 108,
+      "decided": 108,
+      "simA": 0.605,
+      "marketA": 0.618,
+      "actualA": 0.75,
       "logLoss": {
-        "sim": 0.5759,
-        "market": 0.447
+        "sim": 0.5013,
+        "market": 0.529
       },
       "valueBets": {
-        "bets": 9,
-        "record": "0-9-0",
-        "units": -9.0,
-        "roi": -1.0,
-        "avgClv": -0.013
+        "bets": 64,
+        "record": "26-38-0",
+        "units": -2.63,
+        "roi": -0.041,
+        "avgClv": -0.018
       }
     },
     "line:h2h_h1": {
-      "quotes": 2,
-      "decided": 2,
-      "simA": 0.555,
-      "marketA": 0.601,
-      "actualA": 1.0,
+      "quotes": 24,
+      "decided": 24,
+      "simA": 0.582,
+      "marketA": 0.599,
+      "actualA": 0.833,
       "logLoss": {
-        "sim": 0.5896,
-        "market": 0.5088
+        "sim": 0.5975,
+        "market": 0.5661
       },
       "valueBets": {
-        "bets": 2,
-        "record": "0-2-0",
-        "units": -2.0,
-        "roi": -1.0,
+        "bets": 10,
+        "record": "1-9-0",
+        "units": -8.54,
+        "roi": -0.854,
         "avgClv": null
       }
     },
     "line:spreads": {
-      "quotes": 9,
-      "decided": 9,
-      "simA": 0.426,
-      "marketA": 0.501,
-      "actualA": 1.0,
+      "quotes": 108,
+      "decided": 108,
+      "simA": 0.479,
+      "marketA": 0.5,
+      "actualA": 0.75,
       "logLoss": {
-        "sim": 0.8527,
-        "market": 0.6903
+        "sim": 0.6848,
+        "market": 0.6946
       },
       "valueBets": {
-        "bets": 9,
-        "record": "0-9-0",
-        "units": -9.0,
-        "roi": -1.0,
-        "avgClv": 0.111
+        "bets": 57,
+        "record": "29-28-0",
+        "units": -1.5,
+        "roi": -0.026,
+        "avgClv": 0.5
       }
     },
     "line:spreads_h1": {
-      "quotes": 2,
-      "decided": 2,
-      "simA": 0.459,
-      "marketA": 0.515,
-      "actualA": 1.0,
+      "quotes": 24,
+      "decided": 24,
+      "simA": 0.472,
+      "marketA": 0.495,
+      "actualA": 0.667,
       "logLoss": {
-        "sim": 0.7798,
-        "market": 0.664
+        "sim": 0.745,
+        "market": 0.6787
       },
       "valueBets": {
-        "bets": 2,
-        "record": "0-2-0",
-        "units": -2.0,
+        "bets": 8,
+        "record": "0-8-0",
+        "units": -8.0,
         "roi": -1.0,
         "avgClv": null
       }
     },
     "line:team_totals_away": {
-      "quotes": 2,
-      "decided": 2,
-      "simA": 0.501,
-      "marketA": 0.537,
-      "actualA": 0.0,
+      "quotes": 24,
+      "decided": 24,
+      "simA": 0.503,
+      "marketA": 0.499,
+      "actualA": 0.333,
       "logLoss": {
-        "sim": 0.6951,
-        "market": 0.77
+        "sim": 0.6734,
+        "market": 0.722
       },
       "valueBets": {
-        "bets": 0,
-        "record": "0-0-0",
-        "units": 0.0,
-        "roi": null,
+        "bets": 15,
+        "record": "11-4-0",
+        "units": 7.24,
+        "roi": 0.483,
         "avgClv": null
       }
     },
     "line:team_totals_home": {
-      "quotes": 2,
-      "decided": 2,
-      "simA": 0.352,
-      "marketA": 0.48,
-      "actualA": 1.0,
+      "quotes": 24,
+      "decided": 24,
+      "simA": 0.481,
+      "marketA": 0.507,
+      "actualA": 0.667,
       "logLoss": {
-        "sim": 1.0427,
-        "market": 0.733
+        "sim": 0.6602,
+        "market": 0.6974
       },
       "valueBets": {
-        "bets": 2,
-        "record": "0-2-0",
-        "units": -2.0,
-        "roi": -1.0,
+        "bets": 14,
+        "record": "8-6-0",
+        "units": 1.39,
+        "roi": 0.099,
         "avgClv": null
       }
     },
     "line:totals": {
-      "quotes": 9,
-      "decided": 9,
-      "simA": 0.369,
-      "marketA": 0.494,
-      "actualA": 0.0,
+      "quotes": 108,
+      "decided": 104,
+      "simA": 0.474,
+      "marketA": 0.498,
+      "actualA": 0.462,
       "logLoss": {
-        "sim": 0.4611,
-        "market": 0.6815
+        "sim": 0.5951,
+        "market": 0.6912
       },
       "valueBets": {
-        "bets": 9,
-        "record": "9-0-0",
-        "units": 7.98,
-        "roi": 0.886,
-        "avgClv": -0.278
+        "bets": 85,
+        "record": "68-13-4",
+        "units": 48.64,
+        "roi": 0.572,
+        "avgClv": -0.271
       }
     },
     "line:totals_h1": {
-      "quotes": 2,
-      "decided": 2,
-      "simA": 0.435,
-      "marketA": 0.489,
-      "actualA": 1.0,
+      "quotes": 24,
+      "decided": 24,
+      "simA": 0.504,
+      "marketA": 0.498,
+      "actualA": 0.5,
       "logLoss": {
-        "sim": 0.8313,
-        "market": 0.7151
+        "sim": 0.6638,
+        "market": 0.7044
       },
       "valueBets": {
-        "bets": 2,
-        "record": "0-2-0",
-        "units": -2.0,
-        "roi": -1.0,
+        "bets": 13,
+        "record": "9-4-0",
+        "units": 4.58,
+        "roi": 0.352,
         "avgClv": null
       }
     },
