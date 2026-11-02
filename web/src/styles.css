@@ -974,3 +974,23 @@ tbody tr:last-child td {
   font-weight: 600;
   color: var(--rr-text-tertiary, var(--rr-text-secondary));
 }
+
+/* ------------------------------------------------------------ Final card */
+
+.call {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 6px;
+  font: var(--rr-text-caption);
+  font-weight: 600;
+}
+
+.call.hit {
+  background: var(--rr-positive-tint);
+  color: var(--rr-positive);
+}
+
+.call.miss {
+  background: var(--rr-chart-grid);
+  color: var(--rr-text-secondary);
+}

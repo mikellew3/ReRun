@@ -168,6 +168,7 @@ def clv(r: pd.Series, side: str, g: pd.Series) -> float | None:
 
 
 def grade(records: pd.DataFrame) -> pd.DataFrame:
+    records = records[records["kind"] != "game"]  # projections, not bets
     seasons = sorted({int(g[:4]) for g in records["gameId"]})
     games = game_results(seasons)
     stats = player_stats(seasons)

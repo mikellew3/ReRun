@@ -264,3 +264,39 @@ def test_snapshot_matches_typescript_types():
     for game in s["games"]:
         assert set(game) == GAME_KEYS
         assert game["home"] in s["teams"] and game["away"] in s["teams"]
+
+
+def test_pregame_projection_is_last_record_before_kickoff(tmp_path):
+    from build_snapshot import pregame_projections
+
+    def row(t: str, home: float) -> str:
+        return json.dumps(
+            {
+                "kind": "game",
+                "gameId": "2026_08_CAR_GB",
+                "kickoff": "2026-10-30T00:15:00Z",
+                "t": t,
+                "snapshot": "x",
+                "sims": 2000,
+                "homePts": home,
+                "awayPts": 20.0,
+                "homeWin": 0.55,
+                "tie": 0.0,
+                "margins": {"3": 2000},
+                "totals": {"43": 2000},
+            }
+        )
+
+    (tmp_path / "2026-W08.jsonl").write_text(
+        "\n".join(
+            [
+                row("2026-10-29T05:00:00Z", 21.0),
+                row("2026-10-29T17:00:00Z", 22.7),  # the last one before kickoff
+                row("2026-10-30T01:00:00Z", 99.0),  # after kickoff: ignored
+                '{"kind":"line","gameId":"2026_08_CAR_GB"}',
+            ]
+        )
+    )
+    p = pregame_projections(2026, 8, tmp_path)["2026_08_CAR_GB"]
+    assert p["homePts"] == 22.7
+    assert p["homeDist"] == {}  # older records without team distributions

@@ -399,6 +399,23 @@ export interface GameResult {
   closingTotal: number | null;
 }
 
+/** The forward test's last pregame sim of a game (jobs/recordForward.ts), attached once it
+ *  kicks off. Distributions map a value to its number of sims. */
+export interface GameProjection {
+  /** When it was simmed, and from which snapshot. */
+  t: string;
+  snapshot: string;
+  sims: number;
+  homePts: number;
+  awayPts: number;
+  homeWin: number;
+  tie: number;
+  margins: Record<number, number>;
+  totals: Record<number, number>;
+  homeDist: Record<number, number>;
+  awayDist: Record<number, number>;
+}
+
 export interface SnapshotGame {
   gameId: GameId;
   /** ISO timestamp. */
@@ -426,6 +443,8 @@ export interface SnapshotGame {
   props?: PropLine[];
   /** Once status is 'final'. */
   result?: GameResult;
+  /** Once the game has kicked off: the sim's final pregame projection. */
+  projection?: GameProjection;
 }
 
 // ---------------------------------------------------------------------------

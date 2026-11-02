@@ -8,8 +8,13 @@
  * Games are recorded within config forwardTest.recordWithinHours of kickoff; a game's new
  * record replaces its earlier one, so each week's file ends as the last pre-kickoff numbers.
  *
- * Usage: npx tsx jobs/recordForward.ts <snapshot.json> [--dir forward-test]
- * Writes <dir>/<season>-W<week>.jsonl.
+ * Each game also gets one 'game' row: the projected score, win chance and the margin and total
+ * distributions, which the snapshot attaches to the game once it has kicked off (the site's
+ * Final card shows it next to the result).
+ *
+ * Usage: npx tsx jobs/recordForward.ts <snapshot.json> [--dir forward-test] [--now <iso>]
+ * Writes <dir>/<season>-W<week>.jsonl. --now re-creates a past record (the sim is
+ * deterministic: same snapshot, settings and seed give the same numbers).
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -35,7 +40,7 @@ const dir = arg('dir', 'forward-test');
 const cfg = MODEL_CONFIG.forwardTest;
 const n = cfg.sims;
 const seed = 2026;
-const now = new Date();
+const now = new Date(arg('now', new Date().toISOString()));
 const out = join(dir, `${snapshot.id.slice(0, 8)}.jsonl`);
 mkdirSync(dir, { recursive: true });
 
@@ -98,6 +103,29 @@ for (const game of snapshot.games) {
     gameId: game.gameId,
     kickoff: game.kickoff,
   };
+
+  // The game itself: projected score and distributions (value -> sims).
+  const counts = (vals: number[]) => {
+    const c: Record<number, number> = {};
+    for (const v of vals) c[v] = (c[v] ?? 0) + 1;
+    return c;
+  };
+  const mean = (vals: number[]) => vals.reduce((a, b) => a + b, 0) / vals.length;
+  rows.push(
+    JSON.stringify({
+      ...base,
+      kind: 'game',
+      sims: results.length,
+      homePts: r4(mean(homePts)),
+      awayPts: r4(mean(awayPts)),
+      homeWin: r4(margin.filter((m) => m > 0).length / results.length),
+      tie: r4(margin.filter((m) => m === 0).length / results.length),
+      margins: counts(margin),
+      totals: counts(total),
+      homeDist: counts(homePts),
+      awayDist: counts(awayPts),
+    }),
+  );
 
   // Game lines: each book's latest quote. Side a = home (spreads, moneylines) or over.
   for (const h of game.lineHistory ?? []) {

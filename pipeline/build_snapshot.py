@@ -20,12 +20,14 @@ import json
 import math
 import re
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pandas as pd
 
 from common.config import config_hash, history_windows, model_config
 from common.io import (
+    PIPELINE_DIR,
     SNAPSHOTS_DIR,
     STADIUMS_CSV,
     fits_dir,
@@ -405,6 +407,29 @@ def final_result(g: pd.Series) -> dict:
     }
 
 
+FORWARD_TEST_DIR = PIPELINE_DIR.parent / "forward-test"
+
+
+def pregame_projections(season: int, week: int, folder: Path = FORWARD_TEST_DIR) -> dict[str, dict]:
+    """The forward test's last pregame projection per game (jobs/recordForward.ts 'game' rows),
+    attached to games once they kick off so the site can show projected vs final."""
+    path = folder / f"{season}-W{week:02d}.jsonl"
+    if not path.exists():
+        return {}
+    out: dict[str, dict] = {}
+    for line in path.read_text().splitlines():
+        r = json.loads(line) if line.strip() else {}
+        if r.get("kind") != "game":
+            continue
+        if r["t"] < r["kickoff"] and (r["gameId"] not in out or r["t"] > out[r["gameId"]]["t"]):
+            out[r["gameId"]] = r
+    keys = ("t", "snapshot", "sims", "homePts", "awayPts", "homeWin", "tie")
+    dists = ("margins", "totals", "homeDist", "awayDist")
+    return {
+        g: {**{k: r[k] for k in keys}, **{k: r.get(k, {}) for k in dists}} for g, r in out.items()
+    }
+
+
 def build_games(
     slate: pd.DataFrame,
     as_of: datetime,
@@ -499,6 +524,10 @@ def build_snapshot(
 
         forecast = forecast_for
     games = build_games(slate, as_of, Stadiums(), forecast=forecast, status_at=status_at)
+    projections = pregame_projections(season, week) if status_at is not None else {}
+    for game in games:
+        if game["status"] != "scheduled" and game["gameId"] in projections:
+            game["projection"] = projections[game["gameId"]]
     lines_at = None
     if LINES_HISTORY.exists():
         history = json.loads(LINES_HISTORY.read_text())
