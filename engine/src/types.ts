@@ -391,6 +391,14 @@ export interface PropLine {
   books: { book: string; open: PropQuote; current: PropQuote }[];
 }
 
+export interface GameResult {
+  home: number;
+  away: number;
+  /** nflverse closing lines: the home team's spread, and the total. */
+  closingSpread: number | null;
+  closingTotal: number | null;
+}
+
 export interface SnapshotGame {
   gameId: GameId;
   /** ISO timestamp. */
@@ -416,6 +424,8 @@ export interface SnapshotGame {
   lineHistory?: LineHistory[];
   /** DraftKings/FanDuel player props (pipeline/fetch_lines.py). Absent in older snapshots. */
   props?: PropLine[];
+  /** Once status is 'final'. */
+  result?: GameResult;
 }
 
 // ---------------------------------------------------------------------------

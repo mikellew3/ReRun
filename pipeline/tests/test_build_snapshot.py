@@ -89,6 +89,8 @@ def test_game_status_is_relative_to_as_of():
                 "home_team": "KC",
                 "away_team": "DEN",
                 "result": 2.0,
+                "home_score": 16,
+                "away_score": 14,
                 "stadium": "GEHA Field at Arrowhead Stadium",
                 "stadium_id": "KAN00",
                 "location": "Home",
@@ -101,7 +103,18 @@ def test_game_status_is_relative_to_as_of():
     before = build_games(slate, datetime(2024, 11, 9, tzinfo=UTC), Stadiums(), texts)
     after = build_games(slate, datetime(2024, 11, 11, tzinfo=UTC), Stadiums(), texts)
     assert before[0]["status"] == "scheduled"
+    assert "result" not in before[0]  # no leaked score
     assert after[0]["status"] == "final"
+    assert after[0]["result"]["home"] == 16 and after[0]["result"]["away"] == 14
+    # Live publishes judge status at publish time, not at the fits' as_of.
+    live = build_games(
+        slate,
+        datetime(2024, 11, 9, tzinfo=UTC),
+        Stadiums(),
+        texts,
+        status_at=datetime(2024, 11, 11, tzinfo=UTC),
+    )
+    assert live[0]["status"] == "final"
     # A game already played carries its game-time weather (backtests).
     assert before[0]["weather"]["windMph"] == 18.0
     assert before[0]["weather"]["precip"] == "light_snow"

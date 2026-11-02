@@ -545,6 +545,8 @@ export const MODEL_CONFIG = {
      */
     sharpGapWinProb: 0.02,
     sharpGapTotalPts: 1,
+    /** Line history keeps a game this long after kickoff, so final games can be settled. */
+    keepDaysAfterKickoff: 8,
     /** A move this big since open (points) counts as "the line moved". */
     minMovePts: 0.5,
   },

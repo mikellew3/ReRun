@@ -21,6 +21,7 @@ import { Icon } from './icons';
 import { EdgesCard, MarketCard, marketSpread, marketTotal } from './market';
 import { PropsCard } from './props';
 import { TeamTotals } from './teamTotals';
+import { FinalCard, isClosed } from './finalCard';
 import type { Aggregate, WorkerOut } from './sim.worker';
 
 function kickoffLabel(iso: string): string {
@@ -238,7 +239,7 @@ export function App() {
         ).json()) as { path: string };
         const snap = (await (await fetch(latest.path)).json()) as SlateSnapshot;
         setSnapshot(snap);
-        const first = snap.games.find((g) => g.status === 'scheduled') ?? snap.games[0];
+        const first = snap.games.find((g) => !isClosed(g)) ?? snap.games[snap.games.length - 1];
         if (first) setGameId(first.gameId);
       } catch (err) {
         setLoadError(err instanceof Error ? err.message : String(err));
@@ -248,9 +249,10 @@ export function App() {
   }, []);
 
   const game: SnapshotGame | undefined = snapshot?.games.find((g) => g.gameId === gameId);
+  const closed = game ? isClosed(game) : false;
 
   function run() {
-    if (!snapshot || !game) return;
+    if (!snapshot || !game || isClosed(game)) return;
     workerRef.current?.terminate();
     const worker = new Worker(new URL('./sim.worker.ts', import.meta.url), { type: 'module' });
     workerRef.current = worker;
@@ -273,7 +275,7 @@ export function App() {
   }
 
   // Results belong to the game they were run on.
-  const shown = agg && game && agg.gameId === game.gameId ? agg : null;
+  const shown = agg && game && agg.gameId === game.gameId && !closed ? agg : null;
 
   const summary = useMemo(() => {
     if (!shown || shown.done === 0 || !snapshot || !game) return null;
@@ -341,43 +343,57 @@ export function App() {
                 <select value={gameId} onChange={(e) => setGameId(e.target.value)}>
                   {snapshot.games.map((g) => (
                     <option key={g.gameId} value={g.gameId}>
-                      {g.away} @ {g.home} · {kickoffLabel(g.kickoff)}
+                      {g.away} @ {g.home} ·{' '}
+                      {g.result
+                        ? `Final ${g.result.away}–${g.result.home}`
+                        : isClosed(g)
+                          ? 'Started'
+                          : kickoffLabel(g.kickoff)}
                     </option>
                   ))}
                 </select>
               </label>
-              <label className="field">
-                <span className="caption">Sims</span>
-                <select
-                  value={nSims}
-                  onChange={(e) => setNSims(Number(e.target.value) as SimCount)}
-                >
-                  {GAME_CONTROLS.nSims.options.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="button"
-                className="btn-run num"
-                onClick={run}
-                disabled={!game}
-                aria-busy={running}
-              >
-                {running && <span className="sweep" style={{ width: `${100 * progress}%` }} />}
-                <span className="btn-run-label">
-                  {running ? (
-                    `Running… ${(agg?.done ?? 0).toLocaleString()} / ${nSims.toLocaleString()}`
-                  ) : (
-                    <>
-                      <Icon name="play" size={20} />
-                      Run {nSims.toLocaleString()} sims
-                    </>
-                  )}
-                </span>
-              </button>
+              {closed ? (
+                <p className="small muted">
+                  This game has kicked off, so it can&apos;t be simmed. Its result shows on the
+                  right once it&apos;s final.
+                </p>
+              ) : (
+                <>
+                  <label className="field">
+                    <span className="caption">Sims</span>
+                    <select
+                      value={nSims}
+                      onChange={(e) => setNSims(Number(e.target.value) as SimCount)}
+                    >
+                      {GAME_CONTROLS.nSims.options.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    className="btn-run num"
+                    onClick={run}
+                    disabled={!game}
+                    aria-busy={running}
+                  >
+                    {running && <span className="sweep" style={{ width: `${100 * progress}%` }} />}
+                    <span className="btn-run-label">
+                      {running ? (
+                        `Running… ${(agg?.done ?? 0).toLocaleString()} / ${nSims.toLocaleString()}`
+                      ) : (
+                        <>
+                          <Icon name="play" size={20} />
+                          Run {nSims.toLocaleString()} sims
+                        </>
+                      )}
+                    </span>
+                  </button>
+                </>
+              )}
               <span className="caption muted meta">{dataLine(snapshot)}</span>
             </section>
             {game && <GameCard snapshot={snapshot} game={game} />}
@@ -388,7 +404,9 @@ export function App() {
 
             {runError && <p className="error">{runError}</p>}
 
-            {!summary && !runError && (
+            {closed && game && <FinalCard game={game} />}
+
+            {!closed && !summary && !runError && (
               <section className="card empty">
                 <h2>No results yet</h2>
                 <p className="muted">
@@ -399,7 +417,7 @@ export function App() {
             )}
 
             {/* Before a run, props sit at the bottom; after, just above player projections. */}
-            {!summary && game && <PropsCard game={game} snapshot={snapshot} />}
+            {!summary && !closed && game && <PropsCard game={game} snapshot={snapshot} />}
 
             {summary && game && (
               <>

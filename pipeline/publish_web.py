@@ -49,7 +49,8 @@ def next_web_version(season: int, week: int) -> int:
 
 def publish(season: int, week: int, weather: bool) -> str:
     version = next_web_version(season, week)
-    print(run_slate(season, week, version, weather=weather))
+    # Game status and final scores as of now (fits stay as of the week's first kickoff).
+    print(run_slate(season, week, version, weather=weather, status_at=datetime.now(UTC)))
     snap_id = f"{season}-W{week:02d}-v{version}"
     src = SNAPSHOTS_DIR / f"{snap_id}.json"
     for old in WEB_SNAPSHOTS.glob("*-W*-v*.json"):

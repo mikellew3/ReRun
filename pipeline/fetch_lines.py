@@ -39,8 +39,10 @@ from common.teams import abbr
 HISTORY_PATH = DATA_DIR / "lines" / "history.json"
 SHARPAPI_BASE = "https://api.sharpapi.io/api/v1"
 ODDS_API_BASE = "https://api.the-odds-api.com/v4"
-# Games are dropped from the history this long after kickoff.
-KEEP_AFTER_KICKOFF = timedelta(days=3)
+# Games are dropped from the history this long after kickoff (config
+# lineMovement.keepDaysAfterKickoff): long enough that a finished game keeps its last pregame lines
+# until its week's slate is replaced, so the site can settle them.
+KEEP_AFTER_KICKOFF = timedelta(days=model_config()["lineMovement"]["keepDaysAfterKickoff"])
 
 Quote = dict[str, Any]  # {game, home, away, kickoff, book, market, line, a, b, t}
 

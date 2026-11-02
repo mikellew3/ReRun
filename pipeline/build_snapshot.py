@@ -393,16 +393,32 @@ def game_weather(g, site: dict, kickoff: datetime, texts: dict, forecast):
     return None
 
 
+def final_result(g: pd.Series) -> dict:
+    """Final score plus nflverse's closing spread (home line) and total, for settling."""
+    spread = g.get("spread_line")
+    total = g.get("total_line")
+    return {
+        "home": int(g["home_score"]),
+        "away": int(g["away_score"]),
+        "closingSpread": None if pd.isna(spread) else -float(spread),
+        "closingTotal": None if pd.isna(total) else float(total),
+    }
+
+
 def build_games(
     slate: pd.DataFrame,
     as_of: datetime,
     stadiums: Stadiums,
     weather_texts: dict[str, str] | None = None,
     forecast=None,
+    status_at: datetime | None = None,
 ) -> list[dict]:
     """weather_texts: game_id -> nflverse weather text; read from play-by-play if not given.
     forecast: (stadium facts, kickoff) -> weather dict or None, for games not yet played
-    (fetch_weather.forecast_for on live builds); None = no forecasts."""
+    (fetch_weather.forecast_for on live builds); None = no forecasts.
+    status_at: when to judge each game's status (and attach final scores). Live publishes pass
+    the publish time; backtests leave it at as_of so no results leak in."""
+    status_at = status_at or as_of
     texts = (
         weather_texts
         if weather_texts is not None
@@ -411,8 +427,7 @@ def build_games(
     games = []
     for _, g in slate.sort_values(["gameday", "gametime", "game_id"]).iterrows():
         kickoff = kickoff_utc(g["gameday"], g["gametime"])
-        # Status is relative to as_of, so historical (backtest) snapshots don't leak results.
-        if kickoff > as_of:
+        if kickoff > status_at:
             status = "scheduled"
         elif pd.notna(g["result"]):
             status = "final"
@@ -438,6 +453,7 @@ def build_games(
                 "market": [],
                 "marketUsage": {},
             }
+            | ({"result": final_result(g)} if status == "final" else {})
         )
     return games
 
@@ -449,10 +465,15 @@ def next_version(season: int, week: int) -> int:
 
 
 def build_snapshot(
-    season: int, week: int, as_of: datetime, version: int, weather: bool = True
+    season: int,
+    week: int,
+    as_of: datetime,
+    version: int,
+    weather: bool = True,
+    status_at: datetime | None = None,
 ) -> dict:
     """weather: fetch forecasts for games that haven't kicked off yet. Games already played
-    always carry observed game-time weather (backtests)."""
+    always carry observed game-time weather (backtests). status_at: see build_games."""
     fdir = fits_dir(season, week)
     base = read_json(fdir / "league_base.json")
     teams_fit = read_json(fdir / "teams.json")
@@ -477,7 +498,7 @@ def build_snapshot(
         from fetch_weather import forecast_for
 
         forecast = forecast_for
-    games = build_games(slate, as_of, Stadiums(), forecast=forecast)
+    games = build_games(slate, as_of, Stadiums(), forecast=forecast, status_at=status_at)
     lines_at = None
     if LINES_HISTORY.exists():
         history = json.loads(LINES_HISTORY.read_text())
