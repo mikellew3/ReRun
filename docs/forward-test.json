@@ -1,16 +1,16 @@
 {
   "quotesRecorded": 7766,
-  "quotesGraded": 7047,
+  "quotesGraded": 7078,
   "markets": {
     "line:h2h": {
-      "quotes": 387,
-      "decided": 387,
-      "simA": 0.498,
-      "marketA": 0.517,
-      "actualA": 0.442,
+      "quotes": 396,
+      "decided": 396,
+      "simA": 0.507,
+      "marketA": 0.524,
+      "actualA": 0.455,
       "logLoss": {
-        "sim": 0.5329,
-        "market": 0.5106
+        "sim": 0.5243,
+        "market": 0.5029
       },
       "valueBets": {
         "bets": 245,
@@ -39,14 +39,14 @@
       }
     },
     "line:spreads": {
-      "quotes": 387,
-      "decided": 387,
+      "quotes": 396,
+      "decided": 396,
       "simA": 0.482,
       "marketA": 0.499,
-      "actualA": 0.393,
+      "actualA": 0.407,
       "logLoss": {
-        "sim": 0.7262,
-        "market": 0.6918
+        "sim": 0.7259,
+        "market": 0.692
       },
       "valueBets": {
         "bets": 245,
@@ -75,14 +75,14 @@
       }
     },
     "line:team_totals_away": {
-      "quotes": 86,
-      "decided": 86,
+      "quotes": 88,
+      "decided": 88,
       "simA": 0.494,
       "marketA": 0.501,
-      "actualA": 0.512,
+      "actualA": 0.5,
       "logLoss": {
-        "sim": 0.7458,
-        "market": 0.7053
+        "sim": 0.7442,
+        "market": 0.7051
       },
       "valueBets": {
         "bets": 59,
@@ -93,14 +93,14 @@
       }
     },
     "line:team_totals_home": {
-      "quotes": 86,
-      "decided": 86,
-      "simA": 0.472,
+      "quotes": 88,
+      "decided": 88,
+      "simA": 0.474,
       "marketA": 0.504,
-      "actualA": 0.512,
+      "actualA": 0.5,
       "logLoss": {
-        "sim": 0.6996,
-        "market": 0.6975
+        "sim": 0.7011,
+        "market": 0.6977
       },
       "valueBets": {
         "bets": 54,
@@ -111,13 +111,13 @@
       }
     },
     "line:totals": {
-      "quotes": 387,
-      "decided": 383,
-      "simA": 0.462,
+      "quotes": 396,
+      "decided": 392,
+      "simA": 0.463,
       "marketA": 0.499,
-      "actualA": 0.525,
+      "actualA": 0.513,
       "logLoss": {
-        "sim": 0.6683,
+        "sim": 0.6696,
         "market": 0.6933
       },
       "valueBets": {
