@@ -1,6 +1,6 @@
 {
-  "quotesRecorded": 9872,
-  "quotesGraded": 9024,
+  "quotesRecorded": 10045,
+  "quotesGraded": 9156,
   "markets": {
     "line:h2h": {
       "quotes": 504,
@@ -147,103 +147,103 @@
       }
     },
     "prop:player_anytime_td": {
-      "quotes": 2539,
-      "decided": 2539,
-      "simA": 0.168,
+      "quotes": 2583,
+      "decided": 2583,
+      "simA": 0.169,
       "marketA": 0.197,
-      "actualA": 0.182,
+      "actualA": 0.181,
       "logLoss": {
-        "sim": 0.4397,
-        "market": 0.4036
+        "sim": 0.4414,
+        "market": 0.404
       },
       "valueBets": {
-        "bets": 624,
-        "record": "122-502-0",
-        "units": 117.22,
-        "roi": 0.188,
+        "bets": 640,
+        "record": "122-518-0",
+        "units": 101.22,
+        "roi": 0.158,
         "avgClv": null
       }
     },
     "prop:player_pass_attempts": {
-      "quotes": 110,
-      "decided": 110,
+      "quotes": 112,
+      "decided": 112,
       "simA": 0.519,
       "marketA": 0.502,
-      "actualA": 0.482,
+      "actualA": 0.491,
       "logLoss": {
-        "sim": 0.7476,
-        "market": 0.6934
+        "sim": 0.7462,
+        "market": 0.6928
       },
       "valueBets": {
-        "bets": 81,
-        "record": "44-37-0",
-        "units": 2.34,
-        "roi": 0.029,
+        "bets": 83,
+        "record": "45-38-0",
+        "units": 2.17,
+        "roi": 0.026,
         "avgClv": null
       }
     },
     "prop:player_pass_completions": {
-      "quotes": 110,
-      "decided": 110,
-      "simA": 0.494,
+      "quotes": 112,
+      "decided": 112,
+      "simA": 0.495,
       "marketA": 0.499,
-      "actualA": 0.455,
+      "actualA": 0.464,
       "logLoss": {
-        "sim": 0.7877,
-        "market": 0.6898
+        "sim": 0.7856,
+        "market": 0.6899
       },
       "valueBets": {
-        "bets": 84,
-        "record": "40-44-0",
-        "units": -8.84,
+        "bets": 86,
+        "record": "41-45-0",
+        "units": -8.99,
         "roi": -0.105,
         "avgClv": null
       }
     },
     "prop:player_pass_interceptions": {
-      "quotes": 112,
-      "decided": 112,
-      "simA": 0.46,
-      "marketA": 0.492,
-      "actualA": 0.554,
+      "quotes": 114,
+      "decided": 114,
+      "simA": 0.458,
+      "marketA": 0.491,
+      "actualA": 0.544,
       "logLoss": {
-        "sim": 0.7126,
-        "market": 0.6797
+        "sim": 0.7082,
+        "market": 0.6781
       },
       "valueBets": {
-        "bets": 83,
-        "record": "47-36-0",
-        "units": 5.23,
-        "roi": 0.063,
+        "bets": 84,
+        "record": "48-36-0",
+        "units": 5.93,
+        "roi": 0.071,
         "avgClv": null
       }
     },
     "prop:player_pass_tds": {
-      "quotes": 220,
-      "decided": 220,
-      "simA": 0.473,
-      "marketA": 0.493,
-      "actualA": 0.445,
+      "quotes": 224,
+      "decided": 224,
+      "simA": 0.472,
+      "marketA": 0.494,
+      "actualA": 0.438,
       "logLoss": {
-        "sim": 0.726,
-        "market": 0.6844
+        "sim": 0.7242,
+        "market": 0.6852
       },
       "valueBets": {
-        "bets": 126,
-        "record": "65-61-0",
-        "units": -9.57,
-        "roi": -0.076,
+        "bets": 128,
+        "record": "67-61-0",
+        "units": -7.51,
+        "roi": -0.059,
         "avgClv": null
       }
     },
     "prop:player_pass_yds": {
-      "quotes": 220,
-      "decided": 220,
+      "quotes": 224,
+      "decided": 224,
       "simA": 0.49,
       "marketA": 0.5,
-      "actualA": 0.505,
+      "actualA": 0.504,
       "logLoss": {
-        "sim": 0.7533,
+        "sim": 0.7517,
         "market": 0.693
       },
       "valueBets": {
@@ -255,74 +255,74 @@
       }
     },
     "prop:player_reception_yds": {
-      "quotes": 1406,
-      "decided": 1406,
+      "quotes": 1436,
+      "decided": 1436,
       "simA": 0.465,
       "marketA": 0.499,
-      "actualA": 0.47,
+      "actualA": 0.469,
       "logLoss": {
-        "sim": 0.7595,
-        "market": 0.6932
+        "sim": 0.7592,
+        "market": 0.693
       },
       "valueBets": {
-        "bets": 970,
-        "record": "502-468-0",
-        "units": -21.89,
-        "roi": -0.023,
+        "bets": 991,
+        "record": "511-480-0",
+        "units": -25.83,
+        "roi": -0.026,
         "avgClv": null
       }
     },
     "prop:player_receptions": {
-      "quotes": 1397,
-      "decided": 1397,
+      "quotes": 1427,
+      "decided": 1427,
       "simA": 0.437,
       "marketA": 0.486,
-      "actualA": 0.447,
+      "actualA": 0.445,
       "logLoss": {
-        "sim": 0.7471,
-        "market": 0.6803
+        "sim": 0.7468,
+        "market": 0.6812
       },
       "valueBets": {
-        "bets": 1032,
-        "record": "520-512-0",
-        "units": -73.62,
-        "roi": -0.071,
+        "bets": 1050,
+        "record": "530-520-0",
+        "units": -70.19,
+        "roi": -0.067,
         "avgClv": null
       }
     },
     "prop:player_rush_attempts": {
-      "quotes": 193,
-      "decided": 193,
+      "quotes": 195,
+      "decided": 195,
       "simA": 0.44,
       "marketA": 0.494,
-      "actualA": 0.404,
+      "actualA": 0.4,
       "logLoss": {
-        "sim": 0.8673,
-        "market": 0.6921
+        "sim": 0.8647,
+        "market": 0.6916
       },
       "valueBets": {
-        "bets": 151,
-        "record": "72-79-0",
-        "units": -15.49,
+        "bets": 153,
+        "record": "73-80-0",
+        "units": -15.78,
         "roi": -0.103,
         "avgClv": null
       }
     },
     "prop:player_rush_yds": {
-      "quotes": 645,
-      "decided": 645,
-      "simA": 0.486,
+      "quotes": 657,
+      "decided": 657,
+      "simA": 0.489,
       "marketA": 0.499,
       "actualA": 0.467,
       "logLoss": {
-        "sim": 0.7918,
-        "market": 0.693
+        "sim": 0.7962,
+        "market": 0.6931
       },
       "valueBets": {
-        "bets": 534,
-        "record": "245-289-0",
-        "units": -69.9,
-        "roi": -0.131,
+        "bets": 544,
+        "record": "247-297-0",
+        "units": -76.08,
+        "roi": -0.14,
         "avgClv": null
       }
     }
